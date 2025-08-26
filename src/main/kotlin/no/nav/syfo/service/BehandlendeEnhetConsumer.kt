@@ -43,7 +43,7 @@ class BehandlendeEnhetConsumer(
                 runBlocking {
                     norg2Client.hentAlleArbeidsfordelinger(criteria, MdcUtils.getCallId())
                 }
-            logger.info("Fant enheter: $arbeidsfordelinger")
+            sikkerlogger.debug("Fant enheter: $arbeidsfordelinger")
             val behandlendeEnhet =
                 finnAktivBehandlendeEnhet(
                     arbeidsfordelinger,
@@ -52,7 +52,7 @@ class BehandlendeEnhetConsumer(
             if (SYKEPENGER_UTLAND == behandlendeEnhet) {
                 metrikk.tellInntektsmeldingSykepengerUtland()
             }
-            logger.info(
+            sikkerlogger.debug(
                 "Fant geografiskTilknytning ${geografiskTilknytning.geografiskTilknytning} med behandlendeEnhet $behandlendeEnhet for inntektsmelding $uuid",
             )
             return behandlendeEnhet
@@ -78,7 +78,7 @@ class BehandlendeEnhetConsumer(
 
     fun gjelderUtland(oppgave: UtsattOppgaveEntitet): Boolean {
         val behandlendeEnhet = this.hentBehandlendeEnhet(oppgave.fnr, oppgave.inntektsmeldingId)
-        logger.info("Fant enhet $behandlendeEnhet for ${oppgave.arkivreferanse}")
+        sikkerlogger.debug("Fant enhet $behandlendeEnhet for ${oppgave.arkivreferanse}")
         return (SYKEPENGER_UTLAND == behandlendeEnhet)
     }
 }

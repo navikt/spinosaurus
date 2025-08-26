@@ -74,13 +74,13 @@ class InntektsmeldingBehandler(
             inntektsmelding.aktorId = aktorid
             if (inntektsmeldingService.isDuplicate(inntektsmelding)) {
                 metrikk.tellFunksjonellLikhet()
-                logger.info("Likhetssjekk: finnes fra før ${inntektsmelding.arkivRefereranse} og blir feilregistrert")
+                logger.debug("Likhetssjekk: finnes fra før ${inntektsmelding.arkivRefereranse} og blir feilregistrert")
                 if (JournalStatus.MOTTATT == inntektsmelding.journalStatus) {
                     journalpostService.feilregistrerJournalpost(inntektsmelding)
                     metrikk.tellInntektsmeldingerFeilregistrert()
                 }
             } else {
-                logger.info("Likhetssjekk: ingen like detaljer fra før for ${inntektsmelding.arkivRefereranse}")
+                logger.debug("Likhetssjekk: ingen like detaljer fra før for ${inntektsmelding.arkivRefereranse}")
                 if (JournalStatus.MOTTATT == inntektsmelding.journalStatus) {
                     metrikk.tellInntektsmeldingerMottatt(inntektsmelding)
 

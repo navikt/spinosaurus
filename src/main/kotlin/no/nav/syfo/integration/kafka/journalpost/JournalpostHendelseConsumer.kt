@@ -71,12 +71,12 @@ class JournalpostHendelseConsumer(
         when (findStatus(journalpostDTO)) {
             JournalpostStatus.Ny -> lagreBakgrunnsjobb(journalpostDTO)
             JournalpostStatus.IkkeInntektsmelding ->
-                logger.info(
+                logger.debug(
                     "Ignorerte journalposthendelse ${journalpostDTO.hendelsesId}. Kanal: ${journalpostDTO.mottaksKanal} Tema: ${journalpostDTO.temaNytt} Status: ${journalpostDTO.journalpostStatus}",
                 )
 
             JournalpostStatus.FeilHendelseType ->
-                logger.info(
+                logger.debug(
                     "Ingorerte JournalpostHendelse ${journalpostDTO.hendelsesId} av type ${journalpostDTO.hendelsesType} med referanse: ${journalpostDTO.kanalReferanseId}",
                 )
         }
@@ -93,7 +93,7 @@ class JournalpostHendelseConsumer(
     }
 
     private fun lagreBakgrunnsjobb(hendelse: InngaaendeJournalpostDTO) {
-        logger.info("Lagrer inntektsmelding ${hendelse.kanalReferanseId} for hendelse ${hendelse.hendelsesId}")
+        logger.debug("Lagrer inntektsmelding ${hendelse.kanalReferanseId} for hendelse ${hendelse.hendelsesId}")
         bakgrunnsjobbRepo.save(
             Bakgrunnsjobb(
                 type = JoarkInntektsmeldingHendelseProsessor.JOB_TYPE,

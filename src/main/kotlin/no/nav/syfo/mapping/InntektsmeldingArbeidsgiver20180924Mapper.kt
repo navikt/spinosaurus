@@ -31,7 +31,7 @@ internal object InntektsmeldingArbeidsgiver20180924Mapper {
         journalStatus: JournalStatus,
         arkivReferanse: String,
     ): Inntektsmelding {
-        logger.info("Behandling inntektsmelding på 20180924 format")
+        logger.debug("Behandling inntektsmelding på 20180924 format")
         val skjemainnhold = (jabxInntektsmelding.value as XMLInntektsmeldingM).skjemainnhold
 
         val arbeidsforholdId =
