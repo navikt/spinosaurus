@@ -26,7 +26,7 @@ fun Route.syfoinntektsmelding(
             call.parameters["inntektsmeldingId"] ?: throw IllegalArgumentException(
                 "Forventet inntektsmeldingId som path parameter",
             )
-        logger().info("Fikk request om å hente inntektsmelding med id: $inntektsmeldingId")
+        logger().debug("Fikk request om å hente inntektsmelding med id: $inntektsmeldingId")
 
         try {
             val dto = imRepo.findByUuid(inntektsmeldingId)
@@ -42,7 +42,7 @@ fun Route.syfoinntektsmelding(
                         dto.uuid,
                     )
 
-                logger().info("Henter inntektsmelding med arkivreferanse: ${inntektsmelding.arkivRefereranse}")
+                logger().debug("Henter inntektsmelding med arkivreferanse: ${inntektsmelding.arkivRefereranse}")
 
                 call.respond(HttpStatusCode.OK, mappedInntektsmelding)
             } else {

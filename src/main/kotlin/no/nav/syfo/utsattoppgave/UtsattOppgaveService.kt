@@ -34,7 +34,7 @@ class UtsattOppgaveService(
             logger.info("Mottok oppdatering på en ukjent oppgave for id: ${oppdatering.id}")
             return
         }
-        logger.info("Fant oppgave for inntektsmelding: ${oppgave.arkivreferanse} med tilstand: ${oppgave.tilstand.name}")
+        logger.debug("Fant oppgave for inntektsmelding: ${oppgave.arkivreferanse} med tilstand: ${oppgave.tilstand.name}")
         val gjelderSpeil = oppdatering.oppdateringstype.erSpeilRelatert()
         when (oppgave.tilstand to oppdatering.handling) {
             (Tilstand.Utsatt to Handling.Utsett) -> {
@@ -46,13 +46,13 @@ class UtsattOppgaveService(
                 }
                 lagre(oppgave)
                 metrikk.tellUtsattOppgaveUtsett()
-                logger.info("Oppdaterte timeout på inntektsmelding: ${oppgave.arkivreferanse} til ${oppdatering.timeout}")
+                logger.debug("Oppdaterte timeout på inntektsmelding: ${oppgave.arkivreferanse} til ${oppdatering.timeout}")
             }
             (Tilstand.Utsatt to Handling.Forkast) -> {
                 oppgave.oppdatert = LocalDateTime.now()
                 lagre(oppgave.copy(tilstand = Tilstand.Forkastet, speil = gjelderSpeil))
                 metrikk.tellUtsattOppgaveForkast()
-                logger.info("Endret oppgave: ${oppgave.arkivreferanse} til tilstand: ${Tilstand.Forkastet.name}")
+                logger.debug("Endret oppgave: ${oppgave.arkivreferanse} til tilstand: ${Tilstand.Forkastet.name}")
             }
             (Tilstand.Utsatt to Handling.Opprett),
             (Tilstand.Forkastet to Handling.Opprett),
@@ -83,7 +83,10 @@ class UtsattOppgaveService(
                                 "Oppgave blir ikke opprettet for inntektsmeldingId: ${oppgave.inntektsmeldingId}, har behandlingskategori: $behandlingsKategori",
                             )
                         }
-                    }.onFailure { sikkerlogger.error(it.message, it) }
+                    }.onFailure {
+                        logger.error("Feil ved henting av inntektsmelding fra databasen for arkivref: ${oppgave.arkivreferanse}")
+                        sikkerlogger.error(it.message, it)
+                    }
             }
             else -> {
                 metrikk.tellUtsattOppgaveIrrelevant()
