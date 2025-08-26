@@ -76,9 +76,10 @@ class InntektsmeldingConsumer(
     }
 
     private fun behandleRecord(record: ConsumerRecord<String, String>) {
+        val key = record.key()
         val json = record.value().parseJson()
-        sikkerlogger.info("InntektsmeldingConsumer: Mottar record fra Simba.\n${json.toPretty()}")
-        logger.info("InntektsmeldingConsumer: Mottar record fra Simba}")
+        sikkerlogger.info("InntektsmeldingConsumer: Mottar record med key: $key fra Simba.\n${json.toPretty()}")
+        logger.info("InntektsmeldingConsumer: Mottar record med key: $key fra Simba}")
         val meldingFraSimba = json.fromJson(JournalfoertInntektsmelding.serializer())
 
         val im = inntektsmeldingService.findByJournalpost(meldingFraSimba.journalpostId)
