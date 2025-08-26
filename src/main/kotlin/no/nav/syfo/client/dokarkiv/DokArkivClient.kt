@@ -162,7 +162,7 @@ class DokArkivClient(
                         "Klarte ikke feilregistrere journalpost $journalpostId".also {
                             logger.error(it)
                             sikkerlogger.error(it, e)
-                            RuntimeException("Feilregistrering: Journalposten finnes ikke for journalpostid $journalpostId", e)
+                            throw RuntimeException("Feilregistrering: Journalposten finnes ikke for journalpostid $journalpostId", e)
                         }
                     }
 
@@ -178,7 +178,7 @@ class DokArkivClient(
             "Dokarkiv svarte med feilmelding ved feilregistrering av journalpost $journalpostId".also {
                 logger.error(it)
                 sikkerlogger.error(it, e)
-                throw RuntimeException(it, e)
+                throw IOException(it, e)
             }
         }
     }

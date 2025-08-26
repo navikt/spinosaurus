@@ -24,7 +24,7 @@ class SafJournalpostClient(
 
     fun getJournalpostMetadata(journalpostId: String): Journalpost? {
         val accessToken = getAccessToken()
-        logger.debug("Henter journalpostmetadata for $journalpostId with token size " + accessToken.length)
+        logger.debug("Henter journalpostmetadata for $journalpostId fra SAF")
         return runBlocking {
             try {
                 val response: JournalResponse =
