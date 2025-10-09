@@ -73,6 +73,7 @@ data class Inntektsmelding(
                 sakId = this.sakId,
                 innsendingstidspunkt = this.innsendingstidspunkt,
                 avsenderSystem = this.avsenderSystem,
+                mottaksKanal = this.mottaksKanal,
                 arsakTilInnsending = this.arsakTilInnsending,
             ),
         )
