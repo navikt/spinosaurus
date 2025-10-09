@@ -74,8 +74,10 @@ fun isDuplicateWithLatest(
     val duplikatLatest = inntektsmelding.isDuplicate(nyesteInntektsmelding)
     val duplikatExclusive = inntektsmelding.isDuplicateExclusiveArsakInnsending(nyesteInntektsmelding)
     // Hvis AG angir en "Endring", blir dette videresendt til Spleis per nå, selv om innholdet er kliss likt. Logger til info for å vite faktisk omfang.
-    logger.info(
-        "Likhetssjekk: Er duplikat ekslusive ÅrsakInnsending? ${!duplikatLatest && duplikatExclusive} Journalpost: ${inntektsmelding.journalpostId} ",
-    )
+    if (!duplikatLatest && duplikatExclusive) {
+        logger.warn(
+            "Likhetssjekk: Er duplikat ekslusiv ÅrsakInnsending! Journalpost: ${inntektsmelding.journalpostId} ",
+        )
+    }
     return duplikatLatest
 }
