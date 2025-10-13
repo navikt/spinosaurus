@@ -3,10 +3,10 @@ package no.nav.syfo.domain.inntektsmelding
 import no.nav.syfo.domain.JournalStatus
 import no.nav.syfo.domain.Periode
 import no.nav.syfo.repository.buildIM
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotEquals
-import org.junit.Assert.assertTrue
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -33,6 +33,8 @@ class InntektsmeldingTest {
     fun `Skal være duplikat selv om arsakInnsending er ulik`() {
         val imNy = im1.copy(arsakTilInnsending = "Ny")
         val imEndring = im1.copy(arsakTilInnsending = "Endring")
+        assertTrue(imNy.isDuplicate(imNy))
+        assertTrue(imNy.isDuplicateExclusiveArsakInnsending(imNy))
         assertTrue(imNy.isDuplicateExclusiveArsakInnsending(imEndring))
         assertFalse(imNy.isDuplicate(imEndring)) // Disse skal bli ulike siden vi tar hensyn til årsakInnsending
     }

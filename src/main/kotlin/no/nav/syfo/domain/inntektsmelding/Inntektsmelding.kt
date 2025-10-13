@@ -61,18 +61,8 @@ data class Inntektsmelding(
         )
 
     fun isDuplicateExclusiveArsakInnsending(inntektsmelding: Inntektsmelding): Boolean =
-        this.equals(
+        isDuplicate(
             inntektsmelding.copy(
-                id = this.id,
-                fnr = this.fnr,
-                mottattDato = this.mottattDato,
-                journalpostId = this.journalpostId,
-                journalStatus = this.journalStatus,
-                arkivRefereranse = this.arkivRefereranse,
-                aktorId = this.aktorId,
-                sakId = this.sakId,
-                innsendingstidspunkt = this.innsendingstidspunkt,
-                avsenderSystem = this.avsenderSystem,
                 arsakTilInnsending = this.arsakTilInnsending,
             ),
         )
