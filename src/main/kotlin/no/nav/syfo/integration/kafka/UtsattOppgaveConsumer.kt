@@ -52,29 +52,30 @@ class UtsattOppgaveConsumer(
         consumer.use {
             setIsReady(true)
             while (!error) {
-                it
-                    .poll(Duration.ofMillis(1000))
-                    .forEach { record ->
-                        try {
-                            val raw: String = record.value()
-                            MdcUtils.withCallId {
-                                val utsattOppgaveDTO = om.readValue<UtsattOppgaveDTO>(raw)
-                                if (utsattOppgaveDTO.dokumentType == DokumentTypeDTO.Inntektsmelding) {
-                                    throw Exception("bare en test!")
-                                    // behandle(utsattOppgaveDTO, raw)
-                                }
+                val records = it.poll(Duration.ofMillis(1000))
+                logger.warn("Mottok ${records.count()} UtsattOppgave meldinger")
+                records.forEach { record ->
+                    logger.warn("Record offset: ${records.first().offset()}")
+                    try {
+                        val raw: String = record.value()
+                        MdcUtils.withCallId {
+                            val utsattOppgaveDTO = om.readValue<UtsattOppgaveDTO>(raw)
+                            if (utsattOppgaveDTO.dokumentType == DokumentTypeDTO.Inntektsmelding) {
+                                throw Exception("bare en test!")
+                                // behandle(utsattOppgaveDTO, raw)
                             }
-                            it.commitSync()
-                        } catch (e: Throwable) {
-                            "Klarte ikke behandle UtsattOppgave. Stopper lytting!".also {
-                                logger.error(it)
-                                sikkerlogger.error(it, e)
-                            }
-                            setIsError(true)
-                            // setIsReady(false)
-                            consumer.close()
                         }
+                        it.commitSync()
+                    } catch (e: Throwable) {
+                        "Klarte ikke behandle UtsattOppgave. Stopper lytting!".also {
+                            logger.error(it)
+                            sikkerlogger.error(it, e)
+                        }
+                        setIsError(true)
+                        // setIsReady(false)
+                        consumer.close()
                     }
+                }
             }
         }
     }
