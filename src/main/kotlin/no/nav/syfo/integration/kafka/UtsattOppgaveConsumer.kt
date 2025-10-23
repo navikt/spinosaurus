@@ -60,7 +60,8 @@ class UtsattOppgaveConsumer(
                             MdcUtils.withCallId {
                                 val utsattOppgaveDTO = om.readValue<UtsattOppgaveDTO>(raw)
                                 if (utsattOppgaveDTO.dokumentType == DokumentTypeDTO.Inntektsmelding) {
-                                    behandle(utsattOppgaveDTO, raw)
+                                    throw Exception("bare en test!")
+                                    // behandle(utsattOppgaveDTO, raw)
                                 }
                             }
                             it.commitSync()
@@ -70,6 +71,8 @@ class UtsattOppgaveConsumer(
                                 sikkerlogger.error(it, e)
                             }
                             setIsError(true)
+                            // setIsReady(false)
+                            // consumer.close()
                         }
                     }
             }
