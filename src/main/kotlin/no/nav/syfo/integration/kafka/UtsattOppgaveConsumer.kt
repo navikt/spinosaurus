@@ -72,7 +72,7 @@ class UtsattOppgaveConsumer(
                             }
                             setIsError(true)
                             // setIsReady(false)
-                            // consumer.close()
+                            consumer.close()
                         }
                     }
             }
