@@ -69,6 +69,8 @@ fun utsattOppgaveAivenProperties() =
         mapOf(
             ConsumerConfig.GROUP_ID_CONFIG to "syfoinntektsmelding-v1",
             ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
+            ConsumerConfig.MAX_POLL_RECORDS_CONFIG to "1",
+            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
         )
 
 fun producerLocalProperties(bootstrapServers: String) =

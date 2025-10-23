@@ -61,8 +61,7 @@ class UtsattOppgaveConsumer(
                         MdcUtils.withCallId {
                             val utsattOppgaveDTO = om.readValue<UtsattOppgaveDTO>(raw)
                             if (utsattOppgaveDTO.dokumentType == DokumentTypeDTO.Inntektsmelding) {
-                                throw Exception("bare en test!")
-                                // behandle(utsattOppgaveDTO, raw)
+                                behandle(utsattOppgaveDTO, raw)
                             }
                         }
                         it.commitSync()
