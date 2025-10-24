@@ -55,6 +55,7 @@ fun joarkAivenProperties() =
             ConsumerConfig.CLIENT_ID_CONFIG to "syfoinntektsmelding",
             ConsumerConfig.GROUP_ID_CONFIG to "syfoinntektsmelding-v1",
             ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
+            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
         )
 
 fun utsattOppgaveLocalProperties() =
