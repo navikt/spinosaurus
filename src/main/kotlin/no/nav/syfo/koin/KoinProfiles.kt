@@ -32,7 +32,7 @@ val common =
     module {
         single { buildObjectMapper() }
 
-        single { KubernetesProbeManager }
+        single { KubernetesProbeManager() }
 
         single {
             createHttpClient(maxRetries = 3)

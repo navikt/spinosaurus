@@ -16,7 +16,7 @@ import kotlin.system.measureTimeMillis
  * Se denne bloggposten for å forstå hva disse er til
  * https://blog.colinbreck.com/kubernetes-liveness-and-readiness-probes-how-to-avoid-shooting-yourself-in-the-foot/
  */
-object KubernetesProbeManager {
+class KubernetesProbeManager {
     private val readynessComponents = HashSet<ReadynessComponent>()
     private val livenessComponents = HashSet<LivenessComponent>()
 
