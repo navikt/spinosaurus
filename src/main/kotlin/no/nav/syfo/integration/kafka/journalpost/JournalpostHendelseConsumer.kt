@@ -53,8 +53,16 @@ class JournalpostHendelseConsumer(
             while (!error) {
                 it.poll(ofMillis(1000)).forEach { record ->
                     try {
+                        val partition = record.partition()
+                        val topicPartition =
+                            org.apache.kafka.common
+                                .TopicPartition(record.topic(), partition)
+                        logger.info("Journalpost Record offset: ${record.offset()}, partition: $partition")
+                        val nyttOffset =
+                            org.apache.kafka.clients.consumer
+                                .OffsetAndMetadata(record.offset() + 1)
                         processHendelse(mapJournalpostHendelse(record.value()))
-                        it.commitSync()
+                        it.commitSync(mapOf(topicPartition to nyttOffset))
                     } catch (e: Throwable) {
                         "Klarte ikke behandle hendelse. Stopper lytting!".also {
                             logger.error(it)
