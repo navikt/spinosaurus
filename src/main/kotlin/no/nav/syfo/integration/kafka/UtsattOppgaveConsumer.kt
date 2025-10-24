@@ -53,9 +53,8 @@ class UtsattOppgaveConsumer(
             setIsReady(true)
             while (!error) {
                 val records = it.poll(Duration.ofMillis(1000))
-                logger.warn("Mottok ${records.count()} UtsattOppgave meldinger")
                 records.forEach { record ->
-                    logger.warn("Record offset: ${records.first().offset()}")
+                    logger.info("Record offset: ${record.offset()}")
                     try {
                         val raw: String = record.value()
                         MdcUtils.withCallId {
@@ -71,8 +70,6 @@ class UtsattOppgaveConsumer(
                             sikkerlogger.error(it, e)
                         }
                         setIsError(true)
-                        // setIsReady(false)
-                        consumer.close()
                     }
                 }
             }
