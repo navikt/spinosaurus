@@ -57,7 +57,6 @@ class UtsattOppgaveConsumer(
                     logger.info("Record offset: ${record.offset()}")
                     try {
                         val raw: String = record.value()
-                        throw java.lang.Exception("UtsattOppgave - test")
                         MdcUtils.withCallId {
                             val utsattOppgaveDTO = om.readValue<UtsattOppgaveDTO>(raw)
                             if (utsattOppgaveDTO.dokumentType == DokumentTypeDTO.Inntektsmelding) {
