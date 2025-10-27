@@ -11,6 +11,8 @@ import no.nav.syfo.util.LivenessComponent
 import no.nav.syfo.util.ReadynessComponent
 import org.apache.avro.generic.GenericRecord
 import org.apache.kafka.clients.consumer.KafkaConsumer
+import org.apache.kafka.clients.consumer.OffsetAndMetadata
+import org.apache.kafka.common.TopicPartition
 import java.time.Duration.ofMillis
 import java.time.LocalDateTime
 
@@ -54,13 +56,10 @@ class JournalpostHendelseConsumer(
                 it.poll(ofMillis(1000)).forEach { record ->
                     try {
                         val partition = record.partition()
-                        val topicPartition =
-                            org.apache.kafka.common
-                                .TopicPartition(record.topic(), partition)
+                        val topicPartition = TopicPartition(record.topic(), partition)
                         logger.info("Journalpost Record offset: ${record.offset()}, partition: $partition")
-                        val nyttOffset =
-                            org.apache.kafka.clients.consumer
-                                .OffsetAndMetadata(record.offset() + 1)
+                        val nyttOffset = OffsetAndMetadata(record.offset() + 1)
+                        // TODO : dele opp consumer og processHendelse i forskjellige klasser, kan gjøre test av kafkaConsumer-logikk enklere
                         processHendelse(mapJournalpostHendelse(record.value()))
                         it.commitSync(mapOf(topicPartition to nyttOffset))
                     } catch (e: Throwable) {
