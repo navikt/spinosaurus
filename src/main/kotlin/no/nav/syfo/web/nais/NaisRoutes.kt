@@ -36,7 +36,7 @@ fun Application.nais() {
 
     routing {
         get("/health/is-alive") {
-            val kubernetesProbeManager = KubernetesProbeManager()
+            val kubernetesProbeManager = this@routing.get<KubernetesProbeManager>()
             val checkResults = kubernetesProbeManager.runLivenessProbe()
             returnResultOfChecks(checkResults)
         }

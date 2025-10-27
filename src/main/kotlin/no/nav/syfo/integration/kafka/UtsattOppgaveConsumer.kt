@@ -52,26 +52,26 @@ class UtsattOppgaveConsumer(
         consumer.use {
             setIsReady(true)
             while (!error) {
-                it
-                    .poll(Duration.ofMillis(1000))
-                    .forEach { record ->
-                        try {
-                            val raw: String = record.value()
-                            MdcUtils.withCallId {
-                                val utsattOppgaveDTO = om.readValue<UtsattOppgaveDTO>(raw)
-                                if (utsattOppgaveDTO.dokumentType == DokumentTypeDTO.Inntektsmelding) {
-                                    behandle(utsattOppgaveDTO, raw)
-                                }
+                val records = it.poll(Duration.ofMillis(1000))
+                records.forEach { record ->
+                    logger.info("Record offset: ${record.offset()}")
+                    try {
+                        val raw: String = record.value()
+                        MdcUtils.withCallId {
+                            val utsattOppgaveDTO = om.readValue<UtsattOppgaveDTO>(raw)
+                            if (utsattOppgaveDTO.dokumentType == DokumentTypeDTO.Inntektsmelding) {
+                                behandle(utsattOppgaveDTO, raw)
                             }
-                            it.commitSync()
-                        } catch (e: Throwable) {
-                            "Klarte ikke behandle UtsattOppgave. Stopper lytting!".also {
-                                logger.error(it)
-                                sikkerlogger.error(it, e)
-                            }
-                            setIsError(true)
                         }
+                        it.commitSync()
+                    } catch (e: Throwable) {
+                        "Klarte ikke behandle UtsattOppgave. Stopper lytting!".also {
+                            logger.error(it)
+                            sikkerlogger.error(it, e)
+                        }
+                        setIsError(true)
                     }
+                }
             }
         }
     }

@@ -48,7 +48,6 @@ class AuthClient(
         target: String,
     ): TokenResponse =
         try {
-            sikkerLogger().info("Forsøker å hente token for $target fra ${provider.alias} og endpoint $tokenEndpoint")
             httpClient
                 .submitForm(
                     tokenEndpoint,
@@ -57,7 +56,6 @@ class AuthClient(
                         set("identity_provider", provider.alias)
                     },
                 ).body<TokenResponse.Success>()
-                .apply { sikkerLogger().info("Hentet token expiresInSeconds: $expiresInSeconds") }
         } catch (e: ResponseException) {
             TokenResponse.Error(e.response.body<TokenErrorResponse>(), e.response.status)
         }
