@@ -1,5 +1,6 @@
 package no.nav.syfo.mapping
 
+import no.nav.helsearbeidsgiver.utils.test.wrapper.genererGyldig
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.inntektsmeldingkontrakt.Arbeidsgivertype
 import no.nav.syfo.FØRSTE_FEBRUAR
@@ -67,6 +68,32 @@ class InntektsmeldingKontraktMapperKtTest {
         assertThat(i.sakId).isEqualTo("sakId")
         assertThat(i.arbeidsgiverOrgnummer).isEqualTo("1234")
         assertThat(i.fnr).isEqualTo(grunnleggendeInntektsmelding.fnr)
+        assertThat(i.aktorId).isEqualTo("aktorId")
+        assertThat(i.arbeidsgiverperioder.size).isEqualTo(1)
+    }
+
+    @Test
+    fun `toInntektsmelding oppdaterer manglende fnr`() {
+        val inntektsmeldingUtenFnr =
+            grunnleggendeInntektsmelding.copy(
+                fnr = "",
+            )
+        val dto =
+            InntektsmeldingEntitet(
+                uuid = UUID.randomUUID().toString(),
+                journalpostId = inntektsmeldingUtenFnr.journalpostId,
+                behandlet = LocalDateTime.of(2019, 10, 25, 0, 0, 0, 0),
+                orgnummer = inntektsmeldingUtenFnr.arbeidsgiverOrgnummer,
+                arbeidsgiverPrivat = "arbeidsgiverPrivat",
+                aktorId = inntektsmeldingUtenFnr.aktorId.toString(),
+                fnr = Fnr.genererGyldig(),
+                data = om.writeValueAsString(inntektsmeldingUtenFnr),
+            )
+        val i = toInntektsmelding(dto, om)
+        assertThat(i.journalpostId).isEqualTo("123")
+        assertThat(i.sakId).isEqualTo("sakId")
+        assertThat(i.arbeidsgiverOrgnummer).isEqualTo("1234")
+        assertThat(i.fnr).isEqualTo(dto.fnr.verdi)
         assertThat(i.aktorId).isEqualTo("aktorId")
         assertThat(i.arbeidsgiverperioder.size).isEqualTo(1)
     }

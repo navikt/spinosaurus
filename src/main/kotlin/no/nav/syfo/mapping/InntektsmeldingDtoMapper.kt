@@ -27,6 +27,7 @@ fun toInntektsmelding(
     objectMapper: ObjectMapper,
 ): Inntektsmelding {
     val im = objectMapper.readValue(inntektsmeldingEntitet.data, Inntektsmelding::class.java)
+    im.fnr = im.fnr.ifEmpty { inntektsmeldingEntitet.fnr.verdi }
     if (im.journalStatus == JournalStatus.MIDLERTIDIG) {
         im.journalStatus = JournalStatus.MOTTATT
     }

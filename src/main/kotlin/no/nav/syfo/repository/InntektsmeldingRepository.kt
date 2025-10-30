@@ -260,7 +260,7 @@ class InntektsmeldingRepositoryImp(
                     journalpostId = res.getString("JOURNALPOST_ID"),
                     behandlet = res.getTimestamp("BEHANDLET").toLocalDateTime(),
                     arbeidsgiverPrivat = res.getString("ARBEIDSGIVER_PRIVAT"),
-                    fnr = res.getString("FNR")?.takeIf { it.isNotBlank() }?.let { Fnr(it) },
+                    fnr = Fnr(res.getString("FNR")),
                     data = res.getString("data"),
                 ),
             )
