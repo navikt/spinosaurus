@@ -72,6 +72,32 @@ class InntektsmeldingKontraktMapperKtTest {
     }
 
     @Test
+    fun `toInntektsmelding oppdaterer manglende fnr`() {
+        val inntektsmeldingUtenFnr =
+            grunnleggendeInntektsmelding.copy(
+                fnr = "",
+            )
+        val dto =
+            InntektsmeldingEntitet(
+                uuid = UUID.randomUUID().toString(),
+                journalpostId = inntektsmeldingUtenFnr.journalpostId,
+                behandlet = LocalDateTime.of(2019, 10, 25, 0, 0, 0, 0),
+                orgnummer = inntektsmeldingUtenFnr.arbeidsgiverOrgnummer,
+                arbeidsgiverPrivat = "arbeidsgiverPrivat",
+                aktorId = inntektsmeldingUtenFnr.aktorId.toString(),
+                fnr = Fnr("28014026691"),
+                data = om.writeValueAsString(inntektsmeldingUtenFnr),
+            )
+        val i = toInntektsmelding(dto, om)
+        assertThat(i.journalpostId).isEqualTo("123")
+        assertThat(i.sakId).isEqualTo("sakId")
+        assertThat(i.arbeidsgiverOrgnummer).isEqualTo("1234")
+        assertThat(i.fnr).isEqualTo(dto.fnr?.verdi)
+        assertThat(i.aktorId).isEqualTo("aktorId")
+        assertThat(i.arbeidsgiverperioder.size).isEqualTo(1)
+    }
+
+    @Test
     fun skal_mappe_enkel_periode() {
         val mappedePerioder = mapArbeidsgiverperioder(grunnleggendeInntektsmelding)
         assertThat(mappedePerioder.size).isEqualTo(1)
