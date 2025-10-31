@@ -6,6 +6,7 @@ metadata:
   labels:
     team: helsearbeidsgiver
 spec:
+  leaderElection: true
   strategy:
     type: Recreate
   image: {{image}}

@@ -21,6 +21,7 @@ import no.nav.syfo.producer.InntektsmeldingAivenProducer
 import no.nav.syfo.prosesser.FinnAlleUtgaandeOppgaverProcessor
 import no.nav.syfo.prosesser.FjernInntektsmeldingByBehandletProcessor
 import no.nav.syfo.prosesser.JoarkInntektsmeldingHendelseProsessor
+import no.nav.syfo.prosesser.LeaderElectionBakgrunnsjobbProcessor
 import no.nav.syfo.repository.ArbeidsgiverperiodeRepository
 import no.nav.syfo.repository.ArbeidsgiverperiodeRepositoryImp
 import no.nav.syfo.repository.InntektsmeldingRepository
@@ -71,6 +72,16 @@ fun localDevConfig(config: ApplicationConfig) =
                 metrikk = get(),
                 inntektsmeldingRepository = get(),
                 om = get(),
+            )
+        }
+
+        single {
+            LeaderElectionBakgrunnsjobbProcessor(
+                bakgrunnsjobbService = get(),
+                finnAlleUtgaandeOppgaverProcessor = get(),
+                fjernInntektsmeldingByBehandletProcessor = get(),
+                joarkInntektsmeldingHendelseProsessor = get(),
+                feiletUtsattOppgaveMeldingProsessor = get(),
             )
         }
 

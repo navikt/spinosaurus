@@ -15,12 +15,10 @@ import no.nav.syfo.integration.kafka.UtsattOppgaveConsumer
 import no.nav.syfo.integration.kafka.journalpost.JournalpostHendelseConsumer
 import no.nav.syfo.koin.selectModuleBasedOnProfile
 import no.nav.syfo.prosesser.FinnAlleUtgaandeOppgaverProcessor
-import no.nav.syfo.prosesser.FjernInntektsmeldingByBehandletProcessor
-import no.nav.syfo.prosesser.JoarkInntektsmeldingHendelseProsessor
+import no.nav.syfo.prosesser.LeaderElectionBakgrunnsjobbProcessor
 import no.nav.syfo.simba.InntektsmeldingConsumer
 import no.nav.syfo.util.KubernetesProbeManager
 import no.nav.syfo.util.getString
-import no.nav.syfo.utsattoppgave.FeiletUtsattOppgaveMeldingProsessor
 import no.nav.syfo.web.inntektsmeldingModule
 import no.nav.syfo.web.nais.nais
 import org.flywaydb.core.Flyway
@@ -86,6 +84,7 @@ class SpinnApplication(
     }
 
     fun shutdown() {
+        get<LeaderElectionBakgrunnsjobbProcessor>().stop()
         get<FinnAlleUtgaandeOppgaverProcessor>().stop()
         val service = get<BakgrunnsjobbService>()
         service.stop()
@@ -116,15 +115,7 @@ class SpinnApplication(
 
     private fun configAndStartBackgroundWorkers() {
         if (appConfig.getString("run_background_workers") == "true") {
-            get<FinnAlleUtgaandeOppgaverProcessor>().startAsync(true)
-
-            get<BakgrunnsjobbService>().apply {
-                registrer(get<FeiletUtsattOppgaveMeldingProsessor>())
-                registrer(get<FjernInntektsmeldingByBehandletProcessor>())
-                registrer(get<JoarkInntektsmeldingHendelseProsessor>())
-
-                startAsync(true)
-            }
+            get<LeaderElectionBakgrunnsjobbProcessor>().startAsync(true)
         }
     }
 
