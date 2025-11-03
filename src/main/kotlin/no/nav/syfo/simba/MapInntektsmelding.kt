@@ -101,7 +101,7 @@ fun mapInntektsmelding(
         arsakTilInnsending = im.aarsakInnsending.name,
         mottattDato = im.mottatt.toLocalDateTime(),
         innsendingstidspunkt = im.mottatt.toLocalDateTime(),
-        mottaksKanal = im.type.kanal().mapTilMottakskanal(),
+        mottaksKanal = im.type.kanal.mapTilMottakskanal(),
         forespurt = forespurt,
     )
 }
