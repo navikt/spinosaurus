@@ -44,7 +44,7 @@ fun mapInntektsmelding(
     journalpostId: String,
     im: InntektsmeldingV1,
 ): Inntektsmelding {
-    val avsenderSystem =
+    val avsenderSystemNavn =
         when (im.type) {
             is InntektsmeldingV1.Type.Forespurt -> Avsender.NAV_NO
             is InntektsmeldingV1.Type.ForespurtEkstern -> im.type.avsenderSystem.navn
@@ -62,7 +62,7 @@ fun mapInntektsmelding(
         id = im.id.toString(),
         aktorId = aktorId,
         journalpostId = journalpostId,
-        avsenderSystem = AvsenderSystem(avsenderSystem, im.type.avsenderSystem.versjon),
+        avsenderSystem = AvsenderSystem(avsenderSystemNavn, im.type.avsenderSystem.versjon),
         vedtaksperiodeId = im.vedtaksperiodeId,
         fnr = im.sykmeldt.fnr.verdi,
         arbeidsgiverOrgnummer = im.avsender.orgnr.verdi,
