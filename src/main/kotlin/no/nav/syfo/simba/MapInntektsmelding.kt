@@ -6,7 +6,6 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Ferie
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Ferietrekk
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.InntektEndringAarsak
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding.Type
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.NyStilling
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.NyStillingsprosent
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Nyansatt
@@ -29,7 +28,7 @@ import no.nav.syfo.domain.inntektsmelding.RapportertInntekt
 import no.nav.syfo.domain.inntektsmelding.Refusjon
 import no.nav.syfo.domain.inntektsmelding.SpinnInntektEndringAarsak
 import no.nav.syfo.domain.inntektsmelding.mapTilMottakskanal
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding as InntektmeldingV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding as InntektsmeldingV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse as NaturalytelseV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Periode as PeriodeV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon as RefusjonV1
@@ -37,23 +36,25 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon as RefusjonV1
 object Avsender {
     const val NAV_NO = "NAV_NO"
     const val NAV_NO_SELVBESTEMT = NAV_NO + "_SELVBESTEMT"
-    const val VERSJON = "1.0"
 }
 
 fun mapInntektsmelding(
     arkivreferanse: String,
     aktorId: String,
     journalpostId: String,
-    im: InntektmeldingV1,
+    im: InntektsmeldingV1,
 ): Inntektsmelding {
-    val (
-        avsenderSystem: String,
-        forespurt: Boolean,
-    ) =
+    val avsenderSystem =
         when (im.type) {
-            is Type.Forespurt, is Type.ForespurtEkstern -> (Avsender.NAV_NO to true)
-            is Type.Selvbestemt, is Type.Fisker, is Type.UtenArbeidsforhold, is Type.Behandlingsdager -> (Avsender.NAV_NO_SELVBESTEMT to false)
+            is InntektsmeldingV1.Type.Forespurt -> Avsender.NAV_NO
+            is InntektsmeldingV1.Type.ForespurtEkstern -> im.type.avsenderSystem.navn
+            is InntektsmeldingV1.Type.Selvbestemt,
+            is InntektsmeldingV1.Type.Fisker,
+            is InntektsmeldingV1.Type.UtenArbeidsforhold,
+            is InntektsmeldingV1.Type.Behandlingsdager,
+            -> Avsender.NAV_NO_SELVBESTEMT
         }
+
     return Inntektsmelding(
         journalStatus = JournalStatus.FERDIGSTILT,
         sakId = "",
@@ -61,7 +62,7 @@ fun mapInntektsmelding(
         id = im.id.toString(),
         aktorId = aktorId,
         journalpostId = journalpostId,
-        avsenderSystem = AvsenderSystem(avsenderSystem, Avsender.VERSJON),
+        avsenderSystem = AvsenderSystem(avsenderSystem, im.type.avsenderSystem.versjon),
         vedtaksperiodeId = im.vedtaksperiodeId,
         fnr = im.sykmeldt.fnr.verdi,
         arbeidsgiverOrgnummer = im.avsender.orgnr.verdi,
@@ -102,7 +103,7 @@ fun mapInntektsmelding(
         mottattDato = im.mottatt.toLocalDateTime(),
         innsendingstidspunkt = im.mottatt.toLocalDateTime(),
         mottaksKanal = im.type.kanal.mapTilMottakskanal(),
-        forespurt = forespurt,
+        forespurt = im.type is InntektsmeldingV1.Type.Forespurt || im.type is InntektsmeldingV1.Type.ForespurtEkstern,
     )
 }
 
