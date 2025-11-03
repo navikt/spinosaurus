@@ -157,11 +157,11 @@ class MapInntektsmeldingFraSimbaTest {
             )
         val selvbestemtMapped = mapInntektsmelding("im1", "2", "3", selvbestemtIm)
         assertEquals(MuligAvsender.NAV_NO_SELVBESTEMT, selvbestemtMapped.avsenderSystem.navn)
-        assertEquals(MuligAvsender.VERSJON, selvbestemtMapped.avsenderSystem.versjon)
+        assertEquals("1.0", selvbestemtMapped.avsenderSystem.versjon)
 
         val mapped = mapInntektsmelding("im1", "2", "3", lagInntektsmelding())
         assertEquals(MuligAvsender.NAV_NO, mapped.avsenderSystem.navn)
-        assertEquals(MuligAvsender.VERSJON, mapped.avsenderSystem.versjon)
+        assertEquals("1.0", mapped.avsenderSystem.versjon)
     }
 }
 
