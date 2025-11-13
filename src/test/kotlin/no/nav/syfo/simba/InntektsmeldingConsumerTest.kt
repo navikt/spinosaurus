@@ -20,7 +20,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.time.LocalDateTime
 import java.util.UUID
 
-internal class InntektsmeldingConsumerTest {
+class InntektsmeldingConsumerTest {
     lateinit var consumer: InntektsmeldingConsumer
     var props = joarkLocalProperties().toMap()
     val inntektsmeldingService: InntektsmeldingService = mockk(relaxed = true)
@@ -45,7 +45,7 @@ internal class InntektsmeldingConsumerTest {
     @Test
     fun `behandle med IM type Forespurt oppretter utsattOppgave med timeout inkludert forsinkelse og legger til IM på topic`() {
         val timeoutNowPlusForsinkelse = LocalDateTime.now().plusHours(OPPRETT_OPPGAVE_FORSINKELSE)
-        val im = lagInntektsmelding()
+        val im = mockInntektsmelding()
 
         consumer.behandle("123456789", im)
 
@@ -64,10 +64,9 @@ internal class InntektsmeldingConsumerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("inntektsmeldingTyperSomIkkeSkalTilSpleis")
-    fun `behandle med IM uten arbeidsforhold oppretter utsattOppgave med timeout now og legger ikke IM på topic for vedtaksloesning`(imType: Inntektsmelding.Type) {
+    @MethodSource("inntektsmeldingerSomIkkeSkalTilSpleis")
+    fun `behandle med IM med type X oppretter utsattOppgave med timeout now og legger ikke IM på topic for vedtaksloesning`(im: Inntektsmelding) {
         val timeoutNow = LocalDateTime.now()
-        val im = lagInntektsmelding().copy(type = imType)
 
         consumer.behandle("123", im)
 
@@ -89,11 +88,28 @@ internal class InntektsmeldingConsumerTest {
 
     companion object {
         @JvmStatic
-        fun inntektsmeldingTyperSomIkkeSkalTilSpleis() =
+        fun inntektsmeldingerSomIkkeSkalTilSpleis(): Set<Inntektsmelding> =
             setOf(
-                Inntektsmelding.Type.Fisker(UUID.randomUUID()),
-                Inntektsmelding.Type.UtenArbeidsforhold(UUID.randomUUID()),
-                Inntektsmelding.Type.Behandlingsdager(UUID.randomUUID()),
+                mockInntektsmelding().copy(type = Inntektsmelding.Type.Fisker(UUID.randomUUID())),
+                mockInntektsmelding().copy(type = Inntektsmelding.Type.UtenArbeidsforhold(UUID.randomUUID())),
+                mockInntektsmelding().copy(type = Inntektsmelding.Type.Behandlingsdager(UUID.randomUUID())),
+                mockInntektsmelding().copy(
+                    type =
+                        Inntektsmelding.Type.Forespurt(
+                            id = UUID.randomUUID(),
+                            erAgpForespurt = false,
+                        ),
+                    agp = mockAgp(),
+                ),
+                mockInntektsmelding().copy(
+                    type =
+                        Inntektsmelding.Type.ForespurtEkstern(
+                            id = UUID.randomUUID(),
+                            erAgpForespurt = false,
+                            _avsenderSystem = mockAvsenderSystem(),
+                        ),
+                    agp = mockAgp(),
+                ),
             )
     }
 }

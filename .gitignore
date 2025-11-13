@@ -6,6 +6,7 @@ bootstrap-local.yaml
 transaction-logs
 target
 .gradle
+.kotlin
 /build/
 /syfoinntektsmelding.ipr
 /syfoinntektsmelding.iws

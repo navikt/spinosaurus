@@ -2,8 +2,13 @@ package no.nav.syfo.simba
 
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding
 
-fun Inntektsmelding.Type.sendTilSpleis(): Boolean =
-    when (this) {
+fun Inntektsmelding.skalSendesTilSpleis(): Boolean {
+    val imType = this.type
+    return when (imType) {
+        is Inntektsmelding.Type.Selvbestemt -> true
         is Inntektsmelding.Type.Fisker, is Inntektsmelding.Type.UtenArbeidsforhold, is Inntektsmelding.Type.Behandlingsdager -> false
-        is Inntektsmelding.Type.Selvbestemt, is Inntektsmelding.Type.Forespurt, is Inntektsmelding.Type.ForespurtEkstern -> true
+        // Skal ikke sende ikke-forespurt AGP til Spleis
+        is Inntektsmelding.Type.Forespurt -> imType.erAgpForespurt || agp == null
+        is Inntektsmelding.Type.ForespurtEkstern -> imType.erAgpForespurt || agp == null
     }
+}
