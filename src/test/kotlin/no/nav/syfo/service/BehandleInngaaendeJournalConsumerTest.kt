@@ -10,9 +10,9 @@ import no.nav.syfo.grunnleggendeInntektsmelding
 import org.junit.jupiter.api.Test
 
 class BehandleInngaaendeJournalConsumerTest {
-    private val dokArkivClient = mockk<DokArkivClient>(relaxed = true)
+    val dokArkivClient = mockk<DokArkivClient>(relaxed = true)
 
-    private val behandleInngaaendeJournalConsumer = BehandleInngaaendeJournalConsumer(dokArkivClient)
+    val behandleInngaaendeJournalConsumer = BehandleInngaaendeJournalConsumer(dokArkivClient)
 
     @Test
     fun ferdigstillJournalpost() {

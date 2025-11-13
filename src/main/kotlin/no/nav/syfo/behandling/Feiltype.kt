@@ -1,7 +1,7 @@
 package no.nav.syfo.behandling
 
 enum class Feiltype(
-    var navn: String,
+    val navn: String,
 ) {
     USPESIFISERT("uspesifisert"),
     AKTØR_IKKE_FUNNET("aktor_ikkefunnet"),
