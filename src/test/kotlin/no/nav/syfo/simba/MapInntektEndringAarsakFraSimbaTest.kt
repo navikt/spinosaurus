@@ -60,7 +60,7 @@ class MapInntektEndringAarsakFraSimbaTest {
     fun `InntektEndringAarsak mappes til riktig SpinnInntektEndringAarsak`(pair: Pair<SpinnInntektEndringAarsak, InntektEndringAarsak>) {
         val (spinnInntektEndringAarsak, inntektEndringAarsak) = pair
         val im =
-            lagInntektsmelding().let {
+            mockInntektsmelding().let {
                 it.copy(
                     inntekt =
                         it.inntekt?.copy(

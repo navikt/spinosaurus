@@ -16,7 +16,7 @@ import org.junit.jupiter.api.assertThrows
 import java.time.LocalDateTime
 import java.util.UUID
 
-internal class UtsattOppgaveConsumerTest {
+class UtsattOppgaveConsumerTest {
     lateinit var consumer: UtsattOppgaveConsumer
     var om: ObjectMapper = mockk(relaxed = true)
     var props = joarkLocalProperties().toMap()

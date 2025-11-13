@@ -1,26 +1,14 @@
 package no.nav.syfo.simba
 
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.AarsakInnsending
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Avsender
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Bonus
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Permisjon
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RedusertLoennIAgp
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Sykmeldt
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.til
 import no.nav.helsearbeidsgiver.utils.test.date.desember
-import no.nav.helsearbeidsgiver.utils.test.date.februar
-import no.nav.helsearbeidsgiver.utils.test.date.januar
 import no.nav.helsearbeidsgiver.utils.test.date.mai
-import no.nav.helsearbeidsgiver.utils.test.date.mars
-import no.nav.helsearbeidsgiver.utils.test.wrapper.genererGyldig
-import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
-import no.nav.helsearbeidsgiver.utils.wrapper.Orgnr
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
@@ -37,7 +25,7 @@ class MapInntektsmeldingFraSimbaTest {
         val naturalytelser = Naturalytelse.Kode.entries.map { Naturalytelse(it, 1.0, LocalDate.now()) }
         val antallNaturalytelser = naturalytelser.count()
         val imd =
-            lagInntektsmelding().let {
+            mockInntektsmelding().let {
                 it.copy(
                     inntekt =
                         it.inntekt?.copy(
@@ -66,7 +54,7 @@ class MapInntektsmeldingFraSimbaTest {
                 arkivreferanse = "im1323",
                 aktorId = "sdfds",
                 journalpostId = "134",
-                im = lagInntektsmelding().copy(refusjon = refusjon),
+                im = mockInntektsmelding().copy(refusjon = refusjon),
             )
         assertNull(mapped.refusjon.opphoersdato)
         assertEquals(mapped.endringerIRefusjon.size, 1)
@@ -76,7 +64,7 @@ class MapInntektsmeldingFraSimbaTest {
     fun mapBegrunnelseRedusert() {
         RedusertLoennIAgp.Begrunnelse.entries.forEach { begrunnelse ->
             val im =
-                lagInntektsmelding().let {
+                mockInntektsmelding().let {
                     it.copy(
                         agp =
                             it.agp?.copy(
@@ -99,7 +87,7 @@ class MapInntektsmeldingFraSimbaTest {
     @Test
     fun mapIngenBegrunnelseRedusert() {
         val im =
-            lagInntektsmelding().let {
+            mockInntektsmelding().let {
                 it.copy(
                     agp =
                         it.agp?.copy(
@@ -115,7 +103,7 @@ class MapInntektsmeldingFraSimbaTest {
     @Test
     fun mapInntektEndringAarsak() {
         val im =
-            lagInntektsmelding().copy(
+            mockInntektsmelding().copy(
                 inntekt =
                     Inntekt(
                         beloep = 60_000.0,
@@ -136,122 +124,31 @@ class MapInntektsmeldingFraSimbaTest {
     fun mapInnsendtTidspunktFraSimba() {
         val localDateTime = LocalDateTime.of(2023, 2, 11, 14, 0)
         val innsendt = OffsetDateTime.of(localDateTime, ZoneOffset.of("+1"))
-        val im = mapInntektsmelding("im1", "2", "3", lagInntektsmelding().copy(mottatt = innsendt))
+        val im = mapInntektsmelding("im1", "2", "3", mockInntektsmelding().copy(mottatt = innsendt))
         assertEquals(localDateTime, im.innsendingstidspunkt)
     }
 
     @Test
     fun mapVedtaksperiodeID() {
-        val im = mapInntektsmelding("im1", "2", "3", lagInntektsmelding().copy(vedtaksperiodeId = null))
+        val im = mapInntektsmelding("im1", "2", "3", mockInntektsmelding().copy(vedtaksperiodeId = null))
         assertNull(im.vedtaksperiodeId)
         val vedtaksperiodeId = UUID.randomUUID()
-        val im2 = mapInntektsmelding("im1", "2", "3", lagInntektsmelding().copy(vedtaksperiodeId = vedtaksperiodeId))
+        val im2 = mapInntektsmelding("im1", "2", "3", mockInntektsmelding().copy(vedtaksperiodeId = vedtaksperiodeId))
         assertEquals(vedtaksperiodeId, im2.vedtaksperiodeId)
     }
 
     @Test
     fun mapAvsenderForSelvbestemtOgVanlig() {
         val selvbestemtIm =
-            lagInntektsmelding().copy(
+            mockInntektsmelding().copy(
                 type = Inntektsmelding.Type.Selvbestemt(UUID.randomUUID()),
             )
         val selvbestemtMapped = mapInntektsmelding("im1", "2", "3", selvbestemtIm)
         assertEquals(MuligAvsender.NAV_NO_SELVBESTEMT, selvbestemtMapped.avsenderSystem.navn)
         assertEquals("1.0", selvbestemtMapped.avsenderSystem.versjon)
 
-        val mapped = mapInntektsmelding("im1", "2", "3", lagInntektsmelding())
+        val mapped = mapInntektsmelding("im1", "2", "3", mockInntektsmelding())
         assertEquals(MuligAvsender.NAV_NO, mapped.avsenderSystem.navn)
         assertEquals("1.0", mapped.avsenderSystem.versjon)
     }
 }
-
-fun lagInntektsmelding(): Inntektsmelding =
-    Inntektsmelding(
-        id = UUID.randomUUID(),
-        type =
-            Inntektsmelding.Type.Forespurt(
-                id = UUID.randomUUID(),
-            ),
-        vedtaksperiodeId = UUID.randomUUID(),
-        sykmeldt =
-            Sykmeldt(
-                fnr = Fnr.genererGyldig(),
-                navn = "Syk Sykesen",
-            ),
-        avsender =
-            Avsender(
-                orgnr = Orgnr.genererGyldig(),
-                orgNavn = "Blåbærsyltetøy A/S",
-                navn = "Hå Erresen",
-                tlf = "22555555",
-            ),
-        sykmeldingsperioder =
-            listOf(
-                10.januar til 31.januar,
-                10.februar til 28.februar,
-            ),
-        agp =
-            Arbeidsgiverperiode(
-                perioder =
-                    listOf(
-                        1.januar til 3.januar,
-                        5.januar til 5.januar,
-                        10.januar til 21.januar,
-                    ),
-                egenmeldinger =
-                    listOf(
-                        1.januar til 3.januar,
-                        5.januar til 5.januar,
-                    ),
-                redusertLoennIAgp =
-                    RedusertLoennIAgp(
-                        beloep = 55_555.0,
-                        begrunnelse = RedusertLoennIAgp.Begrunnelse.Permittering,
-                    ),
-            ),
-        inntekt =
-            Inntekt(
-                beloep = 66_666.0,
-                inntektsdato = 10.januar,
-                naturalytelser =
-                    listOf(
-                        Naturalytelse(
-                            naturalytelse = Naturalytelse.Kode.BIL,
-                            verdiBeloep = 123.0,
-                            sluttdato = 1.februar,
-                        ),
-                        Naturalytelse(
-                            naturalytelse = Naturalytelse.Kode.FRITRANSPORT,
-                            verdiBeloep = 456.0,
-                            sluttdato = 15.februar,
-                        ),
-                    ),
-                endringAarsaker =
-                    listOf(
-                        Permisjon(
-                            permisjoner =
-                                listOf(
-                                    6.januar til 6.januar,
-                                    8.januar til 8.januar,
-                                ),
-                        ),
-                    ),
-            ),
-        refusjon =
-            Refusjon(
-                beloepPerMaaned = 22_222.0,
-                endringer =
-                    listOf(
-                        RefusjonEndring(
-                            beloep = 22_111.0,
-                            startdato = 1.februar,
-                        ),
-                        RefusjonEndring(
-                            beloep = 22_000.0,
-                            startdato = 2.februar,
-                        ),
-                    ),
-            ),
-        aarsakInnsending = AarsakInnsending.Ny,
-        mottatt = 1.mars.atStartOfDay().atOffset(ZoneOffset.ofHours(1)),
-    )
