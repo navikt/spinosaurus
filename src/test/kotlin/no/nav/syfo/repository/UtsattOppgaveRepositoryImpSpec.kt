@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 import java.time.LocalDateTime.now
 import java.util.UUID
 
-open class UtsattOppgaveRepositoryImpSpec : SystemTestBase() {
+class UtsattOppgaveRepositoryImpSpec : SystemTestBase() {
     lateinit var repository: UtsattOppgaveRepository
 
     @BeforeAll
@@ -139,8 +139,11 @@ open class UtsattOppgaveRepositoryImpSpec : SystemTestBase() {
                 ),
             )
 
-        utsattOppgave.enhet = enhet
-        repository.oppdater(utsattOppgave)
+        repository.oppdater(
+            utsattOppgave.copy(
+                enhet = enhet,
+            ),
+        )
 
         val enhetDb = repository.findByInntektsmeldingId(utsattOppgave.inntektsmeldingId)?.enhet
         Assertions.assertEquals(enhet, enhetDb)
