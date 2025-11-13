@@ -6,17 +6,16 @@ import no.nav.helsearbeidsgiver.pdl.PdlClient
 import no.nav.helsearbeidsgiver.pdl.domene.FullPerson
 import no.nav.helsearbeidsgiver.pdl.domene.PersonNavn
 import no.nav.syfo.client.dokarkiv.DokArkivClient
-import no.nav.syfo.client.norg.ArbeidsfordelingRequest
 import no.nav.syfo.client.norg.ArbeidsfordelingResponse
 import no.nav.syfo.client.norg.Norg2Client
 import org.koin.core.module.Module
-import org.koin.dsl.bind
 import java.time.LocalDate
 
 fun Module.mockExternalDependecies() {
     single {
         DokArkivClient("", get()) { "" }
-    } bind DokArkivClient::class
+    }
+
     single {
         mockk<PdlClient> {
             coEvery { personNavn(any()) } returns PersonNavn("Ola", "M", "Avsender")
@@ -33,17 +32,11 @@ fun Module.mockExternalDependecies() {
     }
 
     single {
-        object : Norg2Client(
-            "",
-            get(),
-        ) {
-            override suspend fun hentAlleArbeidsfordelinger(
-                request: ArbeidsfordelingRequest,
-                callId: String?,
-            ): List<ArbeidsfordelingResponse> =
+        mockk<Norg2Client> {
+            coEvery { hentAlleArbeidsfordelinger(any(), any()) } returns
                 listOf(
                     ArbeidsfordelingResponse(
-                        aktiveringsdato = LocalDate.of(2020, 11, 31),
+                        aktiveringsdato = LocalDate.of(2020, 11, 30),
                         antallRessurser = 0,
                         enhetId = 123456789,
                         enhetNr = "1234",
@@ -58,10 +51,10 @@ fun Module.mockExternalDependecies() {
                         status = "Aktiv",
                         type = "KO",
                         underAvviklingDato = null,
-                        underEtableringDato = LocalDate.of(2020, 11, 30),
+                        underEtableringDato = LocalDate.of(2020, 11, 29),
                         versjon = 1,
                     ),
                 )
         }
-    } bind Norg2Client::class
+    }
 }

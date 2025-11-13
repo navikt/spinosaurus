@@ -23,10 +23,9 @@ class InntektsmeldingService(
     fun findByJournalpost(journalpostId: String): InntektsmeldingEntitet? = repository.findByJournalpost(journalpostId)
 
     fun isDuplicate(inntektsmelding: Inntektsmelding): Boolean {
-        if (inntektsmelding.aktorId == null) {
-            return false
-        }
-        return isDuplicateWithLatest(logger, inntektsmelding, finnBehandledeInntektsmeldinger(inntektsmelding.aktorId!!))
+        val aktorId = inntektsmelding.aktorId
+        return aktorId != null &&
+            isDuplicateWithLatest(logger, inntektsmelding, finnBehandledeInntektsmeldinger(aktorId))
     }
 
     fun lagreBehandling(
@@ -41,11 +40,10 @@ class InntektsmeldingService(
 
     fun finnInntektsmeldinger(request: FinnInntektsmeldingerRequest): List<no.nav.inntektsmeldingkontrakt.Inntektsmelding> {
         val results = repository.findByFnrInPeriod(request.fnr, request.fom, request.tom)
-        if (results.isEmpty()) {
+        return if (results.isEmpty()) {
             logger().info("Fant ingen inntektsmeldinger!")
-            return emptyList()
-        }
-        val mappedResults =
+            emptyList()
+        } else {
             results.map { dto ->
                 val inntektsmelding = toInntektsmelding(dto, objectMapper)
                 mapInntektsmeldingKontrakt(
@@ -56,7 +54,7 @@ class InntektsmeldingService(
                     dto.uuid,
                 )
             }
-        return mappedResults
+        }
     }
 }
 
@@ -67,17 +65,18 @@ fun isDuplicateWithLatest(
     inntektsmelding: Inntektsmelding,
     list: List<Inntektsmelding>,
 ): Boolean {
-    if (list.isEmpty()) {
-        return false
+    val nyesteInntektsmelding = list.maxByOrNull { it.mottattDato }
+    return if (nyesteInntektsmelding == null) {
+        false
+    } else {
+        val duplikatLatest = inntektsmelding.isDuplicate(nyesteInntektsmelding)
+        val duplikatExclusive = inntektsmelding.isDuplicateExclusiveArsakInnsending(nyesteInntektsmelding)
+
+        // Hvis AG angir en "Endring", blir dette videresendt til Spleis per nå, selv om innholdet er kliss likt. Logger til info for å vite faktisk omfang.
+        if (!duplikatLatest && duplikatExclusive) {
+            logger.warn("Likhetssjekk: Er duplikat ekslusiv ÅrsakInnsending! Journalpost: ${inntektsmelding.journalpostId} ")
+        }
+
+        duplikatLatest
     }
-    val nyesteInntektsmelding = list.sortedBy { it.mottattDato }.last()
-    val duplikatLatest = inntektsmelding.isDuplicate(nyesteInntektsmelding)
-    val duplikatExclusive = inntektsmelding.isDuplicateExclusiveArsakInnsending(nyesteInntektsmelding)
-    // Hvis AG angir en "Endring", blir dette videresendt til Spleis per nå, selv om innholdet er kliss likt. Logger til info for å vite faktisk omfang.
-    if (!duplikatLatest && duplikatExclusive) {
-        logger.warn(
-            "Likhetssjekk: Er duplikat ekslusiv ÅrsakInnsending! Journalpost: ${inntektsmelding.journalpostId} ",
-        )
-    }
-    return duplikatLatest
 }

@@ -9,14 +9,14 @@ import java.util.UUID
 
 data class Inntektsmelding(
     val id: String = "",
-    var fnr: String,
+    val fnr: String,
     val arbeidsgiverOrgnummer: String? = null,
     val arbeidsgiverPrivatFnr: String? = null,
     val arbeidsgiverPrivatAktørId: String? = null,
     val arbeidsforholdId: String? = null,
     val journalpostId: String,
     val arsakTilInnsending: String,
-    var journalStatus: JournalStatus,
+    val journalStatus: JournalStatus,
     val arbeidsgiverperioder: List<Periode> = emptyList(),
     val beregnetInntekt: BigDecimal? = null,
     val inntektsdato: LocalDate? = null,
@@ -29,7 +29,7 @@ data class Inntektsmelding(
     val feriePerioder: List<Periode> = emptyList(),
     val førsteFraværsdag: LocalDate?,
     val mottattDato: LocalDateTime,
-    var sakId: String? = null,
+    val sakId: String? = null,
     var aktorId: String? = null,
     val begrunnelseRedusert: String = "",
     val avsenderSystem: AvsenderSystem = AvsenderSystem(),
@@ -44,7 +44,7 @@ data class Inntektsmelding(
     val forespurt: Boolean = false,
 ) {
     fun isDuplicate(inntektsmelding: Inntektsmelding): Boolean =
-        this.equals(
+        this ==
             inntektsmelding.copy(
                 id = this.id,
                 fnr = this.fnr,
@@ -57,8 +57,7 @@ data class Inntektsmelding(
                 innsendingstidspunkt = this.innsendingstidspunkt,
                 avsenderSystem = this.avsenderSystem,
                 mottaksKanal = this.mottaksKanal,
-            ),
-        )
+            )
 
     fun isDuplicateExclusiveArsakInnsending(inntektsmelding: Inntektsmelding): Boolean =
         isDuplicate(

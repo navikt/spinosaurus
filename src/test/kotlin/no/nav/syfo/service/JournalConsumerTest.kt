@@ -17,10 +17,10 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 class JournalConsumerTest {
-    private val pdlClient = mockk<PdlClient>(relaxed = true)
-    private val dokumentClient = mockk<SafDokumentClient>(relaxed = true)
-    private val safJournalpostClient = mockk<SafJournalpostClient>(relaxed = true)
-    private val journalConsumer = JournalConsumer(dokumentClient, safJournalpostClient, pdlClient)
+    val pdlClient = mockk<PdlClient>(relaxed = true)
+    val dokumentClient = mockk<SafDokumentClient>(relaxed = true)
+    val safJournalpostClient = mockk<SafJournalpostClient>(relaxed = true)
+    val journalConsumer = JournalConsumer(dokumentClient, safJournalpostClient, pdlClient)
 
     // Todo Lage test for når safJournalpostClient returnerer errrors
 

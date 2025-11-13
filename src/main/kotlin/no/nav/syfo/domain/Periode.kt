@@ -8,10 +8,6 @@ data class Periode(
     val tom: LocalDate,
 )
 
-val norskDatoFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-
-fun LocalDate.tilNorskFormat(): String = format(norskDatoFormat)
-
 fun List<Periode>.tilKortFormat(): String? =
     if (isEmpty()) {
         null
@@ -20,3 +16,7 @@ fun List<Periode>.tilKortFormat(): String? =
     } else {
         "${first().fom.tilNorskFormat()} - [...] - ${last().tom.tilNorskFormat()}"
     }
+
+private val norskDatoFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+
+private fun LocalDate.tilNorskFormat(): String = format(norskDatoFormat)

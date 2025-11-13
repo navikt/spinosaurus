@@ -36,7 +36,7 @@ class SafJournalpostClient(
                             setBody(GetJournalpostRequest(query = lagQuery(journalpostId)))
                         }.call.response
                         .body<JournalResponse>()
-                if (response.errors != null && response.errors.isNotEmpty()) {
+                if (!response.errors.isNullOrEmpty()) {
                     throw ErrorException(journalpostId, response.errors.toString())
                 }
                 if (response.data?.journalpost == null) {
@@ -57,19 +57,19 @@ open class SafJournalpostException(
     journalpostId: String,
 ) : Exception(journalpostId)
 
-open class NotAuthorizedException(
+class NotAuthorizedException(
     journalpostId: String,
 ) : SafJournalpostException(
         "SAF ga ikke tilgang til å lese ut journalpost '$journalpostId'",
     )
 
-open class ErrorException(
+class ErrorException(
     journalpostId: String,
     errors: String,
 ) : SafJournalpostException(
         "SAF returnerte feil journalpost '$journalpostId': $errors",
     )
 
-open class EmptyException(
+class EmptyException(
     journalpostId: String,
 ) : SafJournalpostException("SAF returnerte tom journalpost '$journalpostId'")

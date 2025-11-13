@@ -13,9 +13,9 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 class InngaaendeJournalConsumerTest {
-    private val safJournalpostClient = mockk<SafJournalpostClient>(relaxed = true)
+    val safJournalpostClient = mockk<SafJournalpostClient>(relaxed = true)
 
-    private val inngaaendeJournalConsumer = InngaaendeJournalConsumer(safJournalpostClient)
+    val inngaaendeJournalConsumer = InngaaendeJournalConsumer(safJournalpostClient)
 
     @Test
     fun hentDokumentId() {

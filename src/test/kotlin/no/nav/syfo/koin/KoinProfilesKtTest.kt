@@ -2,7 +2,6 @@ package no.nav.syfo.koin
 
 import io.ktor.server.config.ApplicationConfig
 import io.mockk.every
-import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import no.nav.helsearbeidsgiver.pdl.PdlClient
 import no.nav.syfo.client.dokarkiv.DokArkivClient
@@ -13,7 +12,6 @@ import no.nav.syfo.repository.InntektsmeldingRepository
 import no.nav.syfo.util.AppEnv
 import no.nav.syfo.util.Metrikk
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.core.module.Module
@@ -24,20 +22,19 @@ import org.koin.test.inject
 import javax.sql.DataSource
 import kotlin.test.assertNotNull
 
-@ExtendWith(MockKExtension::class)
 class KoinProfilesKtTest : KoinTest {
-    private val config = mockk<ApplicationConfig>(relaxed = true)
-    private val clientConfig = mockk<ApplicationConfig>(relaxed = true)
-    private val metrikk = mockk<Metrikk>(relaxed = true)
+    val config = mockk<ApplicationConfig>(relaxed = true)
+    val clientConfig = mockk<ApplicationConfig>(relaxed = true)
+    val metrikk = mockk<Metrikk>(relaxed = true)
 
-    private val dataSource = mockk<DataSource>(relaxed = true)
-    private val inntektsmeldingRepository: InntektsmeldingRepository by inject()
-    private val pdlClient: PdlClient by inject()
-    private val safDokumentClient: SafDokumentClient by inject()
-    private val safJournalpostClient: SafDokumentClient by inject()
-    private val dokArkivClient: DokArkivClient by inject()
-    private val norg2Client: Norg2Client by inject()
-    private val oppgaveService: OppgaveService by inject()
+    val dataSource = mockk<DataSource>(relaxed = true)
+    val inntektsmeldingRepository: InntektsmeldingRepository by inject()
+    val pdlClient: PdlClient by inject()
+    val safDokumentClient: SafDokumentClient by inject()
+    val safJournalpostClient: SafDokumentClient by inject()
+    val dokArkivClient: DokArkivClient by inject()
+    val norg2Client: Norg2Client by inject()
+    val oppgaveService: OppgaveService by inject()
 
     @Test
     fun `test prodConfig`() {

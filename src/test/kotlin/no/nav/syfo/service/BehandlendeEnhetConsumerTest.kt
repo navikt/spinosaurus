@@ -18,9 +18,9 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class BehandlendeEnhetConsumerTest {
-    var pdlClient = mockk<PdlClient>(relaxed = true)
-    var norg2Client = mockk<Norg2Client>(relaxed = true)
-    var metrikk = mockk<Metrikk>(relaxed = true)
+    val pdlClient = mockk<PdlClient>(relaxed = true)
+    val norg2Client = mockk<Norg2Client>(relaxed = true)
+    val metrikk = mockk<Metrikk>(relaxed = true)
 
     val fnr = "123456789"
     val uuid = "abcdefgh"

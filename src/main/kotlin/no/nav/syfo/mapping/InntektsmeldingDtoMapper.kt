@@ -1,6 +1,7 @@
 package no.nav.syfo.mapping
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import no.nav.helsearbeidsgiver.utils.pipe.orDefault
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.syfo.domain.JournalStatus
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
@@ -27,9 +28,11 @@ fun toInntektsmelding(
     objectMapper: ObjectMapper,
 ): Inntektsmelding {
     val im = objectMapper.readValue(inntektsmeldingEntitet.data, Inntektsmelding::class.java)
-    im.fnr = im.fnr.ifEmpty { inntektsmeldingEntitet.fnr.verdi }
-    if (im.journalStatus == JournalStatus.MIDLERTIDIG) {
-        im.journalStatus = JournalStatus.MOTTATT
-    }
-    return im
+    return im.copy(
+        fnr = im.fnr.ifEmpty { inntektsmeldingEntitet.fnr.verdi },
+        journalStatus =
+            im.journalStatus
+                .takeIf { it != JournalStatus.MIDLERTIDIG }
+                .orDefault(JournalStatus.MOTTATT),
+    )
 }

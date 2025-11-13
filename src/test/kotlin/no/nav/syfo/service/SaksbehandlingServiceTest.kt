@@ -16,9 +16,9 @@ import java.time.LocalDate
 import java.util.Collections.emptyList
 
 class SaksbehandlingServiceTest {
-    private var oppgaveService = mockk<OppgaveService>(relaxed = true)
-    private var pdlClient = mockk<PdlClient>(relaxed = true)
-    private var inntektsmeldingService = mockk<InntektsmeldingService>(relaxed = true)
+    val oppgaveService = mockk<OppgaveService>(relaxed = true)
+    val pdlClient = mockk<PdlClient>(relaxed = true)
+    val inntektsmeldingService = mockk<InntektsmeldingService>(relaxed = true)
 
     @BeforeEach
     fun setup() {

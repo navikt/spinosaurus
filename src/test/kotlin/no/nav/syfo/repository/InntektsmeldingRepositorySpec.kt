@@ -1,6 +1,10 @@
 package no.nav.syfo.repository
 
 import com.zaxxer.hikari.HikariDataSource
+import no.nav.helsearbeidsgiver.utils.test.date.februar
+import no.nav.helsearbeidsgiver.utils.test.date.januar
+import no.nav.helsearbeidsgiver.utils.test.date.mai
+import no.nav.helsearbeidsgiver.utils.test.date.mars
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.inntektsmelding.kontrakt.serde.JacksonJsonConfig
 import no.nav.syfo.domain.JournalStatus
@@ -24,7 +28,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
-open class InntektsmeldingRepositorySpec : SystemTestBase() {
+class InntektsmeldingRepositorySpec : SystemTestBase() {
     lateinit var repository: InntektsmeldingRepository
 
     @BeforeAll
@@ -246,21 +250,24 @@ open class InntektsmeldingRepositorySpec : SystemTestBase() {
 
     @Test
     fun `skal hente inntektsmeldinger for gitt fnr i periode`() {
-        val im1 = lagInntektsmelding(LocalDate.of(2020, 1, 1).atStartOfDay())
-        val fnr = "07025032327"
-        im1.fnr = Fnr(fnr)
+        val fnr = Fnr("07025032327")
+
+        val im1 =
+            lagInntektsmelding(1.januar(2020).atStartOfDay())
+                .copy(fnr = fnr)
         repository.lagreInnteksmelding(im1)
 
-        val im2 = lagInntektsmelding(LocalDate.of(2020, 2, 1).atStartOfDay())
-        im2.fnr = Fnr(fnr)
+        val im2 =
+            lagInntektsmelding(1.februar(2020).atStartOfDay())
+                .copy(fnr = fnr)
         repository.lagreInnteksmelding(im2)
 
-        val im3 = lagInntektsmelding(LocalDate.of(2020, 3, 1).atStartOfDay())
-        im3.fnr = Fnr(fnr)
+        val im3 =
+            lagInntektsmelding(1.mars(2020).atStartOfDay())
+                .copy(fnr = fnr)
         repository.lagreInnteksmelding(im3)
 
-        val inntektsmeldinger =
-            repository.findByFnrInPeriod(fnr = fnr, fom = LocalDate.of(2020, 1, 15), tom = LocalDate.of(2020, 5, 15))
+        val inntektsmeldinger = repository.findByFnrInPeriod(fnr = fnr.verdi, fom = 15.januar(2020), tom = 15.mai(2020))
 
         assertThat(inntektsmeldinger.size).isEqualTo(2)
     }

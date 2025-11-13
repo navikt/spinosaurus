@@ -4,9 +4,9 @@ import java.time.LocalDate
 import java.util.UUID
 
 data class ArbeidsgiverperiodeEntitet(
-    var uuid: String = UUID.randomUUID().toString(),
+    val uuid: String = UUID.randomUUID().toString(),
     var inntektsmelding: InntektsmeldingEntitet? = null,
-    var fom: LocalDate,
-    var tom: LocalDate,
-    var inntektsmelding_uuid: String = "",
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val inntektsmelding_uuid: String = "",
 )

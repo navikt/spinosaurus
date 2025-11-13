@@ -13,7 +13,7 @@ open class AktørException(
     causedBy: Exception?,
 ) : BehandlingException(feiltype, message, causedBy)
 
-open class FantIkkeAktørException(
+class FantIkkeAktørException(
     causedBy: java.lang.Exception?,
 ) : AktørException(
         Feiltype.AKTØR_IKKE_FUNNET,
@@ -28,7 +28,7 @@ open class OppgaveException(
     causedBy: Exception?,
 ) : BehandlingException(feiltype, message, causedBy)
 
-open class HentOppgaveException(
+class HentOppgaveException(
     journalpostId: String,
     oppgaveType: String,
     cause: Exception?,
@@ -38,12 +38,12 @@ open class HentOppgaveException(
         cause,
     )
 
-open class OpprettOppgaveException(
+class OpprettOppgaveException(
     journalpostId: String,
     cause: Exception?,
 ) : OppgaveException(Feiltype.OPPGAVE_OPPRETT_VANLIG, "Klarte ikke opprette oppgave for journalpostId $journalpostId!", cause)
 
-open class OpprettFordelingsOppgaveException(
+class OpprettFordelingsOppgaveException(
     journalpostId: String,
     cause: Exception?,
 ) : OppgaveException(Feiltype.OPPGAVE_OPPRETT_FORDELING, "Klarte ikke opprette fordelingsoppgave for journalpostId $journalpostId!", cause)
@@ -55,12 +55,12 @@ open class BehandlendeEnhetException(
     cause: Exception?,
 ) : BehandlingException(feiltype, message, cause)
 
-open class IngenAktivEnhetException(
+class IngenAktivEnhetException(
     geografiskTilknytning: String?,
     cause: java.lang.Exception?,
 ) : BehandlendeEnhetException(Feiltype.BEHANDLENDE_INGEN_AKTIV_ENHET, "Fant ingen aktiv enhet for $geografiskTilknytning", cause)
 
-open class BehandlendeEnhetFeiletException(
+class BehandlendeEnhetFeiletException(
     cause: java.lang.Exception?,
 ) : BehandlendeEnhetException(Feiltype.BEHANDLENDE_FEILET, "Feil ved henting av geografisk tilknytning", cause)
 
@@ -71,7 +71,7 @@ open class JournalException(
     cause: Exception?,
 ) : BehandlingException(feiltype, message, cause)
 
-open class HentDokumentFeiletException(
+class HentDokumentFeiletException(
     journalpostId: String,
     cause: java.lang.Exception?,
 ) : JournalException(Feiltype.DOKUMENT_FEILET, "Kall til journal feilet for journalpostId $journalpostId!", cause)
