@@ -10,7 +10,7 @@ import java.net.InetAddress
 
 object LeaderElectionManager {
     val httpClient = createHttpClient(3)
-    val electorUrl = System.getProperty("ELECTOR_GET_URL")
+    val electorUrl = System.getenv("ELECTOR_GET_URL")
 
     fun isLeader() =
         runBlocking {
