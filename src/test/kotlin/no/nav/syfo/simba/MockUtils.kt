@@ -52,19 +52,6 @@ fun mockInntektsmelding(): Inntektsmelding =
             Inntekt(
                 beloep = 66_666.0,
                 inntektsdato = 10.januar,
-                naturalytelser =
-                    listOf(
-                        Naturalytelse(
-                            naturalytelse = Naturalytelse.Kode.BIL,
-                            verdiBeloep = 123.0,
-                            sluttdato = 1.februar,
-                        ),
-                        Naturalytelse(
-                            naturalytelse = Naturalytelse.Kode.FRITRANSPORT,
-                            verdiBeloep = 456.0,
-                            sluttdato = 15.februar,
-                        ),
-                    ),
                 endringAarsaker =
                     listOf(
                         Permisjon(
@@ -75,6 +62,19 @@ fun mockInntektsmelding(): Inntektsmelding =
                                 ),
                         ),
                     ),
+            ),
+        naturalytelser =
+            listOf(
+                Naturalytelse(
+                    naturalytelse = Naturalytelse.Kode.BIL,
+                    verdiBeloep = 123.0,
+                    sluttdato = 1.februar,
+                ),
+                Naturalytelse(
+                    naturalytelse = Naturalytelse.Kode.FRITRANSPORT,
+                    verdiBeloep = 456.0,
+                    sluttdato = 15.februar,
+                ),
             ),
         refusjon =
             Refusjon(

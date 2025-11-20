@@ -25,14 +25,9 @@ class MapInntektsmeldingFraSimbaTest {
         val naturalytelser = Naturalytelse.Kode.entries.map { Naturalytelse(it, 1.0, LocalDate.now()) }
         val antallNaturalytelser = naturalytelser.count()
         val imd =
-            mockInntektsmelding().let {
-                it.copy(
-                    inntekt =
-                        it.inntekt?.copy(
-                            naturalytelser = naturalytelser,
-                        ),
-                )
-            }
+            mockInntektsmelding().copy(
+                naturalytelser = naturalytelser,
+            )
         val mapped =
             mapInntektsmelding(
                 arkivreferanse = "im1323",
@@ -108,7 +103,6 @@ class MapInntektsmeldingFraSimbaTest {
                     Inntekt(
                         beloep = 60_000.0,
                         inntektsdato = 3.mai,
-                        naturalytelser = emptyList(),
                         endringAarsaker = listOf(Bonus),
                     ),
             )
