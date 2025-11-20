@@ -1,6 +1,6 @@
 package no.nav.syfo.integration.kafka.journalpost
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import io.mockk.clearAllMocks
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.runBlocking
@@ -15,19 +15,23 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class JournalpostHendelseConsumerTest {
-    var bakgrunnsjobbRepo: BakgrunnsjobbRepository = mockk(relaxed = true)
-    var om: ObjectMapper = mockk(relaxed = true)
-    var props = joarkLocalProperties().toMap()
-    val topicName = "topic"
-    lateinit var consumer: JournalpostHendelseConsumer
+    val bakgrunnsjobbRepo: BakgrunnsjobbRepository = mockk(relaxed = true)
+
+    val consumer =
+        JournalpostHendelseConsumer(
+            props = joarkLocalProperties().toMap(),
+            topicName = "topic",
+            bakgrunnsjobbRepo = bakgrunnsjobbRepo,
+            om = mockk(relaxed = true),
+        )
+
     val gyldigInntektsmelding = InngaaendeJournalpostDTO("abc", 1, "JournalpostMottatt", 111, "MOTTATT", "", "SYK", "ALTINN", "", "")
-    val ikkeInntektsmelding =
-        InngaaendeJournalpostDTO("abc", 1, "JournalpostMottatt", 333, "IKKE_MOTTATT", "", "IKKE_SYK", "IKKE_ALTINN", "", "")
-    val feilHendelseType = InngaaendeJournalpostDTO("abc", 1, "TemaEndret", 333, "MOTTATT", "", "SYK", "ALTINN", "", "")
+    val ikkeInntektsmelding = gyldigInntektsmelding.copy(journalpostId = 333, journalpostStatus = "IKKE_MOTTATT", temaNytt = "IKKE_SYK", mottaksKanal = "IKKE_ALTINN")
+    val feilHendelseType = gyldigInntektsmelding.copy(hendelsesType = "TemaEndret", journalpostId = 333)
 
     @BeforeEach
     fun before() {
-        consumer = JournalpostHendelseConsumer(props, topicName, bakgrunnsjobbRepo, om)
+        clearAllMocks()
     }
 
     @Test

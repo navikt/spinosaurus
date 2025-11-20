@@ -13,11 +13,9 @@ import org.junit.jupiter.api.assertThrows
 class SafJournalpostClientTest {
     val objectMapper = buildObjectMapper()
 
-    private lateinit var client: SafJournalpostClient
-
     @Test
     fun `Skal hente ut gyldig respons`() {
-        client = SafJournalpostClient(buildHttpClientJson(HttpStatusCode.OK, validJson()), "http://localhost", ::mockAccessToken)
+        val client = SafJournalpostClient(buildHttpClientJson(HttpStatusCode.OK, validJson()), "http://localhost", ::mockAccessToken)
         runBlocking {
             val journalpost = client.getJournalpostMetadata("123")
             Assertions.assertThat(journalpost?.journalstatus).isEqualTo(JournalStatus.MOTTATT)
@@ -27,7 +25,7 @@ class SafJournalpostClientTest {
 
     @Test
     fun `Skal håndtere feil`() {
-        client = SafJournalpostClient(buildHttpClientJson(HttpStatusCode.OK, errorJson()), "http://localhost", ::mockAccessToken)
+        val client = SafJournalpostClient(buildHttpClientJson(HttpStatusCode.OK, errorJson()), "http://localhost", ::mockAccessToken)
         runBlocking {
             assertThrows<ErrorException> {
                 client.getJournalpostMetadata("123")
@@ -37,7 +35,7 @@ class SafJournalpostClientTest {
 
     @Test
     fun `Skal håndtere ikke autorisert`() {
-        client =
+        val client =
             SafJournalpostClient(
                 buildHttpClientJson(HttpStatusCode.Unauthorized, unauthorizedJson()),
                 "http://localhost",

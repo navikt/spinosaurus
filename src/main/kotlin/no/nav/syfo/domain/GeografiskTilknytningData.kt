@@ -1,6 +1,6 @@
 package no.nav.syfo.domain
 
 data class GeografiskTilknytningData(
-    var geografiskTilknytning: String? = null,
-    var diskresjonskode: String? = null,
+    val geografiskTilknytning: String? = null,
+    val diskresjonskode: String? = null,
 )
