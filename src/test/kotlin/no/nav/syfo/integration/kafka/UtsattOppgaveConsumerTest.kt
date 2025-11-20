@@ -18,10 +18,10 @@ import java.util.UUID
 
 class UtsattOppgaveConsumerTest {
     lateinit var consumer: UtsattOppgaveConsumer
-    var om: ObjectMapper = mockk(relaxed = true)
-    var props = joarkLocalProperties().toMap()
-    var utsattOppgaveService: UtsattOppgaveService = mockk(relaxed = true)
-    var bakgrunnsjobbRepo: BakgrunnsjobbRepository = mockk(relaxed = true)
+    val om: ObjectMapper = mockk(relaxed = true)
+    val props = joarkLocalProperties().toMap()
+    val utsattOppgaveService: UtsattOppgaveService = mockk(relaxed = true)
+    val bakgrunnsjobbRepo: BakgrunnsjobbRepository = mockk(relaxed = true)
     val topicName = "topic"
     val timeout: LocalDateTime = LocalDateTime.now()
     val utsattOppgaveDTO = UtsattOppgaveDTO(DokumentTypeDTO.Inntektsmelding, OppdateringstypeDTO.Opprett, UUID.randomUUID(), timeout)

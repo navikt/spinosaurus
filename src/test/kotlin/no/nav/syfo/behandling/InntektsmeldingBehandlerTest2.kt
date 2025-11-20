@@ -45,7 +45,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
 
 class InntektsmeldingBehandlerTest2 {
-    private var objectMapper =
+    val objectMapper =
         ObjectMapper()
             .registerModule(
                 KotlinModule
@@ -63,28 +63,29 @@ class InntektsmeldingBehandlerTest2 {
             .configure(SerializationFeature.INDENT_OUTPUT, true)
             .configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true)
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-    private var inngaaendeJournalConsumer = mockk<InngaaendeJournalConsumer>(relaxed = true)
-    private var metrikk = mockk<Metrikk>(relaxed = true)
-    private var behandleInngaaendeJournalConsumer = mockk<BehandleInngaaendeJournalConsumer>(relaxed = true)
-    private var behandlendeEnhetConsumer = mockk<BehandlendeEnhetConsumer>(relaxed = true)
-    private var journalpostService = mockk<JournalpostService>(relaxed = true)
+    val inngaaendeJournalConsumer = mockk<InngaaendeJournalConsumer>(relaxed = true)
+    val metrikk = mockk<Metrikk>(relaxed = true)
+    val behandleInngaaendeJournalConsumer = mockk<BehandleInngaaendeJournalConsumer>(relaxed = true)
+    val behandlendeEnhetConsumer = mockk<BehandlendeEnhetConsumer>(relaxed = true)
 
-    private var inntektsmeldingRepository = mockk<InntektsmeldingRepository>(relaxed = true)
-    private var mockInnteksmeldingRepo = InntektsmeldingRepositoryMock()
-    private var inntektsmeldingService =
+    val inntektsmeldingRepository = mockk<InntektsmeldingRepository>(relaxed = true)
+    val mockInnteksmeldingRepo = InntektsmeldingRepositoryMock()
+    val inntektsmeldingService =
         InntektsmeldingService(
             mockInnteksmeldingRepo,
             objectMapper,
         ) // mockk<InntektsmeldingService>(relaxed = true)
 
-    private var utsattOppgaveService = mockk<UtsattOppgaveService>(relaxed = true)
+    val utsattOppgaveService = mockk<UtsattOppgaveService>(relaxed = true)
 
-    private var journalConsumer = mockk<JournalConsumer>(relaxed = true)
-    private var safDokumentClient = mockk<SafDokumentClient>(relaxed = true)
-    private var safJournalpostClient = mockk<SafJournalpostClient>(relaxed = true)
-    private var inntektsmeldingBehandler = mockk<InntektsmeldingBehandler>(relaxed = true)
-    private var aivenInntektsmeldingBehandler = mockk<InntektsmeldingAivenProducer>(relaxed = true)
-    private val pdlClient = mockk<PdlClient>(relaxed = true)
+    val safDokumentClient = mockk<SafDokumentClient>(relaxed = true)
+    val safJournalpostClient = mockk<SafJournalpostClient>(relaxed = true)
+    val aivenInntektsmeldingBehandler = mockk<InntektsmeldingAivenProducer>(relaxed = true)
+    val pdlClient = mockk<PdlClient>(relaxed = true)
+
+    var journalpostService = mockk<JournalpostService>(relaxed = true)
+    var journalConsumer = mockk<JournalConsumer>(relaxed = true)
+    var inntektsmeldingBehandler = mockk<InntektsmeldingBehandler>(relaxed = true)
 
     @BeforeEach
     fun setup() {

@@ -22,10 +22,10 @@ import java.util.UUID
 
 class InntektsmeldingConsumerTest {
     lateinit var consumer: InntektsmeldingConsumer
-    var props = joarkLocalProperties().toMap()
+    val props = joarkLocalProperties().toMap()
     val inntektsmeldingService: InntektsmeldingService = mockk(relaxed = true)
     val inntektsmeldingAivenProducer: InntektsmeldingAivenProducer = mockk(relaxed = true)
-    var utsattOppgaveService: UtsattOppgaveService = mockk(relaxed = true)
+    val utsattOppgaveService: UtsattOppgaveService = mockk(relaxed = true)
     val pdlClient: PdlClient = mockk(relaxed = true)
     val topicName = "helsearbeidsgiver.inntektsmelding"
     val testNow: LocalDateTime = LocalDateTime.of(2025, 12, 5, 16, 45)
