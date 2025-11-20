@@ -12,7 +12,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-internal class FinnBehandlingsKategoriTest {
+class FinnBehandlingsKategoriTest {
     @Test
     fun krever_ikke_refusjon_ved_null_beløp() {
         val inntektsmelding = mockInntektsmelding(Refusjon(beloepPrMnd = null, LocalDate.now()), BigDecimal(11000))
