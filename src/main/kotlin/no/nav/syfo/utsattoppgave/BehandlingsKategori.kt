@@ -3,7 +3,6 @@ package no.nav.syfo.utsattoppgave
 import no.nav.helsearbeidsgiver.oppgave.domain.Behandlingstema
 import no.nav.helsearbeidsgiver.oppgave.domain.Behandlingstype
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
-import no.nav.syfo.dto.UtsattOppgaveEntitet
 import java.math.BigDecimal
 
 enum class BehandlingsKategori(
@@ -48,10 +47,7 @@ fun finnBehandlingsKategori(
         inntektsmelding.begrunnelseRedusert == "BetvilerArbeidsufoerhet" -> BehandlingsKategori.BESTRIDER_SYKEMELDING
 
         inntektsmelding.refusjon.beloepPrMnd == null ||
-            inntektsmelding.refusjon.beloepPrMnd <
-            BigDecimal(
-                1,
-            )
+            inntektsmelding.refusjon.beloepPrMnd < BigDecimal(1)
         -> BehandlingsKategori.IKKE_REFUSJON
 
         inntektsmelding.refusjon.opphoersdato != null -> BehandlingsKategori.REFUSJON_MED_DATO
@@ -62,9 +58,3 @@ fun finnBehandlingsKategori(
 
         else -> BehandlingsKategori.REFUSJON_UTEN_DATO
     }
-
-fun utledBehandlingsKategori(
-    oppgave: UtsattOppgaveEntitet,
-    inntektsmelding: Inntektsmelding,
-    gjelderUtland: Boolean,
-): BehandlingsKategori = finnBehandlingsKategori(inntektsmelding, oppgave.speil, gjelderUtland)

@@ -12,14 +12,13 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime.now
 import java.util.UUID
 
-open class UtsattOppgaveDAOTest {
-    private var repository: UtsattOppgaveRepository = UtsattOppgaveRepositoryMockk()
-
-    private lateinit var utsattOppgaveDAO: UtsattOppgaveDAO
+class UtsattOppgaveDAOTest {
+    val repository: UtsattOppgaveRepository = UtsattOppgaveRepositoryMockk()
+    val utsattOppgaveDAO = UtsattOppgaveDAO(repository)
 
     @BeforeEach
     fun setup() {
-        utsattOppgaveDAO = UtsattOppgaveDAO(repository)
+        repository.deleteAll()
     }
 
     @Test
@@ -51,8 +50,11 @@ open class UtsattOppgaveDAOTest {
         utsattOppgaveDAO.opprett(oppgave1)
         utsattOppgaveDAO.opprett(oppgave2)
 
-        oppgave1.tilstand = Tilstand.Forkastet
-        utsattOppgaveDAO.lagre(oppgave1)
+        utsattOppgaveDAO.oppdater(
+            oppgave1.copy(
+                tilstand = Tilstand.Forkastet,
+            ),
+        )
 
         val funnetOppgave1 = utsattOppgaveDAO.finn(oppgave1.inntektsmeldingId)!!
         assertEquals(Tilstand.Forkastet, funnetOppgave1.tilstand)

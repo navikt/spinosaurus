@@ -23,24 +23,27 @@ interface UtsattOppgaveRepository {
 }
 
 class UtsattOppgaveRepositoryMockk : UtsattOppgaveRepository {
-    private val mockrepo = mutableSetOf<UtsattOppgaveEntitet>()
+    private val mockrepo = mutableMapOf<String, UtsattOppgaveEntitet>()
 
-    override fun findByInntektsmeldingId(inntektsmeldingId: String): UtsattOppgaveEntitet? = mockrepo.firstOrNull { it.inntektsmeldingId == inntektsmeldingId }
+    override fun findByInntektsmeldingId(inntektsmeldingId: String): UtsattOppgaveEntitet? = mockrepo[inntektsmeldingId]
 
     override fun findUtsattOppgaveEntitetByTimeoutBeforeAndTilstandEquals(
         timeout: LocalDateTime,
         tilstand: Tilstand,
-    ): List<UtsattOppgaveEntitet> = mockrepo.filter { it.timeout < timeout && it.tilstand == tilstand }
+    ): List<UtsattOppgaveEntitet> = mockrepo.values.filter { it.timeout < timeout && it.tilstand == tilstand }
 
     override fun opprett(uo: UtsattOppgaveEntitet): UtsattOppgaveEntitet {
-        mockrepo.add(uo)
+        mockrepo.put(uo.inntektsmeldingId, uo)
         return uo
     }
 
-    override fun oppdater(uo: UtsattOppgaveEntitet): UtsattOppgaveEntitet = uo
+    override fun oppdater(uo: UtsattOppgaveEntitet): UtsattOppgaveEntitet {
+        mockrepo.put(uo.inntektsmeldingId, uo)
+        return uo
+    }
 
     override fun deleteAll() {
-        mockrepo.forEach { mockrepo.remove(it) }
+        mockrepo.clear()
     }
 }
 
@@ -57,11 +60,7 @@ class UtsattOppgaveRepositoryImp(
                     .apply {
                         setString(1, inntektsmeldingId)
                     }.executeQuery()
-            val list: ArrayList<UtsattOppgaveEntitet> = resultLoop(res, inntektsmeldinger)
-            if (list.isEmpty()) {
-                return null
-            }
-            return list.first()
+            return resultLoop(res, inntektsmeldinger).firstOrNull()
         }
     }
 

@@ -3,19 +3,19 @@ package no.nav.syfo.dto
 import java.time.LocalDateTime
 
 data class UtsattOppgaveEntitet(
-    var id: Int = 0,
-    var inntektsmeldingId: String,
-    var arkivreferanse: String,
-    var fnr: String,
-    var aktørId: String,
-    var journalpostId: String,
-    var timeout: LocalDateTime,
-    var tilstand: Tilstand,
-    var enhet: String = "",
-    var gosysOppgaveId: String?,
-    var oppdatert: LocalDateTime?,
-    var speil: Boolean,
-    var utbetalingBruker: Boolean,
+    val id: Int = 0,
+    val inntektsmeldingId: String,
+    val arkivreferanse: String,
+    val fnr: String,
+    val aktørId: String,
+    val journalpostId: String,
+    val timeout: LocalDateTime,
+    val tilstand: Tilstand,
+    val enhet: String = "",
+    val gosysOppgaveId: String?,
+    val oppdatert: LocalDateTime?,
+    val speil: Boolean,
+    val utbetalingBruker: Boolean,
 )
 
 enum class Tilstand {
