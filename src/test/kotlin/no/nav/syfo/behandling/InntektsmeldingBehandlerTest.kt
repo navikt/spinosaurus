@@ -23,13 +23,13 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 class InntektsmeldingBehandlerTest {
-    private val metrikk = mockk<Metrikk>(relaxed = true)
-    private var journalpostService = mockk<JournalpostService>(relaxed = true)
-    private var utsattOppgaveService = mockk<UtsattOppgaveService>(relaxed = true)
-    private var inntektsmeldingService = mockk<InntektsmeldingService>(relaxed = true)
-    private val aivenInntektsmeldingProducer = mockk<InntektsmeldingAivenProducer>(relaxed = true)
-    private val pdlClient = mockk<PdlClient>(relaxed = true)
-    private var inntektsmeldingBehandler =
+    val metrikk = mockk<Metrikk>(relaxed = true)
+    val journalpostService = mockk<JournalpostService>(relaxed = true)
+    val utsattOppgaveService = mockk<UtsattOppgaveService>(relaxed = true)
+    val inntektsmeldingService = mockk<InntektsmeldingService>(relaxed = true)
+    val aivenInntektsmeldingProducer = mockk<InntektsmeldingAivenProducer>(relaxed = true)
+    val pdlClient = mockk<PdlClient>(relaxed = true)
+    val inntektsmeldingBehandler =
         InntektsmeldingBehandler(
             journalpostService,
             metrikk,

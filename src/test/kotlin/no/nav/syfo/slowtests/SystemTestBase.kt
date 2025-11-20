@@ -14,7 +14,7 @@ import org.koin.test.KoinTest
  * 3) Kjøre ende til ende-tester (feks teste at en søknad send inn på HTTP-endepunktet havner i databasen riktig)
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-open class SystemTestBase : KoinTest {
+abstract class SystemTestBase : KoinTest {
     companion object {
         const val TEST_SERVER_PORT = 8989
         var app: SpinnApplication? = null

@@ -7,11 +7,11 @@ import java.time.LocalDateTime
 data class InntektsmeldingEntitet(
     val uuid: String,
     var aktorId: String,
-    var journalpostId: String,
-    var orgnummer: String? = null,
-    var arbeidsgiverPrivat: String? = null,
-    var behandlet: LocalDateTime? = LocalDateTime.now(),
-    var fnr: Fnr,
+    val journalpostId: String,
+    val orgnummer: String? = null,
+    val arbeidsgiverPrivat: String? = null,
+    val behandlet: LocalDateTime? = LocalDateTime.now(),
+    val fnr: Fnr,
     var data: String? = null,
 ) {
     var arbeidsgiverperioder: MutableList<ArbeidsgiverperiodeEntitet> = ArrayList()

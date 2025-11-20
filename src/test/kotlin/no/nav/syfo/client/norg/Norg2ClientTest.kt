@@ -8,12 +8,10 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class Norg2ClientTest {
-    private lateinit var norgClient: Norg2Client
-
     @Test
     fun hentAlleArbeidsfordelinger() {
         runBlocking {
-            norgClient = Norg2Client("url", buildHttpClientJson(HttpStatusCode.OK, lagResponse()))
+            val norgClient = Norg2Client("url", buildHttpClientJson(HttpStatusCode.OK, lagResponse()))
             val arbeidsfordelinger = norgClient.hentAlleArbeidsfordelinger(lagRequest(), "123")
             assertThat(arbeidsfordelinger.size).isEqualTo(1)
             assertThat(arbeidsfordelinger[0].enhetNr).isEqualTo("1234")
