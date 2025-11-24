@@ -85,11 +85,7 @@ fun mapInntektsmelding(
                 .orEmpty(),
         beregnetInntekt = im.inntekt?.beloep?.toBigDecimal(),
         inntektsdato = im.inntekt?.inntektsdato,
-        opphørAvNaturalYtelse =
-            im.inntekt
-                ?.naturalytelser
-                ?.map(NaturalytelseV1::tilNaturalytelse)
-                .orEmpty(),
+        opphørAvNaturalYtelse = im.naturalytelser.map(NaturalytelseV1::tilNaturalytelse),
         rapportertInntekt = im.inntekt?.tilRapportertInntekt(),
         refusjon = im.refusjon.tilRefusjon(),
         endringerIRefusjon =
