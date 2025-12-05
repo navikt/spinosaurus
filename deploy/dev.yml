@@ -17,8 +17,8 @@ spec:
     limits:
       memory: 2048Mi
   replicas:
-    max: 1
-    min: 1
+    max: 2
+    min: 2
   prometheus:
     enabled: false
     path: /metrics
