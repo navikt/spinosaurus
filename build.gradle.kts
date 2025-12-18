@@ -107,6 +107,8 @@ dependencies {
     val hikariVersion: String by project
     val imkontraktVersion: String by project
     val jacksonVersion: String by project
+    val jaxbRuntimeVersion: String by project
+    val jaxbVersion: String by project
     val joarkHendelseVersion: String by project
     val junitJupiterVersion: String by project
     val kafkaVersion: String by project
@@ -145,6 +147,7 @@ dependencies {
     implementation("io.prometheus:simpleclient_common:$prometheusVersion")
     implementation("io.prometheus:simpleclient_hotspot:$prometheusVersion")
     implementation("javax.annotation:javax.annotation-api:$annotationApiVersion")
+    implementation("javax.xml.bind:jaxb-api:$jaxbVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logbackVersion")
     implementation("no.nav.helsearbeidsgiver:domene-inntektsmelding:$hagDomeneInntektsmeldingVersion")
     implementation("no.nav.helsearbeidsgiver:hag-bakgrunnsjobb:$bakgrunnsjobbVersion")
@@ -168,6 +171,7 @@ dependencies {
     implementation("org.slf4j:slf4j-api:$slf4Version")
 
     runtimeOnly("ch.qos.logback:logback-classic:$logbackClassicVersion")
+    runtimeOnly("com.sun.xml.bind:jaxb-impl:$jaxbRuntimeVersion")
 
     testImplementation(testFixtures("no.nav.helsearbeidsgiver:utils:$hagUtilsVersion"))
     testImplementation("io.insert-koin:koin-test:$koinVersion")

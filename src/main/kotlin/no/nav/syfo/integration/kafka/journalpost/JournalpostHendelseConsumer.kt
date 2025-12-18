@@ -76,16 +76,21 @@ class JournalpostHendelseConsumer(
 
     fun processHendelse(journalpostDTO: InngaaendeJournalpostDTO) {
         when (findStatus(journalpostDTO)) {
-            JournalpostStatus.Ny -> lagreBakgrunnsjobb(journalpostDTO)
-            JournalpostStatus.IkkeInntektsmelding ->
+            JournalpostStatus.Ny -> {
+                lagreBakgrunnsjobb(journalpostDTO)
+            }
+
+            JournalpostStatus.IkkeInntektsmelding -> {
                 logger.debug(
                     "Ignorerte journalposthendelse ${journalpostDTO.hendelsesId}. Kanal: ${journalpostDTO.mottaksKanal} Tema: ${journalpostDTO.temaNytt} Status: ${journalpostDTO.journalpostStatus}",
                 )
+            }
 
-            JournalpostStatus.FeilHendelseType ->
+            JournalpostStatus.FeilHendelseType -> {
                 logger.debug(
                     "Ingorerte JournalpostHendelse ${journalpostDTO.hendelsesId} av type ${journalpostDTO.hendelsesType} med referanse: ${journalpostDTO.kanalReferanseId}",
                 )
+            }
         }
     }
 

@@ -25,9 +25,11 @@ enum class DokumentTypeDTO {
 fun OppdateringstypeDTO.tilHandling() =
     when (this) {
         OppdateringstypeDTO.Utsett -> Handling.Utsett
+
         OppdateringstypeDTO.Opprett,
         OppdateringstypeDTO.OpprettSpeilRelatert,
         -> Handling.Opprett
+
         OppdateringstypeDTO.Ferdigbehandlet -> Handling.Forkast
     }
 
