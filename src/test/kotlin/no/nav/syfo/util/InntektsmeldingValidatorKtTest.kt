@@ -2,7 +2,7 @@ package no.nav.syfo.util
 
 import no.nav.syfo.domain.inntektsmelding.Gyldighetsstatus
 import no.nav.syfo.grunnleggendeInntektsmelding
-import org.junit.Assert.assertEquals
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class InntektsmeldingValidatorKtTest {

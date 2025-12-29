@@ -69,7 +69,10 @@ fun AuthClient.fetchToken(
         runBlocking {
             token(identityProvider, target).let {
                 when (it) {
-                    is TokenResponse.Success -> it.accessToken
+                    is TokenResponse.Success -> {
+                        it.accessToken
+                    }
+
                     is TokenResponse.Error -> {
                         sikkerLogger().error("Feilet å hente token. status: ${it.status} - ${it.error.errorDescription}")
                         throw RuntimeException("Feilet å hente token. status: ${it.status} - ${it.error.errorDescription}")

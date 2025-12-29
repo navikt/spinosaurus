@@ -16,10 +16,9 @@ import no.nav.syfo.repository.InntektsmeldingRepository
 import no.nav.syfo.repository.buildIM
 import no.nav.syfo.web.api.FinnInntektsmeldingerRequest
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -198,6 +197,6 @@ class InntektsmeldingServiceTest {
         val fom = LocalDate.now().minusDays(10)
         val tom = LocalDate.now()
         every { repository.findByFnrInPeriod(fnr, fom, tom) } returns emptyList()
-        Assertions.assertTrue(service.finnInntektsmeldinger(FinnInntektsmeldingerRequest(fnr, fom, tom)).isEmpty())
+        assertTrue(service.finnInntektsmeldinger(FinnInntektsmeldingerRequest(fnr, fom, tom)).isEmpty())
     }
 }

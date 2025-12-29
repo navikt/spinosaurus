@@ -73,5 +73,6 @@ private fun utledMottakskanal(ansenderSystemNavn: String?): MottaksKanal =
         "NAV_NO",
         "NAV_NO_SELVBESTEMT",
         -> MottaksKanal.NAV_NO
+
         else -> MottaksKanal.ALTINN
     }

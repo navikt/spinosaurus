@@ -47,7 +47,9 @@ fun mapInntektsmelding(
     val avsenderSystemNavn =
         when (im.type) {
             is InntektsmeldingV1.Type.Forespurt -> Avsender.NAV_NO
+
             is InntektsmeldingV1.Type.ForespurtEkstern -> im.type.avsenderSystem.navn
+
             is InntektsmeldingV1.Type.Selvbestemt,
             is InntektsmeldingV1.Type.Fisker,
             is InntektsmeldingV1.Type.UtenArbeidsforhold,
