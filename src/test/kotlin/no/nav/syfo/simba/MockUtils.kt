@@ -103,11 +103,6 @@ fun mockAgp(): Arbeidsgiverperiode =
                 5.januar til 5.januar,
                 10.januar til 21.januar,
             ),
-        egenmeldinger =
-            listOf(
-                1.januar til 3.januar,
-                5.januar til 5.januar,
-            ),
         redusertLoennIAgp =
             RedusertLoennIAgp(
                 beloep = 55_555.0,
