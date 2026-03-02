@@ -97,7 +97,7 @@ class InntektsmeldingUtilsKtTest {
     }
 
     @Test
-    fun `forespurt IM med ikke-forespurt AGP skal _ikke_ sendes til Spleis`() {
+    fun `forespurt IM med ikke-forespurt AGP skal sendes til Spleis`() {
         val imMedForespurtAgp =
             mockInntektsmelding().copy(
                 type =
@@ -108,7 +108,7 @@ class InntektsmeldingUtilsKtTest {
                 agp = mockAgp(),
             )
 
-        assertFalse(imMedForespurtAgp.skalSendesTilSpleis())
+        assertTrue(imMedForespurtAgp.skalSendesTilSpleis())
     }
 
     @Test
@@ -160,7 +160,7 @@ class InntektsmeldingUtilsKtTest {
     }
 
     @Test
-    fun `forespurt, ekstern IM med ikke-forespurt AGP skal _ikke_ sendes til Spleis`() {
+    fun `forespurt, ekstern IM med ikke-forespurt AGP skal sendes til Spleis`() {
         val imMedForespurtAgp =
             mockInntektsmelding().copy(
                 type =
@@ -172,6 +172,6 @@ class InntektsmeldingUtilsKtTest {
                 agp = mockAgp(),
             )
 
-        assertFalse(imMedForespurtAgp.skalSendesTilSpleis())
+        assertTrue(imMedForespurtAgp.skalSendesTilSpleis())
     }
 }
