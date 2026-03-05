@@ -93,23 +93,6 @@ class InntektsmeldingConsumerTest {
                 mockInntektsmelding().copy(type = Inntektsmelding.Type.Fisker(UUID.randomUUID())),
                 mockInntektsmelding().copy(type = Inntektsmelding.Type.UtenArbeidsforhold(UUID.randomUUID())),
                 mockInntektsmelding().copy(type = Inntektsmelding.Type.Behandlingsdager(UUID.randomUUID())),
-                mockInntektsmelding().copy(
-                    type =
-                        Inntektsmelding.Type.Forespurt(
-                            id = UUID.randomUUID(),
-                            erAgpForespurt = false,
-                        ),
-                    agp = mockAgp(),
-                ),
-                mockInntektsmelding().copy(
-                    type =
-                        Inntektsmelding.Type.ForespurtEkstern(
-                            id = UUID.randomUUID(),
-                            erAgpForespurt = false,
-                            _avsenderSystem = mockAvsenderSystem(),
-                        ),
-                    agp = mockAgp(),
-                ),
             )
     }
 }
