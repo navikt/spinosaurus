@@ -102,6 +102,7 @@ fun mapInntektsmelding(
         innsendingstidspunkt = im.mottatt.toLocalDateTime(),
         mottaksKanal = im.type.kanal.mapTilMottakskanal(),
         forespurt = im.type is InntektsmeldingV1.Type.Forespurt || im.type is InntektsmeldingV1.Type.ForespurtEkstern,
+        harFlereArbeidsforhold = im.type.harFlereArbeidsforhold(),
     )
 }
 

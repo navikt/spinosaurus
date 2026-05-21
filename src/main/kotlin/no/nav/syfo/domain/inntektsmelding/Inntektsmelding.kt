@@ -42,6 +42,7 @@ data class Inntektsmelding(
     val vedtaksperiodeId: UUID? = null,
     val mottaksKanal: MottaksKanal = utledMottakskanal(avsenderSystem.navn),
     val forespurt: Boolean = false,
+    val harFlereArbeidsforhold: Boolean = false,
 ) {
     fun isDuplicate(inntektsmelding: Inntektsmelding): Boolean =
         this ==
