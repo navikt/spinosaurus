@@ -1,5 +1,6 @@
 package no.nav.syfo.simba
 
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsforhold
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Bonus
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding
@@ -7,10 +8,13 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RedusertLoennIAgp
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema.FlereArbeidsforhold
 import no.nav.helsearbeidsgiver.utils.test.date.desember
 import no.nav.helsearbeidsgiver.utils.test.date.mai
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -129,6 +133,46 @@ class MapInntektsmeldingFraSimbaTest {
         val vedtaksperiodeId = UUID.randomUUID()
         val im2 = mapInntektsmelding("im1", "2", "3", mockInntektsmelding().copy(vedtaksperiodeId = vedtaksperiodeId))
         assertEquals(vedtaksperiodeId, im2.vedtaksperiodeId)
+    }
+
+    @Test
+    fun mapHarFlereArbeidsforholdDefaultFalse() {
+        val mapped = mapInntektsmelding("im1", "2", "3", mockInntektsmelding())
+        assertFalse(mapped.harFlereArbeidsforhold)
+    }
+
+    @Test
+    fun mapHarFlereArbeidsforholdTrue() {
+        val flereArbeidsforhold =
+            FlereArbeidsforhold(
+                harLikLoenn = false,
+                erSykmeldtFraAlle = false,
+                arbeidsforhold =
+                    listOf(
+                        Arbeidsforhold(
+                            inkludertISykefravaer = true,
+                            yrkesbeskrivelse = "Snekker",
+                            stillingsprosent = 50.0,
+                            inntekt = 30000.0,
+                        ),
+                        Arbeidsforhold(
+                            inkludertISykefravaer = false,
+                            yrkesbeskrivelse = "Maler",
+                            stillingsprosent = 50.0,
+                            inntekt = 20000.0,
+                        ),
+                    ),
+            )
+        val im =
+            mockInntektsmelding().copy(
+                type =
+                    Inntektsmelding.Type.Forespurt(
+                        id = UUID.randomUUID(),
+                        flereArbeidsforhold = flereArbeidsforhold,
+                    ),
+            )
+        val mapped = mapInntektsmelding("im1", "2", "3", im)
+        assertTrue(mapped.harFlereArbeidsforhold)
     }
 
     @Test
