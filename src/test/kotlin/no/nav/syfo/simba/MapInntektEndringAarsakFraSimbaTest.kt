@@ -69,7 +69,7 @@ class MapInntektEndringAarsakFraSimbaTest {
                 )
             }
 
-        val mapped = mapInntektsmelding("1", "2", "3", im)
+        val mapped = mapInntektsmelding(im = im)
 
         assertEquals(spinnInntektEndringAarsak, mapped.rapportertInntekt?.endringAarsakerData?.get(0))
     }
