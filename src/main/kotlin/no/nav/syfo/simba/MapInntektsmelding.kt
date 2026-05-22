@@ -38,6 +38,14 @@ object Avsender {
     const val NAV_NO_SELVBESTEMT = NAV_NO + "_SELVBESTEMT"
 }
 
+fun mapInntektsmelding(im: InntektsmeldingV1): Inntektsmelding =
+    mapInntektsmelding(
+        arkivreferanse = "im1",
+        aktorId = "2",
+        journalpostId = "3",
+        im = im,
+    )
+
 fun mapInntektsmelding(
     arkivreferanse: String,
     aktorId: String,
@@ -102,6 +110,7 @@ fun mapInntektsmelding(
         innsendingstidspunkt = im.mottatt.toLocalDateTime(),
         mottaksKanal = im.type.kanal.mapTilMottakskanal(),
         forespurt = im.type is InntektsmeldingV1.Type.Forespurt || im.type is InntektsmeldingV1.Type.ForespurtEkstern,
+        harFlereArbeidsforhold = im.type.harFlereArbeidsforhold(),
     )
 }
 

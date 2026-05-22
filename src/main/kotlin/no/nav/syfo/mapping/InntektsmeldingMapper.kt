@@ -71,6 +71,7 @@ fun mapInntektsmeldingKontrakt(
         mottaksKanal = inntektsmelding.mottaksKanal.konverterMottakskanal(),
         format = inntektsmelding.mottaksKanal.utledFormat(),
         forespurt = inntektsmelding.forespurt,
+        harFlereArbeidsforhold = inntektsmelding.harFlereArbeidsforhold,
     )
 
 fun konverterArsakTilInnsending(arsakTilInnsending: String): ArsakTilInnsending =

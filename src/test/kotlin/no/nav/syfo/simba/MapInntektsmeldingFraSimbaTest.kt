@@ -1,5 +1,6 @@
 package no.nav.syfo.simba
 
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsforhold
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Bonus
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding
@@ -7,10 +8,13 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RedusertLoennIAgp
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema.FlereArbeidsforhold
 import no.nav.helsearbeidsgiver.utils.test.date.desember
 import no.nav.helsearbeidsgiver.utils.test.date.mai
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -28,13 +32,7 @@ class MapInntektsmeldingFraSimbaTest {
             mockInntektsmelding().copy(
                 naturalytelser = naturalytelser,
             )
-        val mapped =
-            mapInntektsmelding(
-                arkivreferanse = "im1323",
-                aktorId = "sdfds",
-                journalpostId = "134",
-                im = imd,
-            )
+        val mapped = mapInntektsmelding(im = imd)
         assertEquals(antallNaturalytelser, mapped.opphørAvNaturalYtelse.size)
         val naturalytelse = mapped.opphørAvNaturalYtelse[0]
         assertEquals(no.nav.syfo.domain.inntektsmelding.Naturalytelse.AKSJERGRUNNFONDSBEVISTILUNDERKURS, naturalytelse.naturalytelse)
@@ -44,13 +42,7 @@ class MapInntektsmeldingFraSimbaTest {
     fun mapRefusjon() {
         val refusjonEndringer = listOf(RefusjonEndring(123.0, 1.desember(2025)))
         val refusjon = Refusjon(10.0, refusjonEndringer)
-        val mapped =
-            mapInntektsmelding(
-                arkivreferanse = "im1323",
-                aktorId = "sdfds",
-                journalpostId = "134",
-                im = mockInntektsmelding().copy(refusjon = refusjon),
-            )
+        val mapped = mapInntektsmelding(im = mockInntektsmelding().copy(refusjon = refusjon))
         assertNull(mapped.refusjon.opphoersdato)
         assertEquals(mapped.endringerIRefusjon.size, 1)
     }
@@ -72,7 +64,7 @@ class MapInntektsmeldingFraSimbaTest {
                     )
                 }
 
-            val mapped = mapInntektsmelding("im123", "abc", "345", im)
+            val mapped = mapInntektsmelding(im = im)
 
             assertEquals(begrunnelse.name, mapped.begrunnelseRedusert, "Feil ved mapping: $begrunnelse")
             assertEquals(1.0.toBigDecimal(), mapped.bruttoUtbetalt, "Feil ved mapping: $begrunnelse")
@@ -90,7 +82,7 @@ class MapInntektsmeldingFraSimbaTest {
                         ),
                 )
             }
-        val mapped = mapInntektsmelding("im1", "2", "3", im)
+        val mapped = mapInntektsmelding(im = im)
         assertEquals("", mapped.begrunnelseRedusert)
         assertNull(mapped.bruttoUtbetalt)
     }
@@ -106,7 +98,7 @@ class MapInntektsmeldingFraSimbaTest {
                         endringAarsaker = listOf(Bonus),
                     ),
             )
-        val mapped = mapInntektsmelding("im1", "2", "3", im)
+        val mapped = mapInntektsmelding(im = im)
         val endringAarsak = mapped.rapportertInntekt?.endringAarsakerData?.get(0)!!
         assertEquals("Bonus", endringAarsak.aarsak)
         assertNull(endringAarsak.perioder)
@@ -118,17 +110,57 @@ class MapInntektsmeldingFraSimbaTest {
     fun mapInnsendtTidspunktFraSimba() {
         val localDateTime = LocalDateTime.of(2023, 2, 11, 14, 0)
         val innsendt = OffsetDateTime.of(localDateTime, ZoneOffset.of("+1"))
-        val im = mapInntektsmelding("im1", "2", "3", mockInntektsmelding().copy(mottatt = innsendt))
+        val im = mapInntektsmelding(im = mockInntektsmelding().copy(mottatt = innsendt))
         assertEquals(localDateTime, im.innsendingstidspunkt)
     }
 
     @Test
     fun mapVedtaksperiodeID() {
-        val im = mapInntektsmelding("im1", "2", "3", mockInntektsmelding().copy(vedtaksperiodeId = null))
+        val im = mapInntektsmelding(im = mockInntektsmelding().copy(vedtaksperiodeId = null))
         assertNull(im.vedtaksperiodeId)
         val vedtaksperiodeId = UUID.randomUUID()
-        val im2 = mapInntektsmelding("im1", "2", "3", mockInntektsmelding().copy(vedtaksperiodeId = vedtaksperiodeId))
+        val im2 = mapInntektsmelding(im = mockInntektsmelding().copy(vedtaksperiodeId = vedtaksperiodeId))
         assertEquals(vedtaksperiodeId, im2.vedtaksperiodeId)
+    }
+
+    @Test
+    fun mapHarFlereArbeidsforholdDefaultFalse() {
+        val mapped = mapInntektsmelding(im = mockInntektsmelding())
+        assertFalse(mapped.harFlereArbeidsforhold)
+    }
+
+    @Test
+    fun mapHarFlereArbeidsforholdTrue() {
+        val flereArbeidsforhold =
+            FlereArbeidsforhold(
+                harLikLoenn = false,
+                erSykmeldtFraAlle = false,
+                arbeidsforhold =
+                    listOf(
+                        Arbeidsforhold(
+                            inkludertISykefravaer = true,
+                            yrkesbeskrivelse = "Snekker",
+                            stillingsprosent = 50.0,
+                            inntekt = 30000.0,
+                        ),
+                        Arbeidsforhold(
+                            inkludertISykefravaer = false,
+                            yrkesbeskrivelse = "Maler",
+                            stillingsprosent = 50.0,
+                            inntekt = 20000.0,
+                        ),
+                    ),
+            )
+        val im =
+            mockInntektsmelding().copy(
+                type =
+                    Inntektsmelding.Type.Forespurt(
+                        id = UUID.randomUUID(),
+                        flereArbeidsforhold = flereArbeidsforhold,
+                    ),
+            )
+        val mapped = mapInntektsmelding(im = im)
+        assertTrue(mapped.harFlereArbeidsforhold)
     }
 
     @Test
@@ -137,11 +169,11 @@ class MapInntektsmeldingFraSimbaTest {
             mockInntektsmelding().copy(
                 type = Inntektsmelding.Type.Selvbestemt(UUID.randomUUID()),
             )
-        val selvbestemtMapped = mapInntektsmelding("im1", "2", "3", selvbestemtIm)
+        val selvbestemtMapped = mapInntektsmelding(im = selvbestemtIm)
         assertEquals(MuligAvsender.NAV_NO_SELVBESTEMT, selvbestemtMapped.avsenderSystem.navn)
         assertEquals("1.0", selvbestemtMapped.avsenderSystem.versjon)
 
-        val mapped = mapInntektsmelding("im1", "2", "3", mockInntektsmelding())
+        val mapped = mapInntektsmelding(im = mockInntektsmelding())
         assertEquals(MuligAvsender.NAV_NO, mapped.avsenderSystem.navn)
         assertEquals("1.0", mapped.avsenderSystem.versjon)
     }
