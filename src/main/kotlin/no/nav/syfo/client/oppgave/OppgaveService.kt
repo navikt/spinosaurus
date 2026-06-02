@@ -14,8 +14,8 @@ import no.nav.syfo.behandling.HentOppgaveException
 import no.nav.syfo.behandling.OpprettFordelingsOppgaveException
 import no.nav.syfo.behandling.OpprettOppgaveException
 import no.nav.syfo.domain.OppgaveResultat
-import no.nav.syfo.util.Metrikk
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
+import no.nav.syfo.util.Metrikk
 import no.nav.syfo.utsattoppgave.BehandlingsKategori
 import java.time.DayOfWeek
 import java.time.LocalDate
