@@ -77,7 +77,7 @@ class UtsattOppgaveService(
                         val gjelderUtland = behandlendeEnhetConsumer.gjelderUtland(oppgave)
                         val behandlingsKategori = finnBehandlingsKategori(inntektsmelding, oppgave.speil, gjelderUtland)
                         if (behandlingsKategori != BehandlingsKategori.IKKE_FRAVAER) {
-                            val resultat = oppgaveService.opprettOppgaveIGosys(oppgave, behandlingsKategori)
+                            val resultat = oppgaveService.opprettOppgaveIGosys(oppgave, behandlingsKategori, inntektsmelding)
 
                             val oppdatertOppgave =
                                 oppgave.copy(
@@ -148,12 +148,14 @@ fun InntektsmeldingRepository.hentInntektsmelding(
 fun OppgaveService.opprettOppgaveIGosys(
     utsattOppgave: UtsattOppgaveEntitet,
     behandlingsKategori: BehandlingsKategori,
+    inntektsmelding: Inntektsmelding? = null,
 ): OppgaveResultat =
     runBlocking {
         opprettOppgave(
             journalpostId = utsattOppgave.journalpostId,
             aktoerId = utsattOppgave.aktørId,
             behandlingsKategori = behandlingsKategori,
+            inntektsmelding = inntektsmelding,
         )
     }
 

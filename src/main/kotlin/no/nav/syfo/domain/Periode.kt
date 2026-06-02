@@ -19,4 +19,4 @@ fun List<Periode>.tilKortFormat(): String? =
 
 private val norskDatoFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
 
-private fun LocalDate.tilNorskFormat(): String = format(norskDatoFormat)
+fun LocalDate.tilNorskFormat(): String = format(norskDatoFormat)

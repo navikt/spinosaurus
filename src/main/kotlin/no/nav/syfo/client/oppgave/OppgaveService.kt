@@ -15,6 +15,7 @@ import no.nav.syfo.behandling.OpprettFordelingsOppgaveException
 import no.nav.syfo.behandling.OpprettOppgaveException
 import no.nav.syfo.domain.OppgaveResultat
 import no.nav.syfo.util.Metrikk
+import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 import no.nav.syfo.utsattoppgave.BehandlingsKategori
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -65,6 +66,7 @@ class OppgaveService(
         journalpostId: String,
         aktoerId: String,
         behandlingsKategori: BehandlingsKategori,
+        inntektsmelding: Inntektsmelding? = null,
     ): OppgaveResultat {
         val eksisterendeOppgave = hentHvisOppgaveFinnes(Oppgavetype.INNTEKTSMELDING, journalpostId)
         metrikk.tellOpprettOppgave(eksisterendeOppgave != null)
@@ -81,7 +83,7 @@ class OppgaveService(
                 aktoerId = aktoerId,
                 journalpostId = journalpostId,
                 behandlesAvApplikasjon = "FS22",
-                beskrivelse = "Det har kommet en inntektsmelding på sykepenger.",
+                beskrivelse = lagInntektsmeldingOppgaveBeskrivelse(inntektsmelding, behandlingsKategori),
                 tema = Tema.SYK,
                 oppgavetype = Oppgavetype.INNTEKTSMELDING,
                 behandlingstype = behandlingsKategori.getBehandlingsType(),

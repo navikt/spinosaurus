@@ -43,7 +43,7 @@ class UtsattOppgaveServiceTest {
     fun setup() {
         clearAllMocks()
         every { utsattOppgaveDAO.finn(any()) } returns oppgave
-        coEvery { oppgaveService.opprettOppgave(any(), any(), any()) } returns OppgaveResultat(Random.nextInt(), false, false)
+        coEvery { oppgaveService.opprettOppgave(any(), any(), any(), any()) } returns OppgaveResultat(Random.nextInt(), false, false)
         every { behandlendeEnhetConsumer.hentBehandlendeEnhet(any(), any()) } returns "4488"
         every { inntektsmeldingRepository.findByUuid(any()) } returns UtsattOppgaveTestData.inntektsmeldingEntitet
     }
@@ -65,7 +65,7 @@ class UtsattOppgaveServiceTest {
             )
         utsattOppgaveService.prosesser(oppgaveOppdatering)
         verify { utsattOppgaveDAO.oppdater(match { it.tilstand == Tilstand.Opprettet && it.speil && it.timeout.isEqual(timeout) }) }
-        coVerify { oppgaveService.opprettOppgave(any(), any(), any()) }
+        coVerify { oppgaveService.opprettOppgave(any(), any(), any(), any()) }
     }
 
     @Test
@@ -79,7 +79,7 @@ class UtsattOppgaveServiceTest {
             )
         utsattOppgaveService.prosesser(oppgaveOppdatering)
         verify { utsattOppgaveDAO.oppdater(match { it.tilstand == Tilstand.Opprettet && !it.speil && it.timeout.isEqual(timeout) }) }
-        coVerify { oppgaveService.opprettOppgave(any(), any(), any()) }
+        coVerify { oppgaveService.opprettOppgave(any(), any(), any(), any()) }
     }
 
     @Test
@@ -98,7 +98,7 @@ class UtsattOppgaveServiceTest {
                 match { it.tilstand == Tilstand.Utsatt && it.timeout.isEqual(nyTimeout) && !it.oppdatert.isEqualNullSafe(oppgave.oppdatert) },
             )
         }
-        coVerify(exactly = 0) { oppgaveService.opprettOppgave(any(), any(), any()) }
+        coVerify(exactly = 0) { oppgaveService.opprettOppgave(any(), any(), any(), any()) }
     }
 
     @Test
@@ -116,7 +116,7 @@ class UtsattOppgaveServiceTest {
                 match { it.tilstand == Tilstand.Forkastet && it.timeout.isEqual(timeout) && !it.oppdatert.isEqualNullSafe(oppgave.oppdatert) },
             )
         }
-        coVerify(exactly = 0) { oppgaveService.opprettOppgave(any(), any(), any()) }
+        coVerify(exactly = 0) { oppgaveService.opprettOppgave(any(), any(), any(), any()) }
     }
 
     @Test
@@ -131,7 +131,7 @@ class UtsattOppgaveServiceTest {
             )
         utsattOppgaveService.prosesser(oppgaveOppdatering)
         verify { utsattOppgaveDAO.oppdater(match { it.tilstand == Tilstand.Forkastet && !it.oppdatert.isEqualNullSafe(oppgave.oppdatert) }) }
-        coVerify(exactly = 0) { oppgaveService.opprettOppgave(any(), any(), any()) }
+        coVerify(exactly = 0) { oppgaveService.opprettOppgave(any(), any(), any(), any()) }
     }
 
     @Test
@@ -149,6 +149,6 @@ class UtsattOppgaveServiceTest {
             )
         utsattOppgaveService.prosesser(oppgaveOppdatering)
         verify(exactly = 0) { utsattOppgaveDAO.oppdater(any()) }
-        coVerify(exactly = 0) { oppgaveService.opprettOppgave(any(), any(), any()) }
+        coVerify(exactly = 0) { oppgaveService.opprettOppgave(any(), any(), any(), any()) }
     }
 }

@@ -55,7 +55,7 @@ class FinnAlleUtgaandeOppgaverProcessor(
                                 if (behandlingsKategori != BehandlingsKategori.IKKE_FRAVAER) {
                                     logger.info("Skal opprette oppgave for inntektsmelding: ${oppgaveEntitet.arkivreferanse}")
 
-                                    val resultat = oppgaveService.opprettOppgaveIGosys(oppgaveEntitet, behandlingsKategori)
+                                    val resultat = oppgaveService.opprettOppgaveIGosys(oppgaveEntitet, behandlingsKategori, inntektsmelding)
 
                                     logger.info(
                                         "Oppgave opprettet i gosys pga timeout for inntektsmelding: ${oppgaveEntitet.arkivreferanse}",
