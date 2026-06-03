@@ -66,7 +66,7 @@ class OppgaveService(
         journalpostId: String,
         aktoerId: String,
         behandlingsKategori: BehandlingsKategori,
-        inntektsmelding: Inntektsmelding? = null,
+        oppgaveBeskrivelse: String,
     ): OppgaveResultat {
         val eksisterendeOppgave = hentHvisOppgaveFinnes(Oppgavetype.INNTEKTSMELDING, journalpostId)
         metrikk.tellOpprettOppgave(eksisterendeOppgave != null)
@@ -83,7 +83,7 @@ class OppgaveService(
                 aktoerId = aktoerId,
                 journalpostId = journalpostId,
                 behandlesAvApplikasjon = "FS22",
-                beskrivelse = lagInntektsmeldingOppgaveBeskrivelse(inntektsmelding, behandlingsKategori),
+                beskrivelse = oppgaveBeskrivelse,
                 tema = Tema.SYK,
                 oppgavetype = Oppgavetype.INNTEKTSMELDING,
                 behandlingstype = behandlingsKategori.getBehandlingsType(),

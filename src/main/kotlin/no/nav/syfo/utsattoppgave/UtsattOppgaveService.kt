@@ -6,6 +6,7 @@ import kotlinx.coroutines.runBlocking
 import no.nav.helsearbeidsgiver.utils.log.logger
 import no.nav.helsearbeidsgiver.utils.log.sikkerLogger
 import no.nav.syfo.client.oppgave.OppgaveService
+import no.nav.syfo.client.oppgave.lagInntektsmeldingOppgaveBeskrivelse
 import no.nav.syfo.domain.OppgaveResultat
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 import no.nav.syfo.dto.Tilstand
@@ -148,14 +149,14 @@ fun InntektsmeldingRepository.hentInntektsmelding(
 fun OppgaveService.opprettOppgaveIGosys(
     utsattOppgave: UtsattOppgaveEntitet,
     behandlingsKategori: BehandlingsKategori,
-    inntektsmelding: Inntektsmelding? = null,
+    inntektsmelding: Inntektsmelding,
 ): OppgaveResultat =
     runBlocking {
         opprettOppgave(
             journalpostId = utsattOppgave.journalpostId,
             aktoerId = utsattOppgave.aktørId,
             behandlingsKategori = behandlingsKategori,
-            inntektsmelding = inntektsmelding,
+            oppgaveBeskrivelse = lagInntektsmeldingOppgaveBeskrivelse(inntektsmelding, behandlingsKategori),
         )
     }
 
