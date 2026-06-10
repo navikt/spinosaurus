@@ -14,6 +14,7 @@ class ImBeskrivelseTest {
         val forventet =
             """
             Inntektsmelding sykepenger
+            Utdrag av info, se vedlagt inntektsmeldingen (PDF) for full informasjon.
             Kategori: Utbetaling til bruker
 
             Bestemmende fraværsdag: 10.02.2010
@@ -51,6 +52,7 @@ class ImBeskrivelseTest {
         val forventet =
             """
             Inntektsmelding sykepenger
+            Utdrag av info, se vedlagt inntektsmeldingen (PDF) for full informasjon.
             Kategori: Bestrider sykmelding
 
             Bestemmende fraværsdag: 10.02.2010
