@@ -15,19 +15,19 @@ class ImBeskrivelseTest {
             """
             Refusjon: Ja | Kategori: Utbetaling til bruker
             Inntektsmelding sykepenger
-            Utdrag av info, se vedlagt inntektsmeldingen (PDF) for full informasjon.
+            Utdrag av info, se vedlagt inntektsmelding (PDF) for full informasjon.
 
             Bestemmende fraværsdag: 10.02.2010
             Arbeidsgiverperiode: 01.11.2011 - [...] - 04.04.2014
 
-            Beregnet månedslønn: 999999999999 kr
-            Refusjon: 333333333333 kr/mnd
+            Beregnet månedslønn: 999 999 999 999,00 kr
+            Refusjon: 333 333 333 333,00 kr/mnd
             Refusjon opphører: 20.02.2020
-            Endring i refusjon: 555555555555 kr fra 05.05.2015
-            Endring i refusjon: 666666666666 kr fra 06.06.2016
+            Endring i refusjon: 555 555 555 555,00 kr fra 05.05.2015
+            Endring i refusjon: 666 666 666 666,00 kr fra 06.06.2016
             Begrunnelse redusert AGP: Grunn til reduksjon
-            Bortfall av naturalytelse: BIL (555555555555 kr/mnd) fra 05.05.2015
-            Bortfall av naturalytelse: TILSKUDDBARNEHAGEPLASS (666666666666 kr/mnd) fra 06.06.2016
+            Bortfall av naturalytelse: BIL (555 555 555 555,00 kr/mnd) fra 05.05.2015
+            Bortfall av naturalytelse: TILSKUDDBARNEHAGEPLASS (666 666 666 666,00 kr/mnd) fra 06.06.2016
 
             Forespurt: Nei
             """.trimIndent()
@@ -53,12 +53,12 @@ class ImBeskrivelseTest {
             """
             Refusjon: Nei | Kategori: Bestrider sykmelding
             Inntektsmelding sykepenger
-            Utdrag av info, se vedlagt inntektsmeldingen (PDF) for full informasjon.
+            Utdrag av info, se vedlagt inntektsmelding (PDF) for full informasjon.
 
             Bestemmende fraværsdag: 10.02.2010
             Arbeidsgiverperiode: Ingen
 
-            Beregnet månedslønn: 999999999999 kr
+            Beregnet månedslønn: 999 999 999 999,00 kr
             Ingen refusjon - utbetaling til bruker
 
             Forespurt: Ja

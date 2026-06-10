@@ -37,14 +37,14 @@ fun lagInntektsmeldingOppgaveBeskrivelse(
             inntektsmelding.beregnetInntekt?.let { add("Beregnet månedslønn: ${it.tilNorskFormat()} kr") }
 
             if (refusjon.beloepPrMnd != null) {
-                add("Refusjon: ${refusjon.beloepPrMnd} kr/mnd")
+                add("Refusjon: ${refusjon.beloepPrMnd.tilNorskFormat()} kr/mnd")
                 refusjon.opphoersdato?.let { add("Refusjon opphører: ${it.tilNorskFormat()}") }
             } else {
                 add("Ingen refusjon - utbetaling til bruker")
             }
 
             inntektsmelding.endringerIRefusjon.forEach { endring ->
-                val beloep = endring.beloep?.let { "$it kr" } ?: "Ukjent beløp"
+                val beloep = endring.beloep?.let { "${it.tilNorskFormat()} kr" } ?: "Ukjent beløp"
                 val dato = endring.endringsdato?.let { " fra ${it.tilNorskFormat()}" }.orEmpty()
                 add("Endring i refusjon: $beloep$dato")
             }
@@ -55,7 +55,7 @@ fun lagInntektsmeldingOppgaveBeskrivelse(
 
             inntektsmelding.opphørAvNaturalYtelse.forEach { opphoer ->
                 val ytelse = opphoer.naturalytelse?.name ?: "Naturalytelse"
-                val beloep = opphoer.beloepPrMnd?.let { " ($it kr/mnd)" }.orEmpty()
+                val beloep = opphoer.beloepPrMnd?.let { " (${it.tilNorskFormat()} kr/mnd)" }.orEmpty()
                 val dato = opphoer.fom?.let { " fra ${it.tilNorskFormat()}" }.orEmpty()
                 add("Bortfall av naturalytelse: $ytelse$beloep$dato")
             }
@@ -74,7 +74,7 @@ private val inntektFormat =
     DecimalFormat(
         "#,##0.00",
         DecimalFormatSymbols().apply {
-            groupingSeparator = ' '
+            groupingSeparator = ' '
             decimalSeparator = ','
         },
     )
