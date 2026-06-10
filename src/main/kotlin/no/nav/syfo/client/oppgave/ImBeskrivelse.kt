@@ -1,14 +1,14 @@
 package no.nav.syfo.client.oppgave
 
-import java.math.BigDecimal
-import java.math.RoundingMode
-import java.text.DecimalFormat
-import java.text.DecimalFormatSymbols
 import no.nav.helsearbeidsgiver.utils.pipe.orDefault
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 import no.nav.syfo.domain.tilKortFormat
 import no.nav.syfo.domain.tilNorskFormat
 import no.nav.syfo.utsattoppgave.BehandlingsKategori
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 
 fun lagInntektsmeldingOppgaveBeskrivelse(
     inntektsmelding: Inntektsmelding,
@@ -68,7 +68,6 @@ fun lagInntektsmeldingOppgaveBeskrivelse(
 
     return linjer.joinToString("\n")
 }
-
 
 private val inntektFormat =
     DecimalFormat(
