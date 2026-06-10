@@ -30,7 +30,6 @@ fun lagInntektsmeldingOppgaveBeskrivelse(
                 // førsteFraværsdag koden kan slettes når ingen utsatt oppgave er av typen Altinn2 inntektsmelding
                 add("Bestemmende fraværsdag: ${inntektsmelding.førsteFraværsdag.tilNorskFormat()}")
             }
-            inntektsmelding.inntektsdato?.let { add("Inntektsdato: ${it.tilNorskFormat()}") }
             add("Arbeidsgiverperiode: ${inntektsmelding.arbeidsgiverperioder.tilKortFormat().orDefault("Ingen")}")
 
             add("")
