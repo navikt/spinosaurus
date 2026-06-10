@@ -29,7 +29,7 @@ class SaksbehandlingServiceTest {
     @Test
     fun oppretterIkkeOppgaveForSak() {
         runBlocking {
-            coVerify(exactly = 0) { oppgaveService.opprettOppgave(any(), any(), any()) }
+            coVerify(exactly = 0) { oppgaveService.opprettOppgave(any(), any(), any(), any()) }
         }
     }
 

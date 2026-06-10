@@ -6,6 +6,7 @@ import kotlinx.coroutines.runBlocking
 import no.nav.helsearbeidsgiver.utils.log.logger
 import no.nav.helsearbeidsgiver.utils.log.sikkerLogger
 import no.nav.syfo.client.oppgave.OppgaveService
+import no.nav.syfo.client.oppgave.lagInntektsmeldingOppgaveBeskrivelse
 import no.nav.syfo.domain.OppgaveResultat
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 import no.nav.syfo.dto.Tilstand
@@ -77,7 +78,7 @@ class UtsattOppgaveService(
                         val gjelderUtland = behandlendeEnhetConsumer.gjelderUtland(oppgave)
                         val behandlingsKategori = finnBehandlingsKategori(inntektsmelding, oppgave.speil, gjelderUtland)
                         if (behandlingsKategori != BehandlingsKategori.IKKE_FRAVAER) {
-                            val resultat = oppgaveService.opprettOppgaveIGosys(oppgave, behandlingsKategori)
+                            val resultat = oppgaveService.opprettOppgaveIGosys(oppgave, behandlingsKategori, inntektsmelding)
 
                             val oppdatertOppgave =
                                 oppgave.copy(
@@ -148,12 +149,14 @@ fun InntektsmeldingRepository.hentInntektsmelding(
 fun OppgaveService.opprettOppgaveIGosys(
     utsattOppgave: UtsattOppgaveEntitet,
     behandlingsKategori: BehandlingsKategori,
+    inntektsmelding: Inntektsmelding,
 ): OppgaveResultat =
     runBlocking {
         opprettOppgave(
             journalpostId = utsattOppgave.journalpostId,
             aktoerId = utsattOppgave.aktørId,
             behandlingsKategori = behandlingsKategori,
+            oppgaveBeskrivelse = lagInntektsmeldingOppgaveBeskrivelse(inntektsmelding, behandlingsKategori),
         )
     }
 

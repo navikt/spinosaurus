@@ -43,7 +43,7 @@ class FinnAlleUtgaandeOppgaverProcessorTest {
     fun setup() {
         clearAllMocks()
         every { utsattOppgaveDAO.finnAlleUtgaatteOppgaver() } returns listOf(oppgave)
-        coEvery { oppgaveService.opprettOppgave(any(), any(), any()) } returns OppgaveResultat(Random.nextInt(), false, false)
+        coEvery { oppgaveService.opprettOppgave(any(), any(), any(), any()) } returns OppgaveResultat(Random.nextInt(), false, false)
         every { behandlendeEnhetConsumer.hentBehandlendeEnhet(any(), any()) } returns "4488"
         every { inntektsmeldingRepository.findByUuid(any()) } returns UtsattOppgaveTestData.inntektsmeldingEntitet
     }
@@ -56,7 +56,7 @@ class FinnAlleUtgaandeOppgaverProcessorTest {
                 match { it.tilstand == Tilstand.OpprettetTimeout && !it.speil && it.timeout.isEqual(timeout) && !it.oppdatert.isEqualNullSafe(oppgave.oppdatert) },
             )
         }
-        coVerify { oppgaveService.opprettOppgave(any(), any(), any()) }
+        coVerify { oppgaveService.opprettOppgave(any(), any(), any(), any()) }
     }
 
     @Test
@@ -68,6 +68,6 @@ class FinnAlleUtgaandeOppgaverProcessorTest {
                 match { it.tilstand == Tilstand.Forkastet && !it.speil && it.timeout.isEqual(timeout) && !it.oppdatert.isEqualNullSafe(oppgave.oppdatert) },
             )
         }
-        coVerify(exactly = 0) { oppgaveService.opprettOppgave(any(), any(), any()) }
+        coVerify(exactly = 0) { oppgaveService.opprettOppgave(any(), any(), any(), any()) }
     }
 }

@@ -15,9 +15,12 @@ import no.nav.helsearbeidsgiver.oppgave.domain.OpprettOppgaveRequest
 import no.nav.helsearbeidsgiver.oppgave.domain.OpprettOppgaveResponse
 import no.nav.helsearbeidsgiver.oppgave.domain.Prioritet
 import no.nav.helsearbeidsgiver.oppgave.exception.OpprettOppgaveFeiletException
+import no.nav.syfo.UtsattOppgaveTestData
 import no.nav.syfo.behandling.OpprettOppgaveException
 import no.nav.syfo.domain.OppgaveResultat
+import no.nav.syfo.repository.buildIM
 import no.nav.syfo.utsattoppgave.BehandlingsKategori
+import no.nav.syfo.utsattoppgave.opprettOppgaveIGosys
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -91,8 +94,8 @@ class OppgaveServiceTest {
     @Test
     fun `skal ikke opprette oppgave dersom oppgave finnes fra før`() {
         val behandlingsKategori = BehandlingsKategori.UTLAND
-        val journalpostId = "123"
-        val aktoerId = "456"
+        val oppgave = UtsattOppgaveTestData.oppgave
+        val im = buildIM()
 
         coEvery { oppgaveClient.hentOppgaver(any()) } returns
             OppgaveListeResponse(
@@ -109,7 +112,7 @@ class OppgaveServiceTest {
 
         val result =
             runBlocking {
-                oppgaveService.opprettOppgave(journalpostId, aktoerId, behandlingsKategori)
+                oppgaveService.opprettOppgaveIGosys(oppgave, behandlingsKategori, im)
             }
 
         coVerify(exactly = 0) {
@@ -124,8 +127,8 @@ class OppgaveServiceTest {
 
     @Test
     fun `skal kaste feil når oppretteOppgave feiler`() {
-        val journalpostId = "123"
-        val aktoerId = "456"
+        val oppgave = UtsattOppgaveTestData.oppgave
+        val im = buildIM()
         val behandlingsKategori = BehandlingsKategori.REFUSJON_MED_DATO
         coEvery { oppgaveClient.hentOppgaver(any()) } returns OppgaveListeResponse(0, emptyList())
         coEvery {
@@ -137,7 +140,7 @@ class OppgaveServiceTest {
         val exception =
             assertThrows<OpprettOppgaveException> {
                 runBlocking {
-                    oppgaveService.opprettOppgave(journalpostId, aktoerId, behandlingsKategori)
+                    oppgaveService.opprettOppgaveIGosys(oppgave, behandlingsKategori, im)
                 }
             }
 
@@ -247,12 +250,12 @@ class OppgaveServiceTest {
     }
 
     private fun mockAndRunOpprettOppgave(behandlingsKategori: BehandlingsKategori): OppgaveResultat {
-        val journalpostId = "123"
-        val aktoerId = "456"
+        val oppgave = UtsattOppgaveTestData.oppgave
+        val im = buildIM()
 
         coEvery { oppgaveClient.hentOppgaver(any()) } returns OppgaveListeResponse(0, emptyList())
         coEvery { oppgaveClient.opprettOppgave(any<OpprettOppgaveRequest>()) } returns OpprettOppgaveResponse(1)
 
-        return runBlocking { oppgaveService.opprettOppgave(journalpostId, aktoerId, behandlingsKategori) }
+        return runBlocking { oppgaveService.opprettOppgaveIGosys(oppgave, behandlingsKategori, im) }
     }
 }
