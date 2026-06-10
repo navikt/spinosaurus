@@ -1,5 +1,9 @@
 package no.nav.syfo.client.oppgave
 
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 import no.nav.helsearbeidsgiver.utils.pipe.orDefault
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 import no.nav.syfo.domain.tilKortFormat
@@ -17,14 +21,20 @@ fun lagInntektsmeldingOppgaveBeskrivelse(
             val kategori = behandlingsKategori.oppgaveBeskrivelse ?: behandlingsKategori.name
             add("Refusjon: ${if (erRefusjon) "Ja" else "Nei"} | Kategori: $kategori")
             add("Inntektsmelding sykepenger")
-            add("Utdrag av info, se vedlagt inntektsmeldingen (PDF) for full informasjon.")
+            add("Utdrag av info, se vedlagt inntektsmelding (PDF) for full informasjon.")
 
             add("")
-            inntektsmelding.førsteFraværsdag?.let { add("Bestemmende fraværsdag: ${it.tilNorskFormat()}") }
+            if (inntektsmelding.inntektsdato != null) {
+                add("Inntektsdato: ${inntektsmelding.inntektsdato.tilNorskFormat()}")
+            } else if (inntektsmelding.førsteFraværsdag != null) {
+                // førsteFraværsdag koden kan slettes når ingen utsatt oppgave er av typen Altinn2 inntektsmelding
+                add("Bestemmende fraværsdag: ${inntektsmelding.førsteFraværsdag.tilNorskFormat()}")
+            }
+            inntektsmelding.inntektsdato?.let { add("Inntektsdato: ${it.tilNorskFormat()}") }
             add("Arbeidsgiverperiode: ${inntektsmelding.arbeidsgiverperioder.tilKortFormat().orDefault("Ingen")}")
 
             add("")
-            inntektsmelding.beregnetInntekt?.let { add("Beregnet månedslønn: $it kr") }
+            inntektsmelding.beregnetInntekt?.let { add("Beregnet månedslønn: ${it.tilNorskFormat()} kr") }
 
             if (refusjon.beloepPrMnd != null) {
                 add("Refusjon: ${refusjon.beloepPrMnd} kr/mnd")
@@ -34,8 +44,8 @@ fun lagInntektsmeldingOppgaveBeskrivelse(
             }
 
             inntektsmelding.endringerIRefusjon.forEach { endring ->
-                val beloep = endring.beloep?.let { "$it kr" } ?: "ukjent beløp"
-                val dato = endring.endringsdato?.let { " fra ${it.tilNorskFormat()}" } ?: ""
+                val beloep = endring.beloep?.let { "$it kr" } ?: "Ukjent beløp"
+                val dato = endring.endringsdato?.let { " fra ${it.tilNorskFormat()}" }.orEmpty()
                 add("Endring i refusjon: $beloep$dato")
             }
 
@@ -45,8 +55,8 @@ fun lagInntektsmeldingOppgaveBeskrivelse(
 
             inntektsmelding.opphørAvNaturalYtelse.forEach { opphoer ->
                 val ytelse = opphoer.naturalytelse?.name ?: "Naturalytelse"
-                val beloep = opphoer.beloepPrMnd?.let { " ($it kr/mnd)" } ?: ""
-                val dato = opphoer.fom?.let { " fra ${it.tilNorskFormat()}" } ?: ""
+                val beloep = opphoer.beloepPrMnd?.let { " ($it kr/mnd)" }.orEmpty()
+                val dato = opphoer.fom?.let { " fra ${it.tilNorskFormat()}" }.orEmpty()
                 add("Bortfall av naturalytelse: $ytelse$beloep$dato")
             }
 
@@ -58,3 +68,17 @@ fun lagInntektsmeldingOppgaveBeskrivelse(
 
     return linjer.joinToString("\n")
 }
+
+
+private val inntektFormat =
+    DecimalFormat(
+        "#,##0.00",
+        DecimalFormatSymbols().apply {
+            groupingSeparator = ' '
+            decimalSeparator = ','
+        },
+    )
+
+fun BigDecimal.tilNorskFormat(): String =
+    setScale(2, RoundingMode.HALF_UP)
+        .let(inntektFormat::format)
