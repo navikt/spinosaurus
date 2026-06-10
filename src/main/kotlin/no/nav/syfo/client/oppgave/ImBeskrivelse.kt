@@ -5,19 +5,15 @@ import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 import no.nav.syfo.domain.tilKortFormat
 import no.nav.syfo.domain.tilNorskFormat
 import no.nav.syfo.utsattoppgave.BehandlingsKategori
-import java.math.BigDecimal
 
 fun lagInntektsmeldingOppgaveBeskrivelse(
-    inntektsmelding: Inntektsmelding?,
+    inntektsmelding: Inntektsmelding,
     behandlingsKategori: BehandlingsKategori,
 ): String {
-    if (inntektsmelding == null) {
-        return "Det har kommet en inntektsmelding på sykepenger."
-    }
-
     val linjer =
         buildList {
             add("Inntektsmelding sykepenger")
+            add("Utdrag av info, se vedlagt inntektsmeldingen (PDF) for full informasjon.")
             add("Kategori: ${behandlingsKategori.oppgaveBeskrivelse ?: behandlingsKategori.name}")
 
             add("")
@@ -28,7 +24,7 @@ fun lagInntektsmeldingOppgaveBeskrivelse(
             inntektsmelding.beregnetInntekt?.let { add("Beregnet månedslønn: $it kr") }
 
             val refusjon = inntektsmelding.refusjon
-            if (refusjon.beloepPrMnd != null && refusjon.beloepPrMnd > BigDecimal.ZERO) {
+            if (refusjon.beloepPrMnd != null) {
                 add("Refusjon: ${refusjon.beloepPrMnd} kr/mnd")
                 refusjon.opphoersdato?.let { add("Refusjon opphører: ${it.tilNorskFormat()}") }
             } else {
