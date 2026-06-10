@@ -12,9 +12,12 @@ fun lagInntektsmeldingOppgaveBeskrivelse(
 ): String {
     val linjer =
         buildList {
+            val refusjon = inntektsmelding.refusjon
+            val erRefusjon = refusjon.beloepPrMnd != null
+            val kategori = behandlingsKategori.oppgaveBeskrivelse ?: behandlingsKategori.name
+            add("Refusjon: ${if (erRefusjon) "Ja" else "Nei"} | Kategori: $kategori")
             add("Inntektsmelding sykepenger")
             add("Utdrag av info, se vedlagt inntektsmeldingen (PDF) for full informasjon.")
-            add("Kategori: ${behandlingsKategori.oppgaveBeskrivelse ?: behandlingsKategori.name}")
 
             add("")
             inntektsmelding.førsteFraværsdag?.let { add("Bestemmende fraværsdag: ${it.tilNorskFormat()}") }
@@ -23,7 +26,6 @@ fun lagInntektsmeldingOppgaveBeskrivelse(
             add("")
             inntektsmelding.beregnetInntekt?.let { add("Beregnet månedslønn: $it kr") }
 
-            val refusjon = inntektsmelding.refusjon
             if (refusjon.beloepPrMnd != null) {
                 add("Refusjon: ${refusjon.beloepPrMnd} kr/mnd")
                 refusjon.opphoersdato?.let { add("Refusjon opphører: ${it.tilNorskFormat()}") }

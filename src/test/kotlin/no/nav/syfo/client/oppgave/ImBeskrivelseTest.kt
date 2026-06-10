@@ -13,9 +13,9 @@ class ImBeskrivelseTest {
 
         val forventet =
             """
+            Refusjon: Ja | Kategori: Utbetaling til bruker
             Inntektsmelding sykepenger
             Utdrag av info, se vedlagt inntektsmeldingen (PDF) for full informasjon.
-            Kategori: Utbetaling til bruker
 
             Bestemmende fraværsdag: 10.02.2010
             Arbeidsgiverperiode: 01.11.2011 - [...] - 04.04.2014
@@ -51,9 +51,9 @@ class ImBeskrivelseTest {
 
         val forventet =
             """
+            Refusjon: Nei | Kategori: Bestrider sykmelding
             Inntektsmelding sykepenger
             Utdrag av info, se vedlagt inntektsmeldingen (PDF) for full informasjon.
-            Kategori: Bestrider sykmelding
 
             Bestemmende fraværsdag: 10.02.2010
             Arbeidsgiverperiode: Ingen
