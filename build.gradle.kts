@@ -14,9 +14,7 @@ plugins {
 }
 
 kotlin {
-    compilerOptions {
-        jvmTarget = JvmTarget.JVM_21
-    }
+    jvmToolchain(25)
 }
 
 tasks.withType<Test> {

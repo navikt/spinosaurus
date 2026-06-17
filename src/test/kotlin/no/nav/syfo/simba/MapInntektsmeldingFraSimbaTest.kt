@@ -2,13 +2,13 @@ package no.nav.syfo.simba
 
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsforhold
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Bonus
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.FlereArbeidsforhold
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RedusertLoennIAgp
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema.FlereArbeidsforhold
 import no.nav.helsearbeidsgiver.utils.test.date.desember
 import no.nav.helsearbeidsgiver.utils.test.date.mai
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -135,20 +135,23 @@ class MapInntektsmeldingFraSimbaTest {
             FlereArbeidsforhold(
                 harLikLoenn = false,
                 erSykmeldtFraAlle = false,
-                arbeidsforhold =
-                    listOf(
-                        Arbeidsforhold(
-                            inkludertISykefravaer = true,
-                            yrkesbeskrivelse = "Snekker",
-                            stillingsprosent = 50.0,
-                            inntekt = 30000.0,
-                        ),
-                        Arbeidsforhold(
-                            inkludertISykefravaer = false,
-                            yrkesbeskrivelse = "Maler",
-                            stillingsprosent = 50.0,
-                            inntekt = 20000.0,
-                        ),
+                arbeidsforholdPerSykmeldingStartdato =
+                    mapOf(
+                        LocalDate.now() to
+                            listOf(
+                                Arbeidsforhold(
+                                    inkludertISykefravaer = true,
+                                    yrkesbeskrivelse = "Snekker",
+                                    stillingsprosent = 50.0,
+                                    inntekt = 30000.0,
+                                ),
+                                Arbeidsforhold(
+                                    inkludertISykefravaer = false,
+                                    yrkesbeskrivelse = "Maler",
+                                    stillingsprosent = 50.0,
+                                    inntekt = 20000.0,
+                                ),
+                            ),
                     ),
             )
         val im =

@@ -123,6 +123,7 @@ class InntektsmeldingBehandlerTest {
                 arkivRefereranse = "AR-123",
                 førsteFraværsdag = LocalDate.now(),
                 mottattDato = LocalDate.of(2019, 2, 6).atStartOfDay(),
+                harFlereArbeidsforhold = false,
             )
         every { inntektsmeldingService.isDuplicate(any()) } returns false
         // Kjør
