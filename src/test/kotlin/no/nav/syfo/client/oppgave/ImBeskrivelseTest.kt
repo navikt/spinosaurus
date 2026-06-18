@@ -1,5 +1,6 @@
 package no.nav.syfo.client.oppgave
 
+import java.math.BigDecimal
 import no.nav.syfo.domain.inntektsmelding.Refusjon
 import no.nav.syfo.repository.buildIM
 import no.nav.syfo.utsattoppgave.BehandlingsKategori
@@ -33,6 +34,13 @@ class ImBeskrivelseTest {
             """.trimIndent()
 
         assertEquals(forventet, lagInntektsmeldingOppgaveBeskrivelse(inntektsmelding, BehandlingsKategori.REFUSJON_MED_DATO))
+    }
+
+    @Test
+    fun `beskrivelse med refusjon 0 kr`() {
+        val inntektsmelding = buildIM().copy(refusjon = Refusjon(beloepPrMnd = BigDecimal.ZERO))
+        val beskrivelse = lagInntektsmeldingOppgaveBeskrivelse(inntektsmelding, BehandlingsKategori.REFUSJON_MED_DATO)
+        assert(beskrivelse.contains("Refusjon: Ja (0 kr) | "))
     }
 
     @Test
