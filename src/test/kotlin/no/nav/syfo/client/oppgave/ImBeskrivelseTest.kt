@@ -5,6 +5,7 @@ import no.nav.syfo.repository.buildIM
 import no.nav.syfo.utsattoppgave.BehandlingsKategori
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 
 class ImBeskrivelseTest {
     @Test
@@ -33,6 +34,13 @@ class ImBeskrivelseTest {
             """.trimIndent()
 
         assertEquals(forventet, lagInntektsmeldingOppgaveBeskrivelse(inntektsmelding, BehandlingsKategori.REFUSJON_MED_DATO))
+    }
+
+    @Test
+    fun `beskrivelse med refusjon 0 kr`() {
+        val inntektsmelding = buildIM().copy(refusjon = Refusjon(beloepPrMnd = BigDecimal.ZERO))
+        val beskrivelse = lagInntektsmeldingOppgaveBeskrivelse(inntektsmelding, BehandlingsKategori.REFUSJON_MED_DATO)
+        assert(beskrivelse.contains("Refusjon: Ja (0 kr) | "))
     }
 
     @Test

@@ -2,6 +2,7 @@ package no.nav.syfo.client.oppgave
 
 import no.nav.helsearbeidsgiver.utils.pipe.orDefault
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
+import no.nav.syfo.domain.inntektsmelding.Refusjon
 import no.nav.syfo.domain.tilKortFormat
 import no.nav.syfo.domain.tilNorskFormat
 import no.nav.syfo.utsattoppgave.BehandlingsKategori
@@ -17,9 +18,8 @@ fun lagInntektsmeldingOppgaveBeskrivelse(
     val linjer =
         buildList {
             val refusjon = inntektsmelding.refusjon
-            val erRefusjon = refusjon.beloepPrMnd != null
             val kategori = behandlingsKategori.oppgaveBeskrivelse ?: behandlingsKategori.name
-            add("Refusjon: ${if (erRefusjon) "Ja" else "Nei"} | Kategori: $kategori")
+            add("Refusjon: ${refusjon.formaterTilJaNei()} | Kategori: $kategori")
             add("Inntektsmelding sykepenger")
             add("Utdrag av info, se vedlagt inntektsmelding (PDF) for full informasjon.")
 
@@ -67,6 +67,13 @@ fun lagInntektsmeldingOppgaveBeskrivelse(
 
     return linjer.joinToString("\n")
 }
+
+private fun Refusjon.formaterTilJaNei(): String =
+    when {
+        beloepPrMnd == null -> "Nei"
+        beloepPrMnd.compareTo(BigDecimal.ZERO) == 0 -> "Ja (0 kr)"
+        else -> "Ja"
+    }
 
 private val inntektFormat =
     DecimalFormat(
