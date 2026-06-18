@@ -1,11 +1,11 @@
 package no.nav.syfo.client.oppgave
 
-import java.math.BigDecimal
 import no.nav.syfo.domain.inntektsmelding.Refusjon
 import no.nav.syfo.repository.buildIM
 import no.nav.syfo.utsattoppgave.BehandlingsKategori
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 
 class ImBeskrivelseTest {
     @Test
