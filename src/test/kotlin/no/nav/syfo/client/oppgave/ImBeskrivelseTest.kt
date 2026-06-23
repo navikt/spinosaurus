@@ -2,6 +2,8 @@ package no.nav.syfo.client.oppgave
 
 import no.nav.syfo.domain.inntektsmelding.Refusjon
 import no.nav.syfo.repository.buildIM
+import no.nav.syfo.simba.mapInntektsmelding
+import no.nav.syfo.simba.mockInntektsmelding
 import no.nav.syfo.utsattoppgave.BehandlingsKategori
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -41,6 +43,14 @@ class ImBeskrivelseTest {
         val inntektsmelding = buildIM().copy(refusjon = Refusjon(beloepPrMnd = BigDecimal.ZERO))
         val beskrivelse = lagInntektsmeldingOppgaveBeskrivelse(inntektsmelding, BehandlingsKategori.REFUSJON_MED_DATO)
         assert(beskrivelse.contains("Refusjon: Ja (0 kr) | "))
+    }
+
+    @Test
+    fun `beskrivelse med refusjon Nei når mappet fra simba im`() {
+        val simbaIM = mockInntektsmelding().copy(refusjon = null)
+        val inntektsmelding = mapInntektsmelding(im = simbaIM)
+        val beskrivelse = lagInntektsmeldingOppgaveBeskrivelse(inntektsmelding, BehandlingsKategori.REFUSJON_MED_DATO)
+        assert(beskrivelse.contains("Refusjon: Nei | "))
     }
 
     @Test

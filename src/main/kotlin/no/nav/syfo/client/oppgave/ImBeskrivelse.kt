@@ -2,7 +2,6 @@ package no.nav.syfo.client.oppgave
 
 import no.nav.helsearbeidsgiver.utils.pipe.orDefault
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
-import no.nav.syfo.domain.inntektsmelding.Refusjon
 import no.nav.syfo.domain.tilKortFormat
 import no.nav.syfo.domain.tilNorskFormat
 import no.nav.syfo.utsattoppgave.BehandlingsKategori
@@ -17,9 +16,8 @@ fun lagInntektsmeldingOppgaveBeskrivelse(
 ): String {
     val linjer =
         buildList {
-            val refusjon = inntektsmelding.refusjon
             val kategori = behandlingsKategori.oppgaveBeskrivelse ?: behandlingsKategori.name
-            add("Refusjon: ${refusjon.formaterTilJaNei()} | Kategori: $kategori")
+            add("Refusjon: ${inntektsmelding.formaterRefusjonTilJaNei()} | Kategori: $kategori")
             add("Inntektsmelding sykepenger")
             add("Utdrag av info, se vedlagt inntektsmelding (PDF) for full informasjon.")
 
@@ -35,6 +33,7 @@ fun lagInntektsmeldingOppgaveBeskrivelse(
             add("")
             inntektsmelding.beregnetInntekt?.let { add("Beregnet månedslønn: ${it.tilNorskFormat()} kr") }
 
+            val refusjon = inntektsmelding.refusjon
             if (refusjon.beloepPrMnd != null) {
                 add("Refusjon: ${refusjon.beloepPrMnd.tilNorskFormat()} kr/mnd")
                 refusjon.opphoersdato?.let { add("Refusjon opphører: ${it.tilNorskFormat()}") }
@@ -68,10 +67,11 @@ fun lagInntektsmeldingOppgaveBeskrivelse(
     return linjer.joinToString("\n")
 }
 
-private fun Refusjon.formaterTilJaNei(): String =
+private fun Inntektsmelding.formaterRefusjonTilJaNei(): String =
     when {
-        beloepPrMnd == null -> "Nei"
-        beloepPrMnd.compareTo(BigDecimal.ZERO) == 0 -> "Ja (0 kr)"
+        this.refusjon.beloepPrMnd == null -> "Nei"
+        this.refusjon.beloepPrMnd.compareTo(BigDecimal.ZERO) == 0 && this.endringerIRefusjon.isEmpty() -> "Nei"
+        this.refusjon.beloepPrMnd.compareTo(BigDecimal.ZERO) == 0 -> "Ja (0 kr)"
         else -> "Ja"
     }
 
