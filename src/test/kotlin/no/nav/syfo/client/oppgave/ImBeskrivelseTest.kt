@@ -1,11 +1,16 @@
 package no.nav.syfo.client.oppgave
 
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring
+import no.nav.helsearbeidsgiver.utils.test.date.januar
 import no.nav.syfo.domain.inntektsmelding.Refusjon
 import no.nav.syfo.repository.buildIM
+import no.nav.syfo.simba.mapInntektsmelding
+import no.nav.syfo.simba.mockInntektsmelding
 import no.nav.syfo.utsattoppgave.BehandlingsKategori
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon as simbaRefusjon
 
 class ImBeskrivelseTest {
     @Test
@@ -39,6 +44,23 @@ class ImBeskrivelseTest {
     @Test
     fun `beskrivelse med refusjon 0 kr`() {
         val inntektsmelding = buildIM().copy(refusjon = Refusjon(beloepPrMnd = BigDecimal.ZERO))
+        val beskrivelse = lagInntektsmeldingOppgaveBeskrivelse(inntektsmelding, BehandlingsKategori.REFUSJON_MED_DATO)
+        assert(beskrivelse.contains("Refusjon: Ja (0 kr) | "))
+    }
+
+    @Test
+    fun `beskrivelse med refusjon Nei når mappet fra simba im`() {
+        val simbaIM = mockInntektsmelding().copy(refusjon = null)
+        val inntektsmelding = mapInntektsmelding(im = simbaIM)
+        val beskrivelse = lagInntektsmeldingOppgaveBeskrivelse(inntektsmelding, BehandlingsKategori.REFUSJON_MED_DATO)
+        assert(beskrivelse.contains("Refusjon: Nei | "))
+    }
+
+    @Test
+    fun `beskrivelse med refusjon Ja når mappet fra simba im med refusjon endringer`() {
+        val refusjon = simbaRefusjon(0.0, listOf(RefusjonEndring(1.0, 12.januar(2025))))
+        val simbaIM = mockInntektsmelding().copy(refusjon = refusjon)
+        val inntektsmelding = mapInntektsmelding(im = simbaIM)
         val beskrivelse = lagInntektsmeldingOppgaveBeskrivelse(inntektsmelding, BehandlingsKategori.REFUSJON_MED_DATO)
         assert(beskrivelse.contains("Refusjon: Ja (0 kr) | "))
     }
