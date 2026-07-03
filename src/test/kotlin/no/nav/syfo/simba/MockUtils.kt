@@ -1,5 +1,7 @@
 package no.nav.syfo.simba
 
+import java.time.ZoneOffset
+import java.util.UUID
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.AarsakInnsending
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Avsender
@@ -19,8 +21,7 @@ import no.nav.helsearbeidsgiver.utils.test.date.mars
 import no.nav.helsearbeidsgiver.utils.test.wrapper.genererGyldig
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.helsearbeidsgiver.utils.wrapper.Orgnr
-import java.time.ZoneOffset
-import java.util.UUID
+import no.nav.syfo.domain.inntektsmelding.Inntektsmelding as SpinoInntektsmelding
 
 fun mockInntektsmelding(): Inntektsmelding =
     Inntektsmelding(
@@ -115,4 +116,12 @@ fun mockAvsenderSystem(): AvsenderSystem =
         orgnr = Orgnr.genererGyldig(),
         navn = "Hans Christians Hevn",
         versjon = "første og siste",
+    )
+
+fun mockTilSpinoInntektsmelding(im: Inntektsmelding): SpinoInntektsmelding =
+    mapInntektsmelding(
+        arkivreferanse = "im1",
+        aktorId = "2",
+        journalpostId = "3",
+        im = im,
     )

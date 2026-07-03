@@ -69,7 +69,7 @@ class MapInntektEndringAarsakFraSimbaTest {
                 )
             }
 
-        val mapped = mapInntektsmelding(im = im)
+        val mapped = mockTilSpinoInntektsmelding(im = im)
 
         assertEquals(spinnInntektEndringAarsak, mapped.rapportertInntekt?.endringAarsakerData?.get(0))
     }
