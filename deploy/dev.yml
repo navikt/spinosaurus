@@ -55,7 +55,7 @@ spec:
 
   gcp:
     sqlInstances:
-      - type: POSTGRES_14
+      - type: POSTGRES_15
         databases:
           - name: spinosaurus
             users:
