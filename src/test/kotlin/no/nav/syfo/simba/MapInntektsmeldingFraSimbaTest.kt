@@ -135,23 +135,20 @@ class MapInntektsmeldingFraSimbaTest {
             FlereArbeidsforhold(
                 harLikLoenn = false,
                 erSykmeldtFraAlle = false,
-                arbeidsforholdPerSykmeldingStartdato =
-                    mapOf(
-                        LocalDate.now() to
-                            listOf(
-                                Arbeidsforhold(
-                                    inkludertISykefravaer = true,
-                                    yrkesbeskrivelse = "Snekker",
-                                    stillingsprosent = 50.0,
-                                    inntekt = 30000.0,
-                                ),
-                                Arbeidsforhold(
-                                    inkludertISykefravaer = false,
-                                    yrkesbeskrivelse = "Maler",
-                                    stillingsprosent = 50.0,
-                                    inntekt = 20000.0,
-                                ),
-                            ),
+                arbeidsforhold =
+                    listOf(
+                        Arbeidsforhold(
+                            inkludertISykefravaer = true,
+                            yrkesbeskrivelse = "Snekker",
+                            stillingsprosent = 50.0,
+                            inntekt = 30000.0,
+                        ),
+                        Arbeidsforhold(
+                            inkludertISykefravaer = false,
+                            yrkesbeskrivelse = "Maler",
+                            stillingsprosent = 50.0,
+                            inntekt = 20000.0,
+                        ),
                     ),
             )
         val im =
