@@ -2,9 +2,9 @@ rootProject.name = "syfoinntektsmelding"
 
 pluginManagement {
     plugins {
-        val kotlinVersion: String by settings
-        val kotlinterVersion: String by settings
-        val versionsVersion: String by settings
+        val kotlinVersion = providers.gradleProperty("kotlinVersion").get()
+        val kotlinterVersion = providers.gradleProperty("kotlinterVersion").get()
+        val versionsVersion = providers.gradleProperty("versionsVersion").get()
 
         kotlin("jvm") version kotlinVersion
         kotlin("plugin.serialization") version kotlinVersion

@@ -32,6 +32,7 @@ tasks.named<Test>("test") {
 }
 
 tasks.register<Test>("slowTests") {
+    description = "Runs slow tests"
     include("**/*Spec.class")
     exclude("**/*Test.class")
     outputs.upToDateWhen { false }
@@ -79,7 +80,7 @@ tasks.jar {
 }
 
 repositories {
-    val githubPassword: String by project
+    val githubPassword = project.property("githubPassword") as String
     mavenCentral()
     maven("https://packages.confluent.io/maven/")
     maven {
@@ -92,37 +93,37 @@ repositories {
 }
 
 dependencies {
-    val altinnCorrespondanceVersion: String by project
-    val altinnInntektsmeldingVersion: String by project
-    val annotationApiVersion: String by project
-    val apacheKafkaStreamsVersion: String by project
-    val assertJVersion: String by project
-    val bakgrunnsjobbVersion: String by project
-    val cxfVersion: String by project
-    val flywayVersion: String by project
-    val hagDomeneInntektsmeldingVersion: String by project
-    val hagUtilsVersion: String by project
-    val hikariVersion: String by project
-    val imkontraktVersion: String by project
-    val jacksonVersion: String by project
-    val jaxbRuntimeVersion: String by project
-    val jaxbVersion: String by project
-    val joarkHendelseVersion: String by project
-    val junitJupiterVersion: String by project
-    val kafkaVersion: String by project
-    val koinVersion: String by project
-    val kotlinxCoroutinesVersion: String by project
-    val kotlinxSerializationVersion: String by project
-    val ktorVersion: String by project
-    val logbackClassicVersion: String by project
-    val logbackVersion: String by project
-    val mockkVersion: String by project
-    val oppgaveClientVersion: String by project
-    val pdlClientVersion: String by project
-    val postgresVersion: String by project
-    val prometheusVersion: String by project
-    val slf4Version: String by project
-    val tokenSupportVersion: String by project
+    val altinnCorrespondanceVersion = project.property("altinnCorrespondanceVersion") as String
+    val altinnInntektsmeldingVersion = project.property("altinnInntektsmeldingVersion") as String
+    val annotationApiVersion = project.property("annotationApiVersion") as String
+    val apacheKafkaStreamsVersion = project.property("apacheKafkaStreamsVersion") as String
+    val assertJVersion = project.property("assertJVersion") as String
+    val bakgrunnsjobbVersion = project.property("bakgrunnsjobbVersion") as String
+    val cxfVersion = project.property("cxfVersion") as String
+    val flywayVersion = project.property("flywayVersion") as String
+    val hagDomeneInntektsmeldingVersion = project.property("hagDomeneInntektsmeldingVersion") as String
+    val hagUtilsVersion = project.property("hagUtilsVersion") as String
+    val hikariVersion = project.property("hikariVersion") as String
+    val imkontraktVersion = project.property("imkontraktVersion") as String
+    val jacksonVersion = project.property("jacksonVersion") as String
+    val jaxbRuntimeVersion = project.property("jaxbRuntimeVersion") as String
+    val jaxbVersion = project.property("jaxbVersion") as String
+    val joarkHendelseVersion = project.property("joarkHendelseVersion") as String
+    val junitJupiterVersion = project.property("junitJupiterVersion") as String
+    val kafkaVersion = project.property("kafkaVersion") as String
+    val koinVersion = project.property("koinVersion") as String
+    val kotlinxCoroutinesVersion = project.property("kotlinxCoroutinesVersion") as String
+    val kotlinxSerializationVersion = project.property("kotlinxSerializationVersion") as String
+    val ktorVersion = project.property("ktorVersion") as String
+    val logbackClassicVersion = project.property("logbackClassicVersion") as String
+    val logbackVersion = project.property("logbackVersion") as String
+    val mockkVersion = project.property("mockkVersion") as String
+    val oppgaveClientVersion = project.property("oppgaveClientVersion") as String
+    val pdlClientVersion = project.property("pdlClientVersion") as String
+    val postgresVersion = project.property("postgresVersion") as String
+    val prometheusVersion = project.property("prometheusVersion") as String
+    val slf4Version = project.property("slf4Version") as String
+    val tokenSupportVersion = project.property("tokenSupportVersion") as String
 
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
