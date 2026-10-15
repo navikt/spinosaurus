@@ -5,11 +5,13 @@ import no.nav.helsearbeidsgiver.utils.log.logger
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 import no.nav.syfo.dto.InntektsmeldingEntitet
 import no.nav.syfo.mapping.mapInntektsmeldingKontrakt
+import no.nav.syfo.mapping.tilRefusjonskrav
 import no.nav.syfo.mapping.toInntektsmelding
 import no.nav.syfo.mapping.toInntektsmeldingEntitet
 import no.nav.syfo.repository.InntektsmeldingRepository
 import no.nav.syfo.util.validerInntektsmelding
 import no.nav.syfo.web.api.FinnInntektsmeldingerRequest
+import no.nav.syfo.web.api.InntektsmeldingRefusjonskrav
 import org.slf4j.Logger
 
 class InntektsmeldingService(
@@ -36,6 +38,24 @@ class InntektsmeldingService(
         dto.aktorId = aktorid
         dto.data = inntektsmelding.asJsonString(objectMapper)
         return repository.lagreInnteksmelding(dto)
+    }
+
+    fun hentRefusjonskrav(inntektsmeldingIder: List<String>): List<InntektsmeldingRefusjonskrav> {
+        val distinkteInntektsmeldingIder = inntektsmeldingIder.distinct()
+
+        val inntektsmeldingerFunnet = repository.findByUuids(distinkteInntektsmeldingIder).associateBy { it.uuid }
+
+        return distinkteInntektsmeldingIder.map { id ->
+            InntektsmeldingRefusjonskrav(
+                inntektsmeldingId = id,
+                refusjonskrav =
+                    inntektsmeldingerFunnet[id]
+                        ?.let {
+                            toInntektsmelding(it, objectMapper)
+                                .tilRefusjonskrav(id)
+                        },
+            )
+        }
     }
 
     fun finnInntektsmeldinger(request: FinnInntektsmeldingerRequest): List<no.nav.inntektsmeldingkontrakt.Inntektsmelding> {

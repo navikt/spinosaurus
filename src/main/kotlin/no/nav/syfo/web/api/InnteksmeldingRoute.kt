@@ -2,7 +2,6 @@ package no.nav.syfo.web.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.call
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -58,6 +57,24 @@ fun Route.syfoinntektsmelding(
             call.respond(
                 HttpStatusCode.InternalServerError,
                 mapOf("code" to HttpStatusCode.InternalServerError.value, "message" to "Feil ved henting av inntektsmelding"),
+            )
+        }
+    }
+}
+
+fun Route.refusjonskrav(
+    inntektsmeldingService: InntektsmeldingService,
+) {
+    post("/refusjonskrav") {
+        try {
+            val request = call.receive<RefusjonskravRequest>()
+            call.respond(HttpStatusCode.OK, inntektsmeldingService.hentRefusjonskrav(request.inntektsmeldingIder))
+        } catch (e: Exception) {
+            logger().error("Feil ved henting av refusjonskrav (se securelogs for mer detaljer)")
+            sikkerLogger().error("Feil ved henting av refusjonskrav - ${e.message}", e)
+            call.respond(
+                HttpStatusCode.InternalServerError,
+                mapOf("code" to HttpStatusCode.InternalServerError.value, "message" to "Feil ved henting av refusjonskrav"),
             )
         }
     }

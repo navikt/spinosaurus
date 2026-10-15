@@ -44,6 +44,27 @@ class InntektsmeldingRepositorySpec : SystemTestBase() {
     }
 
     @Test
+    fun findByUuids() {
+        val ids = (1..3).map { UUID.randomUUID().toString() }
+        ids.forEachIndexed { i, id ->
+            repository.lagreInnteksmelding(
+                InntektsmeldingEntitet(
+                    uuid = id,
+                    journalpostId = "jp-uuids-$i",
+                    behandlet = LocalDateTime.of(2019, 10, 1, 5, 18, 45, 0),
+                    orgnummer = "orgnummer",
+                    arbeidsgiverPrivat = "arbeidsgiverPrivat",
+                    fnr = Fnr("28014026691"),
+                    aktorId = "aktorId1",
+                ),
+            )
+        }
+        val resultat = repository.findByUuids(listOf(ids[0], ids[2], UUID.randomUUID().toString()))
+        assertThat(resultat.map { it.uuid }).containsExactlyInAnyOrder(ids[0], ids[2])
+        assertThat(repository.findByUuids(emptyList())).isEmpty()
+    }
+
+    @Test
     fun findByJournalpostId() {
         val inntektsmelding =
             InntektsmeldingEntitet(
