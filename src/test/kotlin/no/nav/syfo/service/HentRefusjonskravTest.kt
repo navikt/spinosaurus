@@ -15,18 +15,22 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.LocalDateTime
+import java.util.UUID
 
 class HentRefusjonskravTest {
     private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
     private val repository = mockk<InntektsmeldingRepository>()
     private val service = InntektsmeldingService(repository, objectMapper)
 
+    private val kjentId = UUID.randomUUID()
+    private val ukjentId = UUID.randomUUID()
+
     @Test
     fun `ukjent id gir null og duplikate ider slaas sammen`() {
         val im = buildIM().copy(refusjon = Refusjon(BigDecimal(1000), null), endringerIRefusjon = emptyList())
         val entitet =
             InntektsmeldingEntitet(
-                uuid = "kjent",
+                uuid = kjentId.toString(),
                 aktorId = "aktor",
                 journalpostId = "jp",
                 orgnummer = "org",
@@ -35,11 +39,11 @@ class HentRefusjonskravTest {
                 fnr = Fnr("28014026691"),
                 data = objectMapper.writeValueAsString(im),
             )
-        every { repository.findByUuids(listOf("kjent", "ukjent")) } returns listOf(entitet)
+        every { repository.findByUuids(listOf(kjentId.toString(), ukjentId.toString())) } returns listOf(entitet)
 
-        val resultat = service.hentRefusjonskrav(listOf("kjent", "ukjent", "kjent"))
+        val resultat = service.hentRefusjonskrav(listOf(kjentId, ukjentId, kjentId))
 
-        assertEquals(listOf("kjent", "ukjent"), resultat.map { it.inntektsmeldingId })
+        assertEquals(listOf(kjentId, ukjentId), resultat.map { it.inntektsmeldingId })
         assertEquals(BigDecimal(1000), resultat[0].refusjonskrav?.beloepPerMaaned)
         assertNull(resultat[1].refusjonskrav)
     }

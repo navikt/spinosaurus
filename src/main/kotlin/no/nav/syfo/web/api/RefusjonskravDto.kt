@@ -2,13 +2,14 @@ package no.nav.syfo.web.api
 
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.UUID
 
 data class RefusjonskravRequest(
-    val inntektsmeldingIder: List<String>,
+    val inntektsmeldingIder: List<UUID>,
 )
 
 data class InntektsmeldingRefusjonskrav(
-    val inntektsmeldingId: String,
+    val inntektsmeldingId: UUID,
     val refusjonskrav: Refusjonskrav?,
 )
 

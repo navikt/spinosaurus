@@ -13,6 +13,7 @@ import no.nav.syfo.util.validerInntektsmelding
 import no.nav.syfo.web.api.FinnInntektsmeldingerRequest
 import no.nav.syfo.web.api.InntektsmeldingRefusjonskrav
 import org.slf4j.Logger
+import java.util.UUID
 
 class InntektsmeldingService(
     private val repository: InntektsmeldingRepository,
@@ -40,19 +41,22 @@ class InntektsmeldingService(
         return repository.lagreInnteksmelding(dto)
     }
 
-    fun hentRefusjonskrav(inntektsmeldingIder: List<String>): List<InntektsmeldingRefusjonskrav> {
+    fun hentRefusjonskrav(inntektsmeldingIder: List<UUID>): List<InntektsmeldingRefusjonskrav> {
         val distinkteInntektsmeldingIder = inntektsmeldingIder.distinct()
 
-        val inntektsmeldingerFunnet = repository.findByUuids(distinkteInntektsmeldingIder).associateBy { it.uuid }
+        val inntektsmeldingerFunnet =
+            repository
+                .findByUuids(distinkteInntektsmeldingIder.map { it.toString() })
+                .associateBy { it.uuid }
 
         return distinkteInntektsmeldingIder.map { id ->
             InntektsmeldingRefusjonskrav(
                 inntektsmeldingId = id,
                 refusjonskrav =
-                    inntektsmeldingerFunnet[id]
+                    inntektsmeldingerFunnet[id.toString()]
                         ?.let {
                             toInntektsmelding(it, objectMapper)
-                                .tilRefusjonskrav(id)
+                                .tilRefusjonskrav(id.toString())
                         },
             )
         }
