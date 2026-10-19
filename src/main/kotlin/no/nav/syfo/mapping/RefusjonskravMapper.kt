@@ -1,23 +1,24 @@
 package no.nav.syfo.mapping
 
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring
 import no.nav.helsearbeidsgiver.utils.log.logger
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
-import no.nav.syfo.web.api.Refusjonsendring
-import no.nav.syfo.web.api.Refusjonskrav
 
-fun Inntektsmelding.tilRefusjonskrav(inntektsmeldingId: String): Refusjonskrav? {
+// TODO: Bedre navn på funksjonen..?
+fun Inntektsmelding.tilRefusjonskrav(inntektsmeldingId: String): Refusjon? {
     val beloepPerMaaned = refusjon.beloepPrMnd?.toDouble() ?: return null
 
     val refusjonsendringer =
         endringerIRefusjon.mapNotNull { endring ->
             val dato = endring.endringsdato
             val beloep = endring.beloep
-            if (dato != null && beloep != null) Refusjonsendring(beloep.toDouble(), dato) else null
+            if (dato != null && beloep != null) RefusjonEndring(beloep.toDouble(), dato) else null
         }
 
-    val refusjonsopphoer = refusjon.opphoersdato?.let { Refusjonsendring(0.0, it) }
+    val refusjonsopphoer = refusjon.opphoersdato?.let { RefusjonEndring(0.0, it) }
 
-    return Refusjonskrav(
+    return Refusjon(
         beloepPerMaaned = beloepPerMaaned,
         endringer =
             refusjonsendringer
@@ -30,10 +31,10 @@ fun Inntektsmelding.tilRefusjonskrav(inntektsmeldingId: String): Refusjonskrav? 
     )
 }
 
-private fun List<Refusjonsendring>.adderHvisIkkeKollisjon(
-    refusjonsendring: Refusjonsendring?,
+private fun List<RefusjonEndring>.adderHvisIkkeKollisjon(
+    refusjonsendring: RefusjonEndring?,
     hvisKollisjon: () -> Unit,
-): List<Refusjonsendring> =
+): List<RefusjonEndring> =
     when {
         refusjonsendring == null -> this
         any { it.startdato == refusjonsendring.startdato } -> this.also { hvisKollisjon() }

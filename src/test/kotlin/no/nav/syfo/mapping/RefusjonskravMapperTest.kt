@@ -1,15 +1,15 @@
 package no.nav.syfo.mapping
 
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring
 import no.nav.syfo.domain.inntektsmelding.EndringIRefusjon
 import no.nav.syfo.domain.inntektsmelding.Refusjon
 import no.nav.syfo.repository.buildIM
-import no.nav.syfo.web.api.Refusjonsendring
-import no.nav.syfo.web.api.Refusjonskrav
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.LocalDate
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon as Refusjonskrav
 
 class RefusjonskravMapperTest {
     private val im = buildIM()
@@ -36,8 +36,8 @@ class RefusjonskravMapperTest {
                 ).tilRefusjonskrav("id")
         assertEquals(
             listOf(
-                Refusjonsendring(200.0, LocalDate.of(2024, 2, 1)),
-                Refusjonsendring(300.0, LocalDate.of(2024, 3, 1)),
+                RefusjonEndring(200.0, LocalDate.of(2024, 2, 1)),
+                RefusjonEndring(300.0, LocalDate.of(2024, 3, 1)),
             ),
             resultat?.endringer,
         )
@@ -53,8 +53,8 @@ class RefusjonskravMapperTest {
                 ).tilRefusjonskrav("id")
         assertEquals(
             listOf(
-                Refusjonsendring(200.0, LocalDate.of(2024, 2, 1)),
-                Refusjonsendring(0.0, LocalDate.of(2024, 5, 1)),
+                RefusjonEndring(200.0, LocalDate.of(2024, 2, 1)),
+                RefusjonEndring(0.0, LocalDate.of(2024, 5, 1)),
             ),
             resultat?.endringer,
         )
@@ -69,7 +69,7 @@ class RefusjonskravMapperTest {
                     refusjon = Refusjon(BigDecimal(1000), dato),
                     endringerIRefusjon = listOf(EndringIRefusjon(dato, BigDecimal(200))),
                 ).tilRefusjonskrav("id")
-        assertEquals(listOf(Refusjonsendring(200.0, dato)), resultat?.endringer)
+        assertEquals(listOf(RefusjonEndring(200.0, dato)), resultat?.endringer)
     }
 
     @Test

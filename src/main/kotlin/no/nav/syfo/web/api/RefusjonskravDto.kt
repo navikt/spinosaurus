@@ -1,23 +1,14 @@
 package no.nav.syfo.web.api
 
-import java.time.LocalDate
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon
 import java.util.UUID
 
 data class RefusjonskravRequest(
     val inntektsmeldingIder: List<UUID>,
 )
 
+// TODO: Mer presist navn på class og felt?
 data class InntektsmeldingRefusjonskrav(
     val inntektsmeldingId: UUID,
-    val refusjonskrav: Refusjonskrav?,
-)
-
-data class Refusjonskrav(
-    val beloepPerMaaned: Double,
-    val endringer: List<Refusjonsendring>,
-)
-
-data class Refusjonsendring(
-    val beloep: Double,
-    val startdato: LocalDate,
+    val refusjonskrav: Refusjon?,
 )

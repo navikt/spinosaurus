@@ -24,6 +24,7 @@ import java.time.LocalDate
 import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon as Refusjonskrav
 
 class InnteksmeldingRouteTest {
     val inntektsmeldingService = mockk<InntektsmeldingService>(relaxed = true)
