@@ -130,6 +130,7 @@ components:
       properties:
         beloepPerMaaned:
           type: number
+          format: double
           nullable: true
         endringer:
           type: array
@@ -142,6 +143,7 @@ components:
       properties:
         beloep:
           type: number
+          format: double
         startdato:
           type: string
           format: date

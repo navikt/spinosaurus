@@ -16,7 +16,7 @@ class RefusjonskravMapperTest {
     @Test
     fun `kun beloep gir tom endringsliste`() {
         val resultat = im.copy(refusjon = Refusjon(BigDecimal(1000), null), endringerIRefusjon = emptyList()).tilRefusjonskrav("id")
-        assertEquals(Refusjonskrav(BigDecimal(1000), emptyList()), resultat)
+        assertEquals(Refusjonskrav(1000.0, emptyList()), resultat)
     }
 
     @Test
@@ -35,8 +35,8 @@ class RefusjonskravMapperTest {
                 ).tilRefusjonskrav("id")
         assertEquals(
             listOf(
-                Refusjonsendring(BigDecimal(200), LocalDate.of(2024, 2, 1)),
-                Refusjonsendring(BigDecimal(300), LocalDate.of(2024, 3, 1)),
+                Refusjonsendring(200.0, LocalDate.of(2024, 2, 1)),
+                Refusjonsendring(300.0, LocalDate.of(2024, 3, 1)),
             ),
             resultat.endringer,
         )
@@ -52,8 +52,8 @@ class RefusjonskravMapperTest {
                 ).tilRefusjonskrav("id")
         assertEquals(
             listOf(
-                Refusjonsendring(BigDecimal(200), LocalDate.of(2024, 2, 1)),
-                Refusjonsendring(BigDecimal.ZERO, LocalDate.of(2024, 5, 1)),
+                Refusjonsendring(200.0, LocalDate.of(2024, 2, 1)),
+                Refusjonsendring(0.0, LocalDate.of(2024, 5, 1)),
             ),
             resultat.endringer,
         )
@@ -68,7 +68,7 @@ class RefusjonskravMapperTest {
                     refusjon = Refusjon(BigDecimal(1000), dato),
                     endringerIRefusjon = listOf(EndringIRefusjon(dato, BigDecimal(200))),
                 ).tilRefusjonskrav("id")
-        assertEquals(listOf(Refusjonsendring(BigDecimal(200), dato)), resultat.endringer)
+        assertEquals(listOf(Refusjonsendring(200.0, dato)), resultat.endringer)
     }
 
     @Test

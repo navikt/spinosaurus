@@ -44,7 +44,7 @@ class HentRefusjonskravTest {
         val resultat = service.hentRefusjonskrav(listOf(kjentId, ukjentId, kjentId))
 
         assertEquals(listOf(kjentId, ukjentId), resultat.map { it.inntektsmeldingId })
-        assertEquals(BigDecimal(1000), resultat[0].refusjonskrav?.beloepPerMaaned)
+        assertEquals(1000.0, resultat[0].refusjonskrav?.beloepPerMaaned)
         assertNull(resultat[1].refusjonskrav)
     }
 

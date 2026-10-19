@@ -1,6 +1,5 @@
 package no.nav.syfo.web.api
 
-import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.UUID
 
@@ -14,11 +13,11 @@ data class InntektsmeldingRefusjonskrav(
 )
 
 data class Refusjonskrav(
-    val beloepPerMaaned: BigDecimal?,
+    val beloepPerMaaned: Double?,
     val endringer: List<Refusjonsendring>,
 )
 
 data class Refusjonsendring(
-    val beloep: BigDecimal,
+    val beloep: Double,
     val startdato: LocalDate,
 )

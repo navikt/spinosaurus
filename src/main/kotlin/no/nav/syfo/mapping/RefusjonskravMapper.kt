@@ -4,20 +4,19 @@ import no.nav.helsearbeidsgiver.utils.log.logger
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 import no.nav.syfo.web.api.Refusjonsendring
 import no.nav.syfo.web.api.Refusjonskrav
-import java.math.BigDecimal
 
 fun Inntektsmelding.tilRefusjonskrav(inntektsmeldingId: String): Refusjonskrav {
     val refusjonsendringer =
         endringerIRefusjon.mapNotNull { endring ->
             val dato = endring.endringsdato
             val beloep = endring.beloep
-            if (dato != null && beloep != null) Refusjonsendring(beloep, dato) else null
+            if (dato != null && beloep != null) Refusjonsendring(beloep.toDouble(), dato) else null
         }
 
-    val refusjonsopphoer = refusjon.opphoersdato?.let { Refusjonsendring(BigDecimal.ZERO, it) }
+    val refusjonsopphoer = refusjon.opphoersdato?.let { Refusjonsendring(0.0, it) }
 
     return Refusjonskrav(
-        beloepPerMaaned = refusjon.beloepPrMnd,
+        beloepPerMaaned = refusjon.beloepPrMnd?.toDouble(),
         endringer =
             refusjonsendringer
                 .adderHvisIkkeKollisjon(refusjonsopphoer) {

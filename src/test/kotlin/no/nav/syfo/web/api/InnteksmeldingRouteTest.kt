@@ -18,7 +18,6 @@ import io.mockk.verify
 import no.nav.inntektsmeldingkontrakt.Inntektsmelding
 import no.nav.syfo.service.InntektsmeldingService
 import org.junit.jupiter.api.Test
-import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.test.assertEquals
@@ -98,7 +97,7 @@ class InnteksmeldingRouteTest {
         val b = UUID.randomUUID()
         every { inntektsmeldingService.hentRefusjonskrav(listOf(a, b)) } returns
             listOf(
-                InntektsmeldingRefusjonskrav(a, Refusjonskrav(BigDecimal(100), emptyList())),
+                InntektsmeldingRefusjonskrav(a, Refusjonskrav(100.0, emptyList())),
                 InntektsmeldingRefusjonskrav(b, null),
             )
         testApplication {
