@@ -74,7 +74,7 @@ paths:
   /api/v1/inntektsmelding/refusjonskrav:
     post:
       summary: Hent refusjonskrav for inntektsmeldinger
-      description: Returnerer en liste med refusjonskrav per inntektsmelding-ID, i samme rekkefølge som i requesten (duplikater fjernes). refusjonskrav er null hvis inntektsmeldingen ikke finnes. Opphørsdato returneres som en endring med beløp 0, med mindre en annen endring har samme startdato. Da beholdes endringen og opphørsdatoen ignoreres. Endringene er sortert på startdato.
+      description: Returnerer en liste med refusjonskrav per inntektsmelding-ID, i samme rekkefølge som i requesten (duplikater fjernes). Inntektsmeldinger som ikke finnes utelates fra svaret. En inntektsmelding uten refusjon returneres med refusjonskrav null. Opphørsdato returneres som en endring med beløp 0, med mindre en annen endring har samme startdato. Da beholdes endringen og opphørsdatoen ignoreres. Endringene er sortert på startdato.
       requestBody:
         required: true
         content:
@@ -131,12 +131,12 @@ components:
         beloepPerMaaned:
           type: number
           format: double
-          nullable: true
         endringer:
           type: array
           items:
             $ref: '#/components/schemas/Refusjonsendring'
       required:
+        - beloepPerMaaned
         - endringer
     Refusjonsendring:
       type: object

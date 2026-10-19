@@ -13,7 +13,7 @@ data class InntektsmeldingRefusjonskrav(
 )
 
 data class Refusjonskrav(
-    val beloepPerMaaned: Double?,
+    val beloepPerMaaned: Double,
     val endringer: List<Refusjonsendring>,
 )
 

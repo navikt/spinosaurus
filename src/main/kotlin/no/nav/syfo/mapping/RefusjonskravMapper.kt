@@ -5,7 +5,9 @@ import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 import no.nav.syfo.web.api.Refusjonsendring
 import no.nav.syfo.web.api.Refusjonskrav
 
-fun Inntektsmelding.tilRefusjonskrav(inntektsmeldingId: String): Refusjonskrav {
+fun Inntektsmelding.tilRefusjonskrav(inntektsmeldingId: String): Refusjonskrav? {
+    val beloepPerMaaned = refusjon.beloepPrMnd?.toDouble() ?: return null
+
     val refusjonsendringer =
         endringerIRefusjon.mapNotNull { endring ->
             val dato = endring.endringsdato
@@ -16,7 +18,7 @@ fun Inntektsmelding.tilRefusjonskrav(inntektsmeldingId: String): Refusjonskrav {
     val refusjonsopphoer = refusjon.opphoersdato?.let { Refusjonsendring(0.0, it) }
 
     return Refusjonskrav(
-        beloepPerMaaned = refusjon.beloepPrMnd?.toDouble(),
+        beloepPerMaaned = beloepPerMaaned,
         endringer =
             refusjonsendringer
                 .adderHvisIkkeKollisjon(refusjonsopphoer) {

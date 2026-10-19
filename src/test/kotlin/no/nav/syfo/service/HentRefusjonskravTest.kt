@@ -10,8 +10,8 @@ import no.nav.syfo.domain.inntektsmelding.Refusjon
 import no.nav.syfo.dto.InntektsmeldingEntitet
 import no.nav.syfo.repository.InntektsmeldingRepository
 import no.nav.syfo.repository.buildIM
+import no.nav.syfo.web.api.InntektsmeldingRefusjonskrav
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -27,7 +27,7 @@ class HentRefusjonskravTest {
     private val ukjentId = UUID.randomUUID()
 
     @Test
-    fun `ukjent id gir null og duplikate ider slaas sammen`() {
+    fun `ukjent id utelates og duplikate ider slaas sammen`() {
         val im = buildIM().copy(refusjon = Refusjon(BigDecimal(1000), null), endringerIRefusjon = emptyList())
         val entitet =
             InntektsmeldingEntitet(
@@ -44,9 +44,26 @@ class HentRefusjonskravTest {
 
         val resultat = service.hentRefusjonskrav(listOf(kjentId, ukjentId, kjentId))
 
-        assertEquals(listOf(kjentId, ukjentId), resultat.map { it.inntektsmeldingId })
+        assertEquals(listOf(kjentId), resultat.map { it.inntektsmeldingId })
         assertEquals(1000.0, resultat[0].refusjonskrav?.beloepPerMaaned)
-        assertNull(resultat[1].refusjonskrav)
+    }
+
+    @Test
+    fun `inntektsmelding uten refusjon gir null refusjonskrav`() {
+        val im = buildIM().copy(refusjon = Refusjon(), endringerIRefusjon = emptyList())
+        val entitet =
+            InntektsmeldingEntitet(
+                uuid = kjentId.toString(),
+                aktorId = "aktor",
+                journalpostId = "jp",
+                fnr = Fnr.genererGyldig(),
+                data = objectMapper.writeValueAsString(im),
+            )
+        every { repository.findByUuids(listOf(kjentId.toString())) } returns listOf(entitet)
+
+        val resultat = service.hentRefusjonskrav(listOf(kjentId))
+
+        assertEquals(listOf(InntektsmeldingRefusjonskrav(kjentId, null)), resultat)
     }
 
     @Test

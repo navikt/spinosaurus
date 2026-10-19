@@ -94,7 +94,7 @@ class InnteksmeldingRouteTest {
     private fun refusjonskravRequest(ider: List<UUID>) = jacksonObjectMapper().writeValueAsString(RefusjonskravRequest(ider))
 
     @Test
-    fun refusjonskravReturnerer200MedNullForUkjentId() {
+    fun refusjonskravReturnerer200() {
         val a = UUID.randomUUID()
         val b = UUID.randomUUID()
         every { inntektsmeldingService.hentRefusjonskrav(listOf(a, b)) } returns

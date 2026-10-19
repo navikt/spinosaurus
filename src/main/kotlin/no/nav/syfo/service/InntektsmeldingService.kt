@@ -49,16 +49,13 @@ class InntektsmeldingService(
                 .findByUuids(distinkteInntektsmeldingIder.map { it.toString() })
                 .associateBy { it.uuid }
 
-        return distinkteInntektsmeldingIder.map { id ->
-            InntektsmeldingRefusjonskrav(
-                inntektsmeldingId = id,
-                refusjonskrav =
-                    inntektsmeldingerFunnet[id.toString()]
-                        ?.let {
-                            toInntektsmelding(it, objectMapper)
-                                .tilRefusjonskrav(id.toString())
-                        },
-            )
+        return distinkteInntektsmeldingIder.mapNotNull { id ->
+            inntektsmeldingerFunnet[id.toString()]?.let {
+                InntektsmeldingRefusjonskrav(
+                    inntektsmeldingId = id,
+                    refusjonskrav = toInntektsmelding(it, objectMapper).tilRefusjonskrav(id.toString()),
+                )
+            }
         }
     }
 

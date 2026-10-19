@@ -6,6 +6,7 @@ import no.nav.syfo.repository.buildIM
 import no.nav.syfo.web.api.Refusjonsendring
 import no.nav.syfo.web.api.Refusjonskrav
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -38,7 +39,7 @@ class RefusjonskravMapperTest {
                 Refusjonsendring(200.0, LocalDate.of(2024, 2, 1)),
                 Refusjonsendring(300.0, LocalDate.of(2024, 3, 1)),
             ),
-            resultat.endringer,
+            resultat?.endringer,
         )
     }
 
@@ -55,7 +56,7 @@ class RefusjonskravMapperTest {
                 Refusjonsendring(200.0, LocalDate.of(2024, 2, 1)),
                 Refusjonsendring(0.0, LocalDate.of(2024, 5, 1)),
             ),
-            resultat.endringer,
+            resultat?.endringer,
         )
     }
 
@@ -68,12 +69,24 @@ class RefusjonskravMapperTest {
                     refusjon = Refusjon(BigDecimal(1000), dato),
                     endringerIRefusjon = listOf(EndringIRefusjon(dato, BigDecimal(200))),
                 ).tilRefusjonskrav("id")
-        assertEquals(listOf(Refusjonsendring(200.0, dato)), resultat.endringer)
+        assertEquals(listOf(Refusjonsendring(200.0, dato)), resultat?.endringer)
     }
 
     @Test
-    fun `ingen refusjon gir null og tom liste`() {
+    fun `ingen refusjon gir null`() {
         val resultat = im.copy(refusjon = Refusjon(), endringerIRefusjon = emptyList()).tilRefusjonskrav("id")
-        assertEquals(Refusjonskrav(null, emptyList()), resultat)
+        assertNull(resultat)
+    }
+
+    // Dette er ikke mulig i praksis, men spinosauruskontrakten tillater det.
+    @Test
+    fun `endringer uten beloep per maaned gir null`() {
+        val resultat =
+            im
+                .copy(
+                    refusjon = Refusjon(null, LocalDate.of(2024, 5, 1)),
+                    endringerIRefusjon = listOf(EndringIRefusjon(LocalDate.of(2024, 2, 1), BigDecimal(200))),
+                ).tilRefusjonskrav("id")
+        assertNull(resultat)
     }
 }
