@@ -83,6 +83,7 @@ spec:
     inbound:
       rules:
         - application: im-bro-spinn
+        - application: refusjon
         - application: sparkel-dokumenter
           namespace: tbd
         - application: bakrommet
