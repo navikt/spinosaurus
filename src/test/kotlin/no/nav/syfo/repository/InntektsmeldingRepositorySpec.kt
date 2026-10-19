@@ -5,6 +5,7 @@ import no.nav.helsearbeidsgiver.utils.test.date.februar
 import no.nav.helsearbeidsgiver.utils.test.date.januar
 import no.nav.helsearbeidsgiver.utils.test.date.mai
 import no.nav.helsearbeidsgiver.utils.test.date.mars
+import no.nav.helsearbeidsgiver.utils.test.wrapper.genererGyldig
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.inntektsmelding.kontrakt.serde.JacksonJsonConfig
 import no.nav.syfo.domain.JournalStatus
@@ -54,7 +55,7 @@ class InntektsmeldingRepositorySpec : SystemTestBase() {
                     behandlet = LocalDateTime.of(2019, 10, 1, 5, 18, 45, 0),
                     orgnummer = "orgnummer",
                     arbeidsgiverPrivat = "arbeidsgiverPrivat",
-                    fnr = Fnr("28014026691"),
+                    fnr = Fnr.genererGyldig(),
                     aktorId = "aktorId1",
                 ),
             )
@@ -73,7 +74,7 @@ class InntektsmeldingRepositorySpec : SystemTestBase() {
                 behandlet = LocalDateTime.of(2019, 10, 1, 5, 18, 45, 0),
                 orgnummer = "orgnummer",
                 arbeidsgiverPrivat = "arbeidsgiverPrivat",
-                fnr = Fnr("28014026691"),
+                fnr = Fnr.genererGyldig(),
                 aktorId = "aktorId1",
             )
         repository.lagreInnteksmelding(inntektsmelding)
@@ -90,7 +91,7 @@ class InntektsmeldingRepositorySpec : SystemTestBase() {
                 behandlet = behandlet,
                 orgnummer = "orgnummer",
                 arbeidsgiverPrivat = "arbeidsgiverPrivat",
-                fnr = Fnr("28014026691"),
+                fnr = Fnr.genererGyldig(),
                 aktorId = "aktorId1",
             )
         inntektsmelding.leggtilArbeidsgiverperiode(fom = LocalDate.of(2019, 10, 5), tom = LocalDate.of(2019, 10, 25))
@@ -121,7 +122,7 @@ class InntektsmeldingRepositorySpec : SystemTestBase() {
                 behandlet = behandlet,
                 orgnummer = "orgnummer",
                 arbeidsgiverPrivat = "arbeidsgiverPrivat",
-                fnr = Fnr("28014026691"),
+                fnr = Fnr.genererGyldig(),
                 aktorId = "aktorId2",
             )
         inntektsmelding.leggtilArbeidsgiverperiode(fom = LocalDate.of(2019, 10, 5), tom = LocalDate.of(2019, 10, 25))
@@ -147,7 +148,7 @@ class InntektsmeldingRepositorySpec : SystemTestBase() {
                 behandlet = behandlet,
                 orgnummer = "orgnummer",
                 arbeidsgiverPrivat = "arbeidsgiverPrivat",
-                fnr = Fnr("28014026691"),
+                fnr = Fnr.genererGyldig(),
                 aktorId = "aktorId3",
             )
         repository.lagreInnteksmelding(inntektsmelding)
@@ -214,7 +215,7 @@ class InntektsmeldingRepositorySpec : SystemTestBase() {
                 orgnummer = "orgnummer",
                 arbeidsgiverPrivat = "arbeidsgiverPrivat",
                 aktorId = "aktorId-repo-test",
-                fnr = Fnr("28014026691"),
+                fnr = Fnr.genererGyldig(),
                 data = mapper.writeValueAsString(im),
             )
         repository.lagreInnteksmelding(inntektsmelding)
@@ -271,7 +272,7 @@ class InntektsmeldingRepositorySpec : SystemTestBase() {
 
     @Test
     fun `skal hente inntektsmeldinger for gitt fnr i periode`() {
-        val fnr = Fnr("07025032327")
+        val fnr = Fnr.genererGyldig()
 
         val im1 =
             lagInntektsmelding(1.januar(2020).atStartOfDay())
@@ -300,7 +301,7 @@ class InntektsmeldingRepositorySpec : SystemTestBase() {
             behandlet = behandlet,
             orgnummer = "orgnummer",
             arbeidsgiverPrivat = "arbeidsgiverPrivat",
-            fnr = Fnr("28014026691"),
+            fnr = Fnr.genererGyldig(),
             aktorId = "aktorId1",
         )
 }

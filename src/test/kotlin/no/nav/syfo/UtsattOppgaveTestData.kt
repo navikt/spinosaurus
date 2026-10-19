@@ -1,5 +1,6 @@
 package no.nav.syfo
 
+import no.nav.helsearbeidsgiver.utils.test.wrapper.genererGyldig
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.syfo.dto.InntektsmeldingEntitet
 import no.nav.syfo.dto.Tilstand
@@ -38,7 +39,7 @@ object UtsattOppgaveTestData {
             behandlet = LocalDateTime.now(),
             orgnummer = "arb-org-123",
             journalpostId = "jp-123",
-            fnr = Fnr("28014026691"),
+            fnr = Fnr.genererGyldig(),
             data = buildObjectMapper().writeValueAsString(buildIM()),
         )
     val inntektsmeldingEntitetIkkeFravaer =

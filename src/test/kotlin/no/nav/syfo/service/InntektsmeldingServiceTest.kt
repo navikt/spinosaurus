@@ -7,6 +7,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.helsearbeidsgiver.utils.log.logger
+import no.nav.helsearbeidsgiver.utils.test.wrapper.genererGyldig
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.inntektsmelding.kontrakt.serde.JacksonJsonConfig
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
@@ -180,7 +181,7 @@ class InntektsmeldingServiceTest {
             behandlet = LocalDateTime.now(),
             orgnummer = "arb-org-123",
             journalpostId = "jp-123",
-            fnr = Fnr("28014026691"),
+            fnr = Fnr.genererGyldig(),
             data = objectMapper.writeValueAsString(im),
         )
 
@@ -193,7 +194,7 @@ class InntektsmeldingServiceTest {
     fun `skal kalle findByFnrInPeriod og returnerer tom liste`() {
         val repository = mockk<InntektsmeldingRepository>(relaxed = true)
         val service = InntektsmeldingService(repository, objectMapper)
-        val fnr = "28014026691"
+        val fnr = Fnr.genererGyldig().verdi
         val fom = LocalDate.now().minusDays(10)
         val tom = LocalDate.now()
         every { repository.findByFnrInPeriod(fnr, fom, tom) } returns emptyList()

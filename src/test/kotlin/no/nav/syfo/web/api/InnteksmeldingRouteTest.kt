@@ -15,6 +15,8 @@ import io.ktor.server.testing.testApplication
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.helsearbeidsgiver.utils.test.wrapper.genererGyldig
+import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.inntektsmeldingkontrakt.Inntektsmelding
 import no.nav.syfo.service.InntektsmeldingService
 import org.junit.jupiter.api.Test
@@ -43,7 +45,7 @@ class InnteksmeldingRouteTest {
             }
             val request =
                 FinnInntektsmeldingerRequest(
-                    fnr = "07025032327",
+                    fnr = Fnr.genererGyldig().verdi,
                     fom = LocalDate.now().minusDays(10),
                     tom = LocalDate.now(),
                 )

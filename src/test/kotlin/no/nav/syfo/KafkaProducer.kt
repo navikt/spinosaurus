@@ -1,5 +1,6 @@
 package no.nav.syfo
 
+import no.nav.helsearbeidsgiver.utils.test.wrapper.genererGyldig
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.helsearbeidsgiver.utils.wrapper.Orgnr
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -14,7 +15,6 @@ private const val INNTEKTSMELDING_ID = "%%%INNTEKTSMELDING_ID%%%"
 private const val FORESPOERSEL_ID = "%%%FORESPOERSEL_ID%%%"
 private const val SYKMELDT_FNR = "%%%SYKMELDT%%%"
 private const val ORGNUMMER = "%%%ORGNR%%%"
-const val DEFAULT_FNR = "07025032327"
 const val DEFAULT_ORG = "810007842"
 
 fun main() {
@@ -57,7 +57,7 @@ object Producer {
 fun buildJournalfoertInntektsmelding(
     inntektsmeldingId: UUID = UUID.randomUUID(),
     forespoerselId: UUID = UUID.randomUUID(),
-    sykemeldtFnr: Fnr = Fnr(DEFAULT_FNR),
+    sykemeldtFnr: Fnr = Fnr.genererGyldig(),
     orgNr: Orgnr = Orgnr(DEFAULT_ORG),
 ): String {
     val filePath = "journalfoertInntektsmelding.json"

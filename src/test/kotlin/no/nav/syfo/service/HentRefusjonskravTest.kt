@@ -4,6 +4,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.helsearbeidsgiver.utils.test.wrapper.genererGyldig
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.syfo.domain.inntektsmelding.Refusjon
 import no.nav.syfo.dto.InntektsmeldingEntitet
@@ -36,7 +37,7 @@ class HentRefusjonskravTest {
                 orgnummer = "org",
                 arbeidsgiverPrivat = null,
                 behandlet = LocalDateTime.now(),
-                fnr = Fnr("28014026691"),
+                fnr = Fnr.genererGyldig(),
                 data = objectMapper.writeValueAsString(im),
             )
         every { repository.findByUuids(listOf(kjentId.toString(), ukjentId.toString())) } returns listOf(entitet)
