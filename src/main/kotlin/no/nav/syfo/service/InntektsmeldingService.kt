@@ -5,12 +5,15 @@ import no.nav.helsearbeidsgiver.utils.log.logger
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 import no.nav.syfo.dto.InntektsmeldingEntitet
 import no.nav.syfo.mapping.mapInntektsmeldingKontrakt
+import no.nav.syfo.mapping.tilRefusjonskrav
 import no.nav.syfo.mapping.toInntektsmelding
 import no.nav.syfo.mapping.toInntektsmeldingEntitet
 import no.nav.syfo.repository.InntektsmeldingRepository
 import no.nav.syfo.util.validerInntektsmelding
 import no.nav.syfo.web.api.FinnInntektsmeldingerRequest
+import no.nav.syfo.web.api.InntektsmeldingRefusjonskrav
 import org.slf4j.Logger
+import java.util.UUID
 
 class InntektsmeldingService(
     private val repository: InntektsmeldingRepository,
@@ -36,6 +39,24 @@ class InntektsmeldingService(
         dto.aktorId = aktorid
         dto.data = inntektsmelding.asJsonString(objectMapper)
         return repository.lagreInnteksmelding(dto)
+    }
+
+    fun hentRefusjonskrav(inntektsmeldingIder: List<UUID>): List<InntektsmeldingRefusjonskrav> {
+        val distinkteInntektsmeldingIder = inntektsmeldingIder.distinct()
+
+        val inntektsmeldingerFunnet =
+            repository
+                .findByUuids(distinkteInntektsmeldingIder.map { it.toString() })
+                .associateBy { it.uuid }
+
+        return distinkteInntektsmeldingIder.mapNotNull { id ->
+            inntektsmeldingerFunnet[id.toString()]?.let {
+                InntektsmeldingRefusjonskrav(
+                    inntektsmeldingId = id,
+                    refusjonskrav = toInntektsmelding(it, objectMapper).tilRefusjonskrav(id.toString()),
+                )
+            }
+        }
     }
 
     fun finnInntektsmeldinger(request: FinnInntektsmeldingerRequest): List<no.nav.inntektsmeldingkontrakt.Inntektsmelding> {

@@ -27,7 +27,7 @@ class InntektsmeldingKontraktMapperKtTest {
     fun toInntektsmeldingDTO() {
         val inntektsmelding =
             Inntektsmelding(
-                fnr = "28014026691",
+                fnr = Fnr.genererGyldig().verdi,
                 arbeidsgiverPrivatFnr = "fnr",
                 journalpostId = "journalpostId",
                 arsakTilInnsending = "",
@@ -60,7 +60,7 @@ class InntektsmeldingKontraktMapperKtTest {
                 orgnummer = grunnleggendeInntektsmelding.arbeidsgiverOrgnummer,
                 arbeidsgiverPrivat = "arbeidsgiverPrivat",
                 aktorId = grunnleggendeInntektsmelding.aktorId.toString(),
-                fnr = Fnr("28014026691"),
+                fnr = Fnr.genererGyldig(),
                 data = om.writeValueAsString(grunnleggendeInntektsmelding),
             )
         val i = toInntektsmelding(dto, om)

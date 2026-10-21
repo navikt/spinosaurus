@@ -4,6 +4,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.serialization.jackson.jackson
@@ -14,11 +15,16 @@ import io.ktor.server.testing.testApplication
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.helsearbeidsgiver.utils.test.wrapper.genererGyldig
+import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.inntektsmeldingkontrakt.Inntektsmelding
 import no.nav.syfo.service.InntektsmeldingService
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.util.UUID
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon as Refusjonskrav
 
 class InnteksmeldingRouteTest {
     val inntektsmeldingService = mockk<InntektsmeldingService>(relaxed = true)
@@ -40,7 +46,7 @@ class InnteksmeldingRouteTest {
             }
             val request =
                 FinnInntektsmeldingerRequest(
-                    fnr = "07025032327",
+                    fnr = Fnr.genererGyldig().verdi,
                     fom = LocalDate.now().minusDays(10),
                     tom = LocalDate.now(),
                 )
@@ -83,6 +89,69 @@ class InnteksmeldingRouteTest {
                     )
                 }
             assertEquals(HttpStatusCode.BadRequest, response.status)
+        }
+    }
+
+    private fun refusjonskravRequest(ider: List<UUID>) = jacksonObjectMapper().writeValueAsString(RefusjonskravRequest(ider))
+
+    @Test
+    fun refusjonskravReturnerer200() {
+        val a = UUID.randomUUID()
+        val b = UUID.randomUUID()
+        every { inntektsmeldingService.hentRefusjonskrav(listOf(a, b)) } returns
+            listOf(
+                InntektsmeldingRefusjonskrav(a, Refusjonskrav(100.0, emptyList())),
+                InntektsmeldingRefusjonskrav(b, null),
+            )
+        testApplication {
+            application {
+                install(ContentNegotiation) { jackson { registerModule(JavaTimeModule()) } }
+                routing { refusjonskrav(inntektsmeldingService) }
+            }
+            val response =
+                client.post("/refusjonskrav") {
+                    contentType(io.ktor.http.ContentType.Application.Json)
+                    setBody(refusjonskravRequest(listOf(a, b)))
+                }
+            assertEquals(HttpStatusCode.OK, response.status)
+            val json = jacksonObjectMapper().readTree(response.bodyAsText())
+            assertEquals(listOf(a.toString(), b.toString()), json.map { it["inntektsmeldingId"].asText() })
+            assertEquals(100, json[0]["refusjonskrav"]["beloepPerMaaned"].asInt())
+            assertTrue(json[1].has("refusjonskrav") && json[1]["refusjonskrav"].isNull)
+        }
+    }
+
+    @Test
+    fun refusjonskravUgyldigUuidGir400() {
+        testApplication {
+            application {
+                install(ContentNegotiation) { jackson { registerModule(JavaTimeModule()) } }
+                routing { refusjonskrav(inntektsmeldingService) }
+            }
+            val response =
+                client.post("/refusjonskrav") {
+                    contentType(io.ktor.http.ContentType.Application.Json)
+                    setBody("""{"inntektsmeldingIder":["ikke-en-uuid"]}""")
+                }
+            assertEquals(HttpStatusCode.BadRequest, response.status)
+        }
+    }
+
+    @Test
+    fun refusjonskravTomListeGir200MedTomListe() {
+        every { inntektsmeldingService.hentRefusjonskrav(emptyList()) } returns emptyList()
+        testApplication {
+            application {
+                install(ContentNegotiation) { jackson { registerModule(JavaTimeModule()) } }
+                routing { refusjonskrav(inntektsmeldingService) }
+            }
+            val response =
+                client.post("/refusjonskrav") {
+                    contentType(io.ktor.http.ContentType.Application.Json)
+                    setBody(refusjonskravRequest(emptyList()))
+                }
+            assertEquals(HttpStatusCode.OK, response.status)
+            assertEquals("[]", response.bodyAsText().replace(Regex("\\s"), ""))
         }
     }
 }

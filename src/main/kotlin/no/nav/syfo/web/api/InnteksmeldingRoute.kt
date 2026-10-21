@@ -1,8 +1,10 @@
 package no.nav.syfo.web.api
 
+import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.call
+import io.ktor.server.plugins.BadRequestException
+import io.ktor.server.plugins.ContentTransformationException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -58,6 +60,29 @@ fun Route.syfoinntektsmelding(
             call.respond(
                 HttpStatusCode.InternalServerError,
                 mapOf("code" to HttpStatusCode.InternalServerError.value, "message" to "Feil ved henting av inntektsmelding"),
+            )
+        }
+    }
+}
+
+fun Route.refusjonskrav(
+    inntektsmeldingService: InntektsmeldingService,
+) {
+    post("/refusjonskrav") {
+        try {
+            val request = call.receive<RefusjonskravRequest>()
+            call.respond(HttpStatusCode.OK, inntektsmeldingService.hentRefusjonskrav(request.inntektsmeldingIder))
+        } catch (e: BadRequestException) {
+            call.respond(
+                HttpStatusCode.BadRequest,
+                mapOf("code" to HttpStatusCode.BadRequest.value, "message" to "Ugyldig request. Forventet liste med inntektsmelding-UUIDer"),
+            )
+        } catch (e: Exception) {
+            logger().error("Feil ved henting av refusjonskrav (se securelogs for mer detaljer)")
+            sikkerLogger().error("Feil ved henting av refusjonskrav - ${e.message}", e)
+            call.respond(
+                HttpStatusCode.InternalServerError,
+                mapOf("code" to HttpStatusCode.InternalServerError.value, "message" to "Feil ved henting av refusjonskrav"),
             )
         }
     }

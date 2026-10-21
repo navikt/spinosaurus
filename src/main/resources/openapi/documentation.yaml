@@ -71,8 +71,85 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /api/v1/inntektsmelding/refusjonskrav:
+    post:
+      summary: Hent refusjonskrav for inntektsmeldinger
+      description: Returnerer en liste med refusjonskrav per inntektsmelding-ID, i samme rekkefølge som i requesten (duplikater fjernes). Inntektsmeldinger som ikke finnes utelates fra svaret. En inntektsmelding uten refusjon returneres med refusjonskrav null. Opphørsdato returneres som en endring med beløp 0, med mindre en annen endring har samme startdato. Da beholdes endringen og opphørsdatoen ignoreres. Endringene er sortert på startdato.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefusjonskravRequest'
+      responses:
+        '200':
+          description: Refusjonskrav per inntektsmelding
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InntektsmeldingRefusjonskrav'
+        '400':
+          description: Ugyldig request, for eksempel ugyldig UUID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Intern serverfeil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
+    RefusjonskravRequest:
+      type: object
+      properties:
+        inntektsmeldingIder:
+          type: array
+          items:
+            type: string
+            format: uuid
+      required:
+        - inntektsmeldingIder
+    InntektsmeldingRefusjonskrav:
+      type: object
+      properties:
+        inntektsmeldingId:
+          type: string
+          format: uuid
+        refusjonskrav:
+          $ref: '#/components/schemas/Refusjonskrav'
+      required:
+        - inntektsmeldingId
+    Refusjonskrav:
+      type: object
+      nullable: true
+      properties:
+        beloepPerMaaned:
+          type: number
+          format: double
+        endringer:
+          type: array
+          items:
+            $ref: '#/components/schemas/Refusjonsendring'
+      required:
+        - beloepPerMaaned
+        - endringer
+    Refusjonsendring:
+      type: object
+      properties:
+        beloep:
+          type: number
+          format: double
+        startdato:
+          type: string
+          format: date
+      required:
+        - beloep
+        - startdato
     FinnInntektsmeldingerRequest:
       type: object
       properties:

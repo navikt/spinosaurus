@@ -15,6 +15,8 @@ interface InntektsmeldingRepository {
 
     fun findByUuid(uuid: String): InntektsmeldingEntitet?
 
+    fun findByUuids(uuids: List<String>): List<InntektsmeldingEntitet>
+
     fun findByAktorId(aktoerId: String): List<InntektsmeldingEntitet>
 
     fun findFirst100ByBehandletBefore(førDato: LocalDateTime): List<InntektsmeldingEntitet>
@@ -70,6 +72,8 @@ class InntektsmeldingRepositoryMock : InntektsmeldingRepository {
     override fun findByUuid(uuid: String): InntektsmeldingEntitet {
         TODO("Not yet implemented")
     }
+
+    override fun findByUuids(uuids: List<String>): List<InntektsmeldingEntitet> = mockrepo.filter { it.uuid in uuids }
 }
 
 class InntektsmeldingRepositoryImp(
@@ -110,6 +114,20 @@ class InntektsmeldingRepositoryImp(
             result.arbeidsgiverperioder = finnAgpForIm(uuid).toMutableList()
         }
         return result
+    }
+
+    override fun findByUuids(uuids: List<String>): List<InntektsmeldingEntitet> {
+        if (uuids.isEmpty()) return emptyList()
+        val query = "SELECT * FROM INNTEKTSMELDING WHERE INNTEKTSMELDING_UUID = ANY(?);"
+        ds.connection.use {
+            val res =
+                it
+                    .prepareStatement(query)
+                    .apply {
+                        setArray(1, it.createArrayOf("text", uuids.toTypedArray()))
+                    }.executeQuery()
+            return resultLoop(res, ArrayList())
+        }
     }
 
     override fun findByAktorId(aktoerId: String): List<InntektsmeldingEntitet> {
