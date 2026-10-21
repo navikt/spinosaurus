@@ -7,7 +7,6 @@ data class RefusjonskravRequest(
     val inntektsmeldingIder: List<UUID>,
 )
 
-// TODO: Mer presist navn på class og felt?
 data class InntektsmeldingRefusjonskrav(
     val inntektsmeldingId: UUID,
     val refusjonskrav: Refusjon?,

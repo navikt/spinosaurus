@@ -5,7 +5,6 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring
 import no.nav.helsearbeidsgiver.utils.log.logger
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 
-// TODO: Bedre navn på funksjonen..?
 fun Inntektsmelding.tilRefusjonskrav(inntektsmeldingId: String): Refusjon? {
     val beloepPerMaaned = refusjon.beloepPrMnd?.toDouble() ?: return null
 
