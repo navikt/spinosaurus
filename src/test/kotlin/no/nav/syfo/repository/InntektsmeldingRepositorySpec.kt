@@ -1,6 +1,5 @@
 package no.nav.syfo.repository
 
-import com.zaxxer.hikari.HikariDataSource
 import no.nav.helsearbeidsgiver.utils.test.date.februar
 import no.nav.helsearbeidsgiver.utils.test.date.januar
 import no.nav.helsearbeidsgiver.utils.test.date.mai
@@ -18,29 +17,23 @@ import no.nav.syfo.domain.inntektsmelding.Naturalytelse
 import no.nav.syfo.domain.inntektsmelding.OpphoerAvNaturalytelse
 import no.nav.syfo.domain.inntektsmelding.Refusjon
 import no.nav.syfo.dto.InntektsmeldingEntitet
-import no.nav.syfo.slowtests.SystemTestBase
+import no.nav.syfo.slowtests.WithPostgresContainer
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
-class InntektsmeldingRepositorySpec : SystemTestBase() {
-    lateinit var repository: InntektsmeldingRepository
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class InntektsmeldingRepositorySpec : WithPostgresContainer() {
+    val repository = InntektsmeldingRepositoryImp(dataSource)
 
-    @BeforeAll
-    internal fun setUp() {
-        val ds = HikariDataSource(createTestHikariConfig())
-        repository = InntektsmeldingRepositoryImp(ds)
-        repository.deleteAll()
-    }
-
-    @AfterEach
-    internal fun tearDown() {
+    @BeforeEach
+    fun setup() {
         repository.deleteAll()
     }
 

@@ -5,21 +5,17 @@ import com.zaxxer.hikari.metrics.prometheus.PrometheusMetricsTrackerFactory
 
 fun createHikariConfig(
     jdbcUrl: String,
-    username: String? = null,
-    password: String? = null,
-    prometheusMetricsTrackerFactory: PrometheusMetricsTrackerFactory? = null,
+    username: String,
+    password: String,
 ) = HikariConfig().apply {
     this.jdbcUrl = jdbcUrl
-    maximumPoolSize = 3
+    this.username = username
+    this.password = password
     minimumIdle = 1
-    idleTimeout = 10001
-    connectionTimeout = 2000
+    maximumPoolSize = 3
     maxLifetime = 30001
-    driverClassName = "org.postgresql.Driver"
-    username?.let { this.username = it }
-    password?.let { this.password = it }
+    connectionTimeout = 2000
+    idleTimeout = 10001
     poolName = "defaultPool"
-    prometheusMetricsTrackerFactory?.let { metricsTrackerFactory = prometheusMetricsTrackerFactory }
+    driverClassName = "org.postgresql.Driver"
 }
-
-fun createTestHikariConfig() = createHikariConfig("jdbc:postgresql://localhost:5432/spinn", "spinn", "spinn", null)
