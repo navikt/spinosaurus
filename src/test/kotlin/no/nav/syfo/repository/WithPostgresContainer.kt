@@ -1,4 +1,4 @@
-package no.nav.syfo.slowtests
+package no.nav.syfo.repository
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
