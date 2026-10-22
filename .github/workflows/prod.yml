@@ -62,9 +62,13 @@ jobs:
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
 
+      - uses: nais/setup@v1
+        with:
+          team: helsearbeidsgiver
+
       - name: Deploy to PROD-GCP
-        uses: nais/deploy/actions/deploy@v2
-        env:
-          CLUSTER: prod-gcp
-          RESOURCE: deploy/prod.yml
-          VAR: image=${{ steps.docker-build-push.outputs.image }}
+        run: |
+          nais apply .nais/app.yml \
+            --environment prod-gcp \
+            --set spec.image="${{ steps.docker-build-push.outputs.image }}" \
+            --wait

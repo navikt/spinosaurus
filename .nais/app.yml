@@ -1,0 +1,60 @@
+apiVersion: nais.io/v1alpha1
+kind: Application
+metadata:
+  name: spinosaurus
+  namespace: helsearbeidsgiver
+  labels:
+    team: helsearbeidsgiver
+spec:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 1024Mi
+    limits:
+      memory: 2048Mi
+  replicas:
+    min: 2
+    max: 2
+  leaderElection: true
+  strategy:
+    type: Recreate
+  liveness:
+    failureThreshold: 6
+    initialDelay: 60
+    path: /health/is-alive
+    periodSeconds: 10
+    timeout: 3
+  readiness:
+    failureThreshold: 3
+    initialDelay: 60
+    path: /health/is-ready
+    periodSeconds: 10
+    timeout: 2
+  observability:
+    logging:
+      destinations:
+        - id: loki
+    autoInstrumentation:
+      enabled: true
+      runtime: java
+  azure:
+    application:
+      enabled: true
+  accessPolicy:
+    outbound:
+      rules:
+        - application: logging
+          namespace: nais-system
+        - application: norg2
+          namespace: org
+    inbound:
+      rules:
+        - application: sparkel-dokumenter
+          namespace: tbd
+  env:
+    - name: RUN_BACKGROUND_WORKERS
+      value: "true"
+    - name: KAFKA_UTSATT_OPPGAVE_TOPIC
+      value: tbd.spre-oppgaver
+    - name: NORG2_URL
+      value: http://norg2.org/norg2/api/v1/arbeidsfordeling/enheter/bestmatch

@@ -1,0 +1,62 @@
+spec:
+  kafka:
+    pool: nav-dev
+  prometheus:
+    enabled: false
+  azure:
+    application:
+      allowAllUsers: false
+      claims:
+        extra:
+          - 'NAVident'
+        groups:
+          - id: '4373da97-ad06-40c0-893e-98ba4d0aeecb'
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_15
+        tier: db-f1-micro
+        diskAutoresize: true
+        databases:
+          - name: spinosaurus
+            users:
+              - name: spinosaurus_datastream_bruker
+        flags:
+          - name: cloudsql.logical_decoding
+            value: "on"
+  ingresses:
+    - https://spinosaurus.intern.dev.nav.no
+  accessPolicy:
+    inbound:
+      rules:
+        - application: refusjon
+        - application: bakrommet
+          namespace: speilvendt
+    outbound:
+      external:
+        - host: dokarkiv.dev-fss-pub.nais.io
+        - host: oppgave-q1.dev-fss-pub.nais.io
+        - host: pdl-api.dev-fss-pub.nais.io
+        - host: saf.dev-fss-pub.nais.io
+  env:
+    - name: KOIN_PROFILE
+      value: DEV
+    - name: KAFKA_JOARK_HENDELSE_TOPIC
+      value: teamdokumenthandtering.aapen-dok-journalfoering-q1
+    - name: DOKARKIV_URL
+      value: https://dokarkiv.dev-fss-pub.nais.io/rest/journalpostapi/v1
+    - name: OPPGAVEBEHANDLING_URL
+      value: https://oppgave-q1.dev-fss-pub.nais.io/api/v1/oppgaver
+    - name: PDL_URL
+      value: https://pdl-api.dev-fss-pub.nais.io/graphql
+    - name: SAF_DOKUMENT_URL
+      value: https://saf.dev-fss-pub.nais.io/rest
+    - name: SAF_JOURNAL_URL
+      value: https://saf.dev-fss-pub.nais.io/graphql
+    - name: DOKARKIV_SCOPE
+      value: api://dev-fss.teamdokumenthandtering.dokarkiv-q1/.default
+    - name: OPPGAVE_SCOPE
+      value: api://dev-fss.oppgavehandtering.oppgave-q1/.default
+    - name: PDL_SCOPE
+      value: api://dev-fss.pdl.pdl-api/.default
+    - name: SAF_SCOPE
+      value: api://dev-fss.teamdokumenthandtering.saf-q1/.default
