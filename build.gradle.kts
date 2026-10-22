@@ -37,6 +37,8 @@ tasks.register<Test>("slowTests") {
     exclude("**/*Test.class")
     outputs.upToDateWhen { false }
     group = "verification"
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
 }
 
 tasks.jacocoTestReport {
@@ -124,6 +126,7 @@ dependencies {
     val prometheusVersion = project.property("prometheusVersion") as String
     val slf4Version = project.property("slf4Version") as String
     val tokenSupportVersion = project.property("tokenSupportVersion") as String
+    val testcontainersVersion = project.property("testcontainersVersion") as String
 
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
@@ -179,6 +182,7 @@ dependencies {
     testImplementation("org.assertj:assertj-core:$assertJVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
+    testImplementation("org.testcontainers:testcontainers-postgresql:$testcontainersVersion")
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

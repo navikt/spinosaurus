@@ -1,25 +1,18 @@
 package no.nav.syfo.repository
 
-import com.zaxxer.hikari.HikariDataSource
 import no.nav.syfo.dto.Tilstand
 import no.nav.syfo.dto.UtsattOppgaveEntitet
-import no.nav.syfo.slowtests.SystemTestBase
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import java.time.LocalDateTime
 import java.time.LocalDateTime.now
 import java.util.UUID
 
-class UtsattOppgaveRepositoryImpSpec : SystemTestBase() {
-    lateinit var repository: UtsattOppgaveRepository
-
-    @BeforeAll
-    fun setUp() {
-        val ds = HikariDataSource(createTestHikariConfig())
-        repository = UtsattOppgaveRepositoryImp(ds)
-    }
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class UtsattOppgaveRepositoryImpSpec : WithPostgresContainer() {
+    val repository = UtsattOppgaveRepositoryImp(dataSource)
 
     @BeforeEach
     fun setup() {
