@@ -1,18 +1,12 @@
 # Syfoinntektsmelding
 
 ## Formål
-Applikasjonen tar imot innkommende inntektsmeldinger for sykepenger, journalfører dette og oppretter oppgaver i
-Gosys for behandlende enhet. Dersom behandlede enhet ikke er funnet blir det opprettet en fordelingsoppgave istedet.
-Andre applikasjoner kan be om utsettelse eller ignorering av opprettelser av disse oppgavene.
+Applikasjonen tar imot innkommende inntektsmeldinger for sykepenger fra Simba og oppretter oppgaver i
+Gosys for behandlende enhet. Andre applikasjoner kan be om utsettelse eller ignorering av opprettelser av disse oppgavene.
 
 ### Oversikt
 
 ![image](docs/hovedflyt.svg)
-
-## Meldingsinnhold om JoarkHendelse
-Illustrasjonen viser innholdet i kafka meldingen (InngaaendeJournalpostDTO).
-
-![image](docs/InngaaendeJournalpostDTO.png)
 
 ## Detaljer om inntektsmelding
 Illustrasjonen viser inntektsmeldingen i sin helhet
@@ -21,23 +15,6 @@ Illustrasjonen viser inntektsmeldingen i sin helhet
 
 ## Robusthet
 Applikasjonen er laget med tanke på aldri miste noen inntektsmeldinger. Dette er løst med disse tiltakene:
-
-### Melding om ny inntekstmelding
-[JoarkHendelseConsumer](/src/main/kotlin/no/nav/syfo/kafkamottak/JoarkHendelseConsumer) lytter på en 
-Kafka kø. Straks den får nyss om inntektsmelding blir kafka-meldingen lagret i databasen og køet opp til behandling av de
-periodiserte jobbene.
-
-### Periodiserte jobber (køer)
-[BakgrunnsjobbService](/src/main/kotlin/no/nav/syfo/bakgrunnsjobb/BakgrunnsjobbService) kjører to ulike jobber med faste
-tidsintervaller. Hver av de henter ventende oppgaver fra køen (databasen). Oppgaver som feiler sendes tilbake til køen 
-med en utsettelse. Dersom de feiler for mange ganger blir de stoppet.
-
-#### Behandling
-[JoarkInntektsmeldingHendelseProsessor](/src/main/kotlin/no/nav/syfo/kafkamottak/JoarkInntektsmeldingHendelseProsessor) henter 
-ut inntektsmelding fra køen og sjekker hvor lenge den har ligget ubehandlet i køen. Dersom tidsfristen er nådd opprettes
-det en fordelingsoppgave i Gosys og inntektsmeldingen blir markert som ferdigbehandlet og tatt ut av køen. Hvis ikke
-ferdigstilles journalposten for inntektsmeldingen det gjelder og fjernes fra denne køen. I tillegg blir det opprettet 
-en jobb i oppgavekøen under. Til slutt blir inntektsmeldingen lagt på en Kafka topic. 
 
 #### Oppgave
 [FeiletUtsattOppgaveMeldingProsessor](/src/main/kotlin/no/nav/syfo/utsattoppgave/FeiletUtsattOppgaveMeldingProsessor) henter 

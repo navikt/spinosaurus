@@ -12,7 +12,6 @@ import no.nav.hag.utils.bakgrunnsjobb.BakgrunnsjobbService
 import no.nav.helsearbeidsgiver.utils.log.logger
 import no.nav.helsearbeidsgiver.utils.log.sikkerLogger
 import no.nav.syfo.integration.kafka.UtsattOppgaveConsumer
-import no.nav.syfo.integration.kafka.journalpost.JournalpostHendelseConsumer
 import no.nav.syfo.koin.selectModuleBasedOnProfile
 import no.nav.syfo.prosesser.FinnAlleUtgaandeOppgaverProcessor
 import no.nav.syfo.prosesser.LeaderElectionBakgrunnsjobbProcessor
@@ -61,11 +60,6 @@ class SpinnApplication(
         thread(start = true) {
             utsattOppgaveConsumer.start()
         }
-        logger.info("Starter lytting for journalpost hendelser...")
-        val journalpostHendelseConsumer = get<JournalpostHendelseConsumer>()
-        thread(start = true) {
-            journalpostHendelseConsumer.start()
-        }
         logger.info("Starter lytting for mottak fra simba...")
         val inntektsmeldingConsumer = get<InntektsmeldingConsumer>()
         logger.info("InntektsmeldingConsumer = $inntektsmeldingConsumer")
@@ -75,7 +69,7 @@ class SpinnApplication(
         }
         logger.info("Registrerer helsesjekker for kafka konsumentene...")
         val kubernetesProbeManager = get<KubernetesProbeManager>()
-        val list = listOf(utsattOppgaveConsumer, journalpostHendelseConsumer, inntektsmeldingConsumer)
+        val list = listOf(utsattOppgaveConsumer, inntektsmeldingConsumer)
         list.forEach {
             logger.info("Registrerer helsesjekker for ${it.javaClass}")
             kubernetesProbeManager.registerLivenessComponent(it)

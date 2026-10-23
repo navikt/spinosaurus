@@ -10,7 +10,6 @@ import no.nav.helsearbeidsgiver.utils.json.toPretty
 import no.nav.helsearbeidsgiver.utils.log.logger
 import no.nav.helsearbeidsgiver.utils.log.sikkerLogger
 import no.nav.syfo.behandling.FantIkkeAktørException
-import no.nav.syfo.behandling.OPPRETT_OPPGAVE_FORSINKELSE
 import no.nav.syfo.dto.Tilstand
 import no.nav.syfo.dto.UtsattOppgaveEntitet
 import no.nav.syfo.mapping.mapInntektsmeldingKontrakt
@@ -24,6 +23,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import java.time.Duration
 import java.time.LocalDateTime
+
+const val OPPRETT_OPPGAVE_FORSINKELSE = 48L
 
 class InntektsmeldingConsumer(
     props: Map<String, Any>,
@@ -46,18 +47,18 @@ class InntektsmeldingConsumer(
         consumer.subscribe(listOf(topicName))
     }
 
-    private fun setIsReady(ready: Boolean) {
-        this.ready = ready
+    private fun setIsReady() {
+        this.ready = true
     }
 
-    private fun setIsError(isError: Boolean) {
-        this.error = isError
+    private fun setIsError() {
+        this.error = true
     }
 
     fun start() {
         sikkerlogger.info("Starter InntektsmeldingConsumer...")
         consumer.use {
-            setIsReady(true)
+            setIsReady()
             while (!error) {
                 it
                     .poll(Duration.ofMillis(100))
@@ -68,7 +69,7 @@ class InntektsmeldingConsumer(
                         } catch (e: Throwable) {
                             sikkerlogger.error("InntektsmeldingConsumer: Klarte ikke behandle: ${record.value()}", e)
                             logger.error("InntektsmeldingConsumer: Klarte ikke behandle hendelse. Stopper lytting!")
-                            setIsError(true)
+                            setIsError()
                         }
                     }
             }

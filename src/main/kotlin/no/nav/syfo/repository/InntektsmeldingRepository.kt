@@ -17,11 +17,9 @@ interface InntektsmeldingRepository {
 
     fun findByUuids(uuids: List<String>): List<InntektsmeldingEntitet>
 
-    fun findByAktorId(aktoerId: String): List<InntektsmeldingEntitet>
+    fun findFirst100ByBehandletBefore(foerDato: LocalDateTime): List<InntektsmeldingEntitet>
 
-    fun findFirst100ByBehandletBefore(førDato: LocalDateTime): List<InntektsmeldingEntitet>
-
-    fun deleteByBehandletBefore(førDato: LocalDateTime): Int
+    fun deleteByBehandletBefore(foerDato: LocalDateTime): Int
 
     fun lagreInnteksmelding(innteksmelding: InntektsmeldingEntitet): InntektsmeldingEntitet
 
@@ -39,13 +37,15 @@ interface InntektsmeldingRepository {
 class InntektsmeldingRepositoryMock : InntektsmeldingRepository {
     private val mockrepo = mutableSetOf<InntektsmeldingEntitet>()
 
-    override fun findByAktorId(aktoerId: String): List<InntektsmeldingEntitet> = mockrepo.filter { it.aktorId == aktoerId }
-
-    override fun findFirst100ByBehandletBefore(førDato: LocalDateTime): List<InntektsmeldingEntitet> = mockrepo.filter { it.behandlet!!.isBefore(førDato) }.take(100)
-
-    override fun deleteByBehandletBefore(førDato: LocalDateTime): Int {
+    override fun findFirst100ByBehandletBefore(foerDato: LocalDateTime): List<InntektsmeldingEntitet> =
         mockrepo
-            .filter { it.behandlet!!.isBefore(førDato) }
+            .filter {
+                it.behandlet!!.isBefore(foerDato)
+            }.take(100)
+
+    override fun deleteByBehandletBefore(foerDato: LocalDateTime): Int {
+        mockrepo
+            .filter { it.behandlet!!.isBefore(foerDato) }
             .forEach { mockrepo.remove(it) }
         return (mockrepo.size)
     }
@@ -130,29 +130,13 @@ class InntektsmeldingRepositoryImp(
         }
     }
 
-    override fun findByAktorId(aktoerId: String): List<InntektsmeldingEntitet> {
-        val findByAktorId = "SELECT * FROM INNTEKTSMELDING WHERE AKTOR_ID = ?;"
-        val inntektsmeldinger = ArrayList<InntektsmeldingEntitet>()
-        val results: ArrayList<InntektsmeldingEntitet>
-        ds.connection.use {
-            val res =
-                it
-                    .prepareStatement(findByAktorId)
-                    .apply {
-                        setString(1, aktoerId)
-                    }.executeQuery()
-            results = resultLoop(res, inntektsmeldinger)
-        }
-        return addArbeidsgiverperioderTilInnteksmelding(results)
-    }
-
-    override fun findFirst100ByBehandletBefore(førDato: LocalDateTime): ArrayList<InntektsmeldingEntitet> {
+    override fun findFirst100ByBehandletBefore(foerDato: LocalDateTime): ArrayList<InntektsmeldingEntitet> {
         val findFirst100ByBehandletBefore = " SELECT * FROM INNTEKTSMELDING WHERE BEHANDLET < ? LIMIT 100;"
         val inntektsmeldinger = ArrayList<InntektsmeldingEntitet>()
         val results: ArrayList<InntektsmeldingEntitet>
         ds.connection.use {
             val prepareStatement = it.prepareStatement(findFirst100ByBehandletBefore)
-            prepareStatement.setTimestamp(1, Timestamp.valueOf(førDato))
+            prepareStatement.setTimestamp(1, Timestamp.valueOf(foerDato))
             val res = prepareStatement.executeQuery()
             results = resultLoop(res, inntektsmeldinger)
         }
@@ -160,11 +144,11 @@ class InntektsmeldingRepositoryImp(
         return addArbeidsgiverperioderTilInnteksmelding(results)
     }
 
-    override fun deleteByBehandletBefore(førDato: LocalDateTime): Int {
+    override fun deleteByBehandletBefore(foerDato: LocalDateTime): Int {
         val deleteFirst100ByBehandletBefore = "DELETE FROM INNTEKTSMELDING WHERE BEHANDLET < ?;"
         ds.connection.use {
             val prepareStatement = it.prepareStatement(deleteFirst100ByBehandletBefore)
-            prepareStatement.setTimestamp(1, Timestamp.valueOf(førDato))
+            prepareStatement.setTimestamp(1, Timestamp.valueOf(foerDato))
             return prepareStatement.executeUpdate()
         }
     }

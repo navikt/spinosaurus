@@ -44,7 +44,7 @@ class FinnAlleUtgaandeOppgaverProcessorTest {
         clearAllMocks()
         every { utsattOppgaveDAO.finnAlleUtgaatteOppgaver() } returns listOf(oppgave)
         coEvery { oppgaveService.opprettOppgave(any(), any(), any(), any()) } returns OppgaveResultat(Random.nextInt(), false, false)
-        every { behandlendeEnhetConsumer.hentBehandlendeEnhet(any(), any()) } returns "4488"
+        every { behandlendeEnhetConsumer.gjelderUtland(any()) } returns false
         every { inntektsmeldingRepository.findByUuid(any()) } returns UtsattOppgaveTestData.inntektsmeldingEntitet
     }
 
@@ -53,7 +53,12 @@ class FinnAlleUtgaandeOppgaverProcessorTest {
         processor.doJob()
         verify {
             utsattOppgaveDAO.oppdater(
-                match { it.tilstand == Tilstand.OpprettetTimeout && !it.speil && it.timeout.isEqual(timeout) && !it.oppdatert.isEqualNullSafe(oppgave.oppdatert) },
+                match {
+                    it.tilstand == Tilstand.OpprettetTimeout &&
+                        !it.speil &&
+                        it.timeout.isEqual(timeout) &&
+                        !it.oppdatert.isEqualNullSafe(oppgave.oppdatert)
+                },
             )
         }
         coVerify { oppgaveService.opprettOppgave(any(), any(), any(), any()) }

@@ -12,7 +12,6 @@ class LeaderElectionBakgrunnsjobbProcessor(
     val bakgrunnsjobbService: BakgrunnsjobbService,
     val finnAlleUtgaandeOppgaverProcessor: FinnAlleUtgaandeOppgaverProcessor,
     val fjernInntektsmeldingByBehandletProcessor: FjernInntektsmeldingByBehandletProcessor,
-    val joarkInntektsmeldingHendelseProsessor: JoarkInntektsmeldingHendelseProsessor,
     val feiletUtsattOppgaveMeldingProsessor: FeiletUtsattOppgaveMeldingProsessor,
 ) : RecurringJob(CoroutineScope(Dispatchers.IO), Duration.ofMinutes(5).toMillis()) {
     var started = false
@@ -24,7 +23,6 @@ class LeaderElectionBakgrunnsjobbProcessor(
             bakgrunnsjobbService.apply {
                 registrer(feiletUtsattOppgaveMeldingProsessor)
                 registrer(fjernInntektsmeldingByBehandletProcessor)
-                registrer(joarkInntektsmeldingHendelseProsessor)
                 startAsync(true)
             }
         }

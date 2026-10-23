@@ -5,17 +5,12 @@ import io.mockk.mockk
 import no.nav.helsearbeidsgiver.pdl.PdlClient
 import no.nav.helsearbeidsgiver.pdl.domene.FullPerson
 import no.nav.helsearbeidsgiver.pdl.domene.PersonNavn
-import no.nav.syfo.client.dokarkiv.DokArkivClient
 import no.nav.syfo.client.norg.ArbeidsfordelingResponse
 import no.nav.syfo.client.norg.Norg2Client
 import org.koin.core.module.Module
 import java.time.LocalDate
 
 fun Module.mockExternalDependecies() {
-    single {
-        DokArkivClient("", get()) { "" }
-    }
-
     single {
         mockk<PdlClient> {
             coEvery { personNavn(any()) } returns PersonNavn("Ola", "M", "Avsender")

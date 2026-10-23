@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 val version = "1.0"
 val mainClass = "no.nav.syfo.AppKt"
 val group = "no.nav.syfo"
@@ -84,7 +82,6 @@ tasks.jar {
 repositories {
     val githubPassword = project.property("githubPassword") as String
     mavenCentral()
-    maven("https://packages.confluent.io/maven/")
     maven {
         setUrl("https://maven.pkg.github.com/navikt/*")
         credentials {
@@ -95,9 +92,6 @@ repositories {
 }
 
 dependencies {
-    val altinnCorrespondanceVersion = project.property("altinnCorrespondanceVersion") as String
-    val altinnInntektsmeldingVersion = project.property("altinnInntektsmeldingVersion") as String
-    val annotationApiVersion = project.property("annotationApiVersion") as String
     val apacheKafkaStreamsVersion = project.property("apacheKafkaStreamsVersion") as String
     val assertJVersion = project.property("assertJVersion") as String
     val bakgrunnsjobbVersion = project.property("bakgrunnsjobbVersion") as String
@@ -108,11 +102,7 @@ dependencies {
     val hikariVersion = project.property("hikariVersion") as String
     val imkontraktVersion = project.property("imkontraktVersion") as String
     val jacksonVersion = project.property("jacksonVersion") as String
-    val jaxbRuntimeVersion = project.property("jaxbRuntimeVersion") as String
-    val jaxbVersion = project.property("jaxbVersion") as String
-    val joarkHendelseVersion = project.property("joarkHendelseVersion") as String
     val junitJupiterVersion = project.property("junitJupiterVersion") as String
-    val kafkaVersion = project.property("kafkaVersion") as String
     val koinVersion = project.property("koinVersion") as String
     val kotlinxCoroutinesVersion = project.property("kotlinxCoroutinesVersion") as String
     val kotlinxSerializationVersion = project.property("kotlinxSerializationVersion") as String
@@ -132,8 +122,6 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("com.zaxxer:HikariCP:$hikariVersion")
-    implementation("io.confluent:kafka-avro-serializer:$kafkaVersion") { exclude("org.apache.avro:avro") }
-    implementation("io.confluent:kafka-streams-avro-serde:$kafkaVersion")
     implementation("io.insert-koin:koin-core:$koinVersion")
     implementation("io.insert-koin:koin-ktor:$koinVersion")
     implementation("io.ktor:ktor-client-apache5:$ktorVersion")
@@ -148,8 +136,6 @@ dependencies {
     implementation("io.mockk:mockk:$mockkVersion")
     implementation("io.prometheus:simpleclient_common:$prometheusVersion")
     implementation("io.prometheus:simpleclient_hotspot:$prometheusVersion")
-    implementation("javax.annotation:javax.annotation-api:$annotationApiVersion")
-    implementation("javax.xml.bind:jaxb-api:$jaxbVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logbackVersion")
     implementation("no.nav.helsearbeidsgiver:domene-inntektsmelding:$hagDomeneInntektsmeldingVersion")
     implementation("no.nav.helsearbeidsgiver:hag-bakgrunnsjobb:$bakgrunnsjobbVersion")
@@ -159,9 +145,6 @@ dependencies {
     implementation("no.nav.security:token-client-core:$tokenSupportVersion")
     implementation("no.nav.security:token-validation-ktor-v3:$tokenSupportVersion")
     implementation("no.nav.sykepenger.kontrakter:inntektsmelding-kontrakt:$imkontraktVersion")
-    implementation("no.nav.teamdokumenthandtering:teamdokumenthandtering-avro-schemas:$joarkHendelseVersion")
-    implementation("no.nav.tjenestespesifikasjoner:altinn-correspondence-agency-external-basic:$altinnCorrespondanceVersion")
-    implementation("no.nav.tjenestespesifikasjoner:nav-altinn-inntektsmelding:$altinnInntektsmeldingVersion")
     implementation("org.apache.cxf:cxf-core:$cxfVersion")
     implementation("org.apache.cxf:cxf-rt-databinding-jaxb:$cxfVersion")
     implementation("org.apache.kafka:kafka-streams:$apacheKafkaStreamsVersion")
@@ -173,7 +156,6 @@ dependencies {
     implementation("org.slf4j:slf4j-api:$slf4Version")
 
     runtimeOnly("ch.qos.logback:logback-classic:$logbackClassicVersion")
-    runtimeOnly("com.sun.xml.bind:jaxb-impl:$jaxbRuntimeVersion")
 
     testImplementation(testFixtures("no.nav.helsearbeidsgiver:utils:$hagUtilsVersion"))
     testImplementation("io.insert-koin:koin-test:$koinVersion")

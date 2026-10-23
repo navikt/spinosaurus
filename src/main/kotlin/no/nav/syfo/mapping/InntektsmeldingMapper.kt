@@ -74,7 +74,7 @@ fun mapInntektsmeldingKontrakt(
         harFlereArbeidsforhold = inntektsmelding.harFlereArbeidsforhold,
     )
 
-fun konverterArsakTilInnsending(arsakTilInnsending: String): ArsakTilInnsending =
+private fun konverterArsakTilInnsending(arsakTilInnsending: String): ArsakTilInnsending =
     try {
         ArsakTilInnsending.valueOf(arsakTilInnsending)
     } catch (e: IllegalArgumentException) {
@@ -82,20 +82,20 @@ fun konverterArsakTilInnsending(arsakTilInnsending: String): ArsakTilInnsending 
         ArsakTilInnsending.Ny
     }
 
-fun Kanal.konverterMottakskanal(): MottaksKanal =
+private fun Kanal.konverterMottakskanal(): MottaksKanal =
     when (this) {
         Kanal.NAV_NO -> MottaksKanal.NAV_NO
         Kanal.HR_SYSTEM_API -> MottaksKanal.HR_SYSTEM_API
         Kanal.ALTINN -> MottaksKanal.ALTINN
     }
 
-fun Kanal.utledFormat(): Format =
+private fun Kanal.utledFormat(): Format =
     when (this) {
         Kanal.ALTINN -> Format.Inntektsmelding
         else -> Format.Arbeidsgiveropplysninger
     }
 
-fun SpinnInntektEndringAarsak.tilInntektEndringAarsak(): InntektEndringAarsak =
+private fun SpinnInntektEndringAarsak.tilInntektEndringAarsak(): InntektEndringAarsak =
     InntektEndringAarsak(
         aarsak = aarsak,
         perioder = perioder?.map { Periode(it.fom, it.tom) },
@@ -103,9 +103,9 @@ fun SpinnInntektEndringAarsak.tilInntektEndringAarsak(): InntektEndringAarsak =
         bleKjent = bleKjent,
     )
 
-fun mapFerieperioder(inntektsmelding: Inntektsmelding): List<Periode> = inntektsmelding.feriePerioder.map { p -> Periode(p.fom, p.tom) }
+private fun mapFerieperioder(inntektsmelding: Inntektsmelding): List<Periode> = inntektsmelding.feriePerioder.map { p -> Periode(p.fom, p.tom) }
 
-fun mapStatus(status: Gyldighetsstatus): Status {
+private fun mapStatus(status: Gyldighetsstatus): Status {
     if (status == Gyldighetsstatus.GYLDIG) {
         return Status.GYLDIG
     }
@@ -121,7 +121,7 @@ fun mapArbeidsgivertype(inntektsmelding: Inntektsmelding): Arbeidsgivertype {
     return Arbeidsgivertype.VIRKSOMHET
 }
 
-fun mapGjenopptakelseAvNaturalytelser(inntektsmelding: Inntektsmelding): List<GjenopptakelseNaturalytelse> =
+private fun mapGjenopptakelseAvNaturalytelser(inntektsmelding: Inntektsmelding): List<GjenopptakelseNaturalytelse> =
     inntektsmelding.gjenopptakelserNaturalYtelse.map { gjenopptakelse ->
         GjenopptakelseNaturalytelse(
             mapNaturalytelseType(gjenopptakelse.naturalytelse),
@@ -130,7 +130,7 @@ fun mapGjenopptakelseAvNaturalytelser(inntektsmelding: Inntektsmelding): List<Gj
         )
     }
 
-fun mapOpphørAvNaturalytelser(inntektsmelding: Inntektsmelding): List<OpphoerAvNaturalytelse> =
+private fun mapOpphørAvNaturalytelser(inntektsmelding: Inntektsmelding): List<OpphoerAvNaturalytelse> =
     inntektsmelding.opphørAvNaturalYtelse.map { opphør ->
         OpphoerAvNaturalytelse(
             mapNaturalytelseType(opphør.naturalytelse),
@@ -139,11 +139,12 @@ fun mapOpphørAvNaturalytelser(inntektsmelding: Inntektsmelding): List<OpphoerAv
         )
     }
 
-fun mapEndringIRefusjon(inntektsmelding: Inntektsmelding): List<EndringIRefusjon> = inntektsmelding.endringerIRefusjon.map { endring -> EndringIRefusjon(endring.endringsdato, endring.beloep) }
+private fun mapEndringIRefusjon(inntektsmelding: Inntektsmelding): List<EndringIRefusjon> =
+    inntektsmelding.endringerIRefusjon.map { endring -> EndringIRefusjon(endring.endringsdato, endring.beloep) }
 
-fun mapRefusjon(inntektsmelding: Inntektsmelding): Refusjon = Refusjon(inntektsmelding.refusjon.beloepPrMnd, inntektsmelding.refusjon.opphoersdato)
+private fun mapRefusjon(inntektsmelding: Inntektsmelding): Refusjon = Refusjon(inntektsmelding.refusjon.beloepPrMnd, inntektsmelding.refusjon.opphoersdato)
 
-fun mapNaturalytelseType(naturalytelseType: no.nav.syfo.domain.inntektsmelding.Naturalytelse?): Naturalytelse =
+private fun mapNaturalytelseType(naturalytelseType: no.nav.syfo.domain.inntektsmelding.Naturalytelse?): Naturalytelse =
     naturalytelseType?.let { naturalytelse ->
         if (Naturalytelse.entries.map { it.name }.contains(
                 naturalytelse.name,
@@ -156,7 +157,7 @@ fun mapNaturalytelseType(naturalytelseType: no.nav.syfo.domain.inntektsmelding.N
     }
         ?: Naturalytelse.ANNET
 
-fun mapAvsenderSystem(avsenderSystem: no.nav.syfo.domain.inntektsmelding.AvsenderSystem): AvsenderSystem =
+private fun mapAvsenderSystem(avsenderSystem: no.nav.syfo.domain.inntektsmelding.AvsenderSystem): AvsenderSystem =
     AvsenderSystem(
         navn = avsenderSystem.navn,
         versjon = avsenderSystem.versjon,

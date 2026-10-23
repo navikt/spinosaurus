@@ -43,11 +43,6 @@ class OpprettOppgaveException(
     cause: Exception?,
 ) : OppgaveException(Feiltype.OPPGAVE_OPPRETT_VANLIG, "Klarte ikke opprette oppgave for journalpostId $journalpostId!", cause)
 
-class OpprettFordelingsOppgaveException(
-    journalpostId: String,
-    cause: Exception?,
-) : OppgaveException(Feiltype.OPPGAVE_OPPRETT_FORDELING, "Klarte ikke opprette fordelingsoppgave for journalpostId $journalpostId!", cause)
-
 // BehandlendeEnhetConsumer
 open class BehandlendeEnhetException(
     feiltype: Feiltype,
@@ -63,15 +58,3 @@ class IngenAktivEnhetException(
 class BehandlendeEnhetFeiletException(
     cause: java.lang.Exception?,
 ) : BehandlendeEnhetException(Feiltype.BEHANDLENDE_FEILET, "Feil ved henting av geografisk tilknytning", cause)
-
-// JournalConsumer
-open class JournalException(
-    feiltype: Feiltype,
-    message: String,
-    cause: Exception?,
-) : BehandlingException(feiltype, message, cause)
-
-class HentDokumentFeiletException(
-    journalpostId: String,
-    cause: java.lang.Exception?,
-) : JournalException(Feiltype.DOKUMENT_FEILET, "Kall til journal feilet for journalpostId $journalpostId!", cause)
