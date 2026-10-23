@@ -49,10 +49,10 @@ class UtsattOppgaveConsumer(
 
     fun start() {
         logger.info("Starter å lytte på UtsattOppgave...")
-        consumer.use {
+        consumer.use { con ->
             setIsReady(true)
             while (!error) {
-                val records = it.poll(Duration.ofMillis(1000))
+                val records = con.poll(Duration.ofMillis(1000))
                 records.forEach { record ->
                     logger.info("Record offset: ${record.offset()}")
                     try {
@@ -63,7 +63,7 @@ class UtsattOppgaveConsumer(
                                 behandle(utsattOppgaveDTO, raw)
                             }
                         }
-                        it.commitSync()
+                        con.commitSync()
                     } catch (e: Throwable) {
                         "Klarte ikke behandle UtsattOppgave. Stopper lytting!".also {
                             logger.error(it)

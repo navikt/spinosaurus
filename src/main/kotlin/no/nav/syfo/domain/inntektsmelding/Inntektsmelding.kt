@@ -43,30 +43,7 @@ data class Inntektsmelding(
     val mottaksKanal: MottaksKanal = utledMottakskanal(avsenderSystem.navn),
     val forespurt: Boolean = false,
     val harFlereArbeidsforhold: Boolean = false,
-) {
-    fun isDuplicate(inntektsmelding: Inntektsmelding): Boolean =
-        this ==
-            inntektsmelding.copy(
-                id = this.id,
-                fnr = this.fnr,
-                mottattDato = this.mottattDato,
-                journalpostId = this.journalpostId,
-                journalStatus = this.journalStatus,
-                arkivRefereranse = this.arkivRefereranse,
-                aktorId = this.aktorId,
-                sakId = this.sakId,
-                innsendingstidspunkt = this.innsendingstidspunkt,
-                avsenderSystem = this.avsenderSystem,
-                mottaksKanal = this.mottaksKanal,
-            )
-
-    fun isDuplicateExclusiveArsakInnsending(inntektsmelding: Inntektsmelding): Boolean =
-        isDuplicate(
-            inntektsmelding.copy(
-                arsakTilInnsending = this.arsakTilInnsending,
-            ),
-        )
-}
+)
 
 // For å støtte gamle verdier som mangler mottakskanal
 private fun utledMottakskanal(ansenderSystemNavn: String?): MottaksKanal =

@@ -7,29 +7,21 @@ import no.nav.hag.utils.bakgrunnsjobb.BakgrunnsjobbRepository
 import no.nav.hag.utils.bakgrunnsjobb.BakgrunnsjobbService
 import no.nav.hag.utils.bakgrunnsjobb.PostgresBakgrunnsjobbRepository
 import no.nav.syfo.MetrikkVarsler
-import no.nav.syfo.behandling.InntektsmeldingBehandler
 import no.nav.syfo.client.oppgave.OppgaveService
 import no.nav.syfo.integration.kafka.UtsattOppgaveConsumer
 import no.nav.syfo.integration.kafka.commonAivenProperties
-import no.nav.syfo.integration.kafka.joarkAivenProperties
-import no.nav.syfo.integration.kafka.journalpost.JournalpostHendelseConsumer
 import no.nav.syfo.integration.kafka.utsattOppgaveAivenProperties
 import no.nav.syfo.producer.InntektsmeldingAivenProducer
 import no.nav.syfo.prosesser.FinnAlleUtgaandeOppgaverProcessor
 import no.nav.syfo.prosesser.FjernInntektsmeldingByBehandletProcessor
-import no.nav.syfo.prosesser.JoarkInntektsmeldingHendelseProsessor
 import no.nav.syfo.prosesser.LeaderElectionBakgrunnsjobbProcessor
 import no.nav.syfo.repository.ArbeidsgiverperiodeRepository
 import no.nav.syfo.repository.ArbeidsgiverperiodeRepositoryImp
 import no.nav.syfo.repository.InntektsmeldingRepository
 import no.nav.syfo.repository.InntektsmeldingRepositoryImp
 import no.nav.syfo.repository.UtsattOppgaveRepositoryImp
-import no.nav.syfo.service.BehandleInngaaendeJournalConsumer
 import no.nav.syfo.service.BehandlendeEnhetConsumer
-import no.nav.syfo.service.InngaaendeJournalConsumer
 import no.nav.syfo.service.InntektsmeldingService
-import no.nav.syfo.service.JournalConsumer
-import no.nav.syfo.service.JournalpostService
 import no.nav.syfo.simba.InntektsmeldingConsumer
 import no.nav.syfo.util.Metrikk
 import no.nav.syfo.util.getString
@@ -62,44 +54,12 @@ fun prodConfig(config: ApplicationConfig) =
             )
         } bind DataSource::class
 
-        single {
-            JoarkInntektsmeldingHendelseProsessor(
-                om = get(),
-                metrikk = get(),
-                inntektsmeldingBehandler = get(),
-                oppgaveService = get(),
-            )
-        }
-
-        single {
-            InntektsmeldingBehandler(
-                journalpostService = get(),
-                metrikk = get(),
-                inntektsmeldingService = get(),
-                inntektsmeldingAivenProducer = get(),
-                utsattOppgaveService = get(),
-                pdlClient = get(),
-            )
-        }
-
-        single { InngaaendeJournalConsumer(get()) }
-        single { BehandleInngaaendeJournalConsumer(get()) }
-        single { JournalConsumer(get(), get(), get()) }
         single { Metrikk() }
         single { BehandlendeEnhetConsumer(get(), get(), get()) }
-        single { JournalpostService(get(), get(), get(), get(), get()) }
         single { InntektsmeldingRepositoryImp(get()) } bind InntektsmeldingRepository::class
         single { InntektsmeldingService(get(), get()) }
         single { ArbeidsgiverperiodeRepositoryImp(get()) } bind ArbeidsgiverperiodeRepository::class
 
-        single {
-            JournalpostHendelseConsumer(
-                props = joarkAivenProperties(),
-                topicName = config.getString("kafka_joark_hendelse_topic"),
-                bakgrunnsjobbRepo = get(),
-                om = get(),
-            )
-        }
         single {
             UtsattOppgaveConsumer(
                 props = utsattOppgaveAivenProperties(),
@@ -154,7 +114,6 @@ fun prodConfig(config: ApplicationConfig) =
                 bakgrunnsjobbService = get(),
                 finnAlleUtgaandeOppgaverProcessor = get(),
                 fjernInntektsmeldingByBehandletProcessor = get(),
-                joarkInntektsmeldingHendelseProsessor = get(),
                 feiletUtsattOppgaveMeldingProsessor = get(),
             )
         }
@@ -176,8 +135,10 @@ fun prodConfig(config: ApplicationConfig) =
                 props =
                     commonAivenProperties() +
                         mapOf(
-                            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to "false", // viktig!
-                            ConsumerConfig.MAX_POLL_RECORDS_CONFIG to "1", // også viktig - unngår at vi commiter for stort offset hvis vi henter flere og feiler midt i batchen
+                            // viktig!
+                            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to "false",
+                            // også viktig - unngår at vi commiter for stort offset hvis vi henter flere og feiler midt i batchen
+                            ConsumerConfig.MAX_POLL_RECORDS_CONFIG to "1",
                             ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
                             ConsumerConfig.CLIENT_ID_CONFIG to "syfoinntektsmelding-im-consumer",
                             ConsumerConfig.GROUP_ID_CONFIG to "syfoinntektsmelding-im-v1",

@@ -44,7 +44,7 @@ class UtsattOppgaveServiceTest {
         clearAllMocks()
         every { utsattOppgaveDAO.finn(any()) } returns oppgave
         coEvery { oppgaveService.opprettOppgave(any(), any(), any(), any()) } returns OppgaveResultat(Random.nextInt(), false, false)
-        every { behandlendeEnhetConsumer.hentBehandlendeEnhet(any(), any()) } returns "4488"
+        every { behandlendeEnhetConsumer.gjelderUtland(any()) } returns false
         every { inntektsmeldingRepository.findByUuid(any()) } returns UtsattOppgaveTestData.inntektsmeldingEntitet
     }
 

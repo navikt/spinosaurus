@@ -25,7 +25,7 @@ class BehandlendeEnhetConsumer(
     private val logger = this.logger()
     private val sikkerlogger = sikkerLogger()
 
-    fun hentBehandlendeEnhet(
+    private fun hentBehandlendeEnhet(
         fnr: String,
         uuid: String,
     ): String {
@@ -65,7 +65,7 @@ class BehandlendeEnhetConsumer(
         }
     }
 
-    fun hentGeografiskTilknytning(fnr: String): GeografiskTilknytningData {
+    private fun hentGeografiskTilknytning(fnr: String): GeografiskTilknytningData {
         runBlocking {
             pdlClient.fullPerson(fnr)
         }.let {

@@ -1,10 +1,8 @@
 package no.nav.syfo.web.api
 
-import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.plugins.ContentTransformationException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -65,9 +63,7 @@ fun Route.syfoinntektsmelding(
     }
 }
 
-fun Route.refusjonskrav(
-    inntektsmeldingService: InntektsmeldingService,
-) {
+fun Route.refusjonskrav(inntektsmeldingService: InntektsmeldingService) {
     post("/refusjonskrav") {
         try {
             val request = call.receive<RefusjonskravRequest>()
@@ -88,9 +84,7 @@ fun Route.refusjonskrav(
     }
 }
 
-fun Route.finnInntektsmeldinger(
-    inntektsmeldingService: InntektsmeldingService,
-) {
+fun Route.finnInntektsmeldinger(inntektsmeldingService: InntektsmeldingService) {
     post("/soek") {
         try {
             logger().info("Mottatt request for å finne inntektsmeldinger")

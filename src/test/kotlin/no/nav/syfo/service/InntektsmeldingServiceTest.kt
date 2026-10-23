@@ -6,25 +6,16 @@ import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.helsearbeidsgiver.utils.log.logger
 import no.nav.helsearbeidsgiver.utils.test.wrapper.genererGyldig
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.inntektsmelding.kontrakt.serde.JacksonJsonConfig
-import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
-import no.nav.syfo.dto.InntektsmeldingEntitet
-import no.nav.syfo.mapping.toInntektsmelding
 import no.nav.syfo.repository.InntektsmeldingRepository
 import no.nav.syfo.repository.buildIM
 import no.nav.syfo.web.api.FinnInntektsmeldingerRequest
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import java.math.BigDecimal
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.util.UUID
 
 class InntektsmeldingServiceTest {
     val objectMapper: ObjectMapper =
@@ -40,84 +31,12 @@ class InntektsmeldingServiceTest {
                 .build(),
             JavaTimeModule(),
         )
-    val aktorIdFound = "aktør-123"
-    val logger = this.logger()
-
-    @Test
-    fun `Skal ikke være duplikat dersom ingen tidligere inntektsmeldinger`() {
-        val im = lag(0, 0)
-        assertFalse(isDuplicateWithLatest(logger, im, emptyList()))
-    }
-
-    @Test
-    fun `Skal ikke være duplikat dersom nest siste eller tidligere var lik`() {
-        val inntekt = 100
-        val im = lag(0, inntekt)
-        val list =
-            listOf(
-                lag(1, inntekt + 300),
-                lag(2, inntekt),
-                lag(3, inntekt + 200),
-            )
-        assertFalse(isDuplicateWithLatest(logger, im, list))
-        assertFalse(isDuplicateWithLatest(logger, im, list.asReversed()))
-    }
-
-    @Test
-    fun `Skal være duplikat av sist innsendt`() {
-        val inntekt = 100
-        val im = lag(0, inntekt)
-        val list =
-            listOf(
-                lag(1, inntekt),
-                lag(2, inntekt + 100),
-                lag(3, inntekt + 200),
-            )
-        assertTrue(isDuplicateWithLatest(logger, im, list))
-        assertTrue(isDuplicateWithLatest(logger, im, list.asReversed()))
-    }
-
-    @Test
-    fun `Skal finne inntektsmeldinger og mappe de om til domene objekter`() {
-        val repository = mockk<InntektsmeldingRepository>(relaxed = true)
-        val service = InntektsmeldingService(repository, objectMapper)
-        every { repository.findByAktorId(any()) } returns listOf(buildEntitet(aktorIdFound, buildIM()))
-        assertEquals(1, service.finnBehandledeInntektsmeldinger(aktorIdFound).size)
-    }
-
-    @Test
-    fun `isDuplicate - Skal detektere eksisterende inntektsmeldingene som allerede er lagret`() {
-        val repository = mockk<InntektsmeldingRepository>(relaxed = true)
-        val service = InntektsmeldingService(repository, objectMapper)
-        val ent = buildEntitet(aktorIdFound, buildIM())
-        val im = toInntektsmelding(ent, objectMapper)
-        every { repository.findByAktorId(any()) } returns listOf(ent)
-        assertTrue(service.isDuplicate(im))
-    }
-
-    @Test
-    fun `isDuplicate - Skal detektere at de er litt ulike`() {
-        val repository = mockk<InntektsmeldingRepository>(relaxed = true)
-        val service = InntektsmeldingService(repository, objectMapper)
-        val ent = buildEntitet(aktorIdFound, buildIM())
-        val im = toInntektsmelding(ent, objectMapper).copy(arbeidsforholdId = "abc")
-        every { repository.findByAktorId(any()) } returns listOf(ent)
-        assertFalse(service.isDuplicate(im))
-    }
-
-    @Test
-    fun `isDuplicate - Skal ikke finne når inntektsmeldinger ikke finnes`() {
-        val repository = mockk<InntektsmeldingRepository>(relaxed = true)
-        val service = InntektsmeldingService(repository, objectMapper)
-        every { repository.findByAktorId(any()) } returns emptyList()
-        assertFalse(service.isDuplicate(buildIM()))
-    }
 
     @Test
     fun `Skal gi forventet JSON format`() {
         val im = buildIM()
         val json = im.asJsonString(objectMapper)
-        val mapper = JacksonJsonConfig.objectMapperFactory.opprettObjectMapper()
+        val mapper = JacksonJsonConfig.opprettObjectMapper()
         val node = mapper.readTree(json)
         assertThat(node.get("id").asText()).isEqualTo("id-abc")
         assertThat(node.get("fnr").asText()).isEqualTo("fnr-123") // Skal ikke lagre fødselsnummer
@@ -170,25 +89,6 @@ class InntektsmeldingServiceTest {
         assertThat(node.get("opphørAvNaturalYtelse")[1].get("fom").toString()).isEqualTo("[2016,6,6]")
         assertThat(node.get("opphørAvNaturalYtelse")[1].get("beloepPrMnd").asLong()).isEqualTo(666666666666)
     }
-
-    fun buildEntitet(
-        aktorId: String,
-        im: Inntektsmelding,
-    ): InntektsmeldingEntitet =
-        InntektsmeldingEntitet(
-            uuid = UUID.randomUUID().toString(),
-            aktorId = aktorId,
-            behandlet = LocalDateTime.now(),
-            orgnummer = "arb-org-123",
-            journalpostId = "jp-123",
-            fnr = Fnr.genererGyldig(),
-            data = objectMapper.writeValueAsString(im),
-        )
-
-    fun lag(
-        dager: Long,
-        inntekt: Int,
-    ): Inntektsmelding = buildIM().copy(mottattDato = LocalDateTime.now().minusDays(dager), beregnetInntekt = BigDecimal(inntekt))
 
     @Test
     fun `skal kalle findByFnrInPeriod og returnerer tom liste`() {

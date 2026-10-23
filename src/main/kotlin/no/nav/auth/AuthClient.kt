@@ -40,8 +40,6 @@ data class TokenErrorResponse(
 class AuthClient(
     private val httpClient: HttpClient,
     private val tokenEndpoint: String,
-    private val tokenExchangeEndpoint: String,
-    private val tokenIntrospectionEndpoint: String,
 ) {
     suspend fun token(
         provider: IdentityProvider,

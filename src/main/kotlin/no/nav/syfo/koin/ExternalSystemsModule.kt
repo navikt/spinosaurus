@@ -8,10 +8,7 @@ import no.nav.helsearbeidsgiver.oppgave.OppgaveClient
 import no.nav.helsearbeidsgiver.pdl.Behandlingsgrunnlag
 import no.nav.helsearbeidsgiver.pdl.PdlClient
 import no.nav.helsearbeidsgiver.utils.cache.LocalCache
-import no.nav.syfo.client.dokarkiv.DokArkivClient
 import no.nav.syfo.client.norg.Norg2Client
-import no.nav.syfo.client.saf.SafDokumentClient
-import no.nav.syfo.client.saf.SafJournalpostClient
 import no.nav.syfo.util.getString
 import org.koin.core.module.Module
 import org.koin.dsl.bind
@@ -22,8 +19,6 @@ fun Module.externalSystemClients(config: ApplicationConfig) {
         AuthClient(
             httpClient = get(),
             tokenEndpoint = config.getString("auth.token_endpoint"),
-            tokenExchangeEndpoint = config.getString("auth.token_exchange_endpoint"),
-            tokenIntrospectionEndpoint = config.getString("auth.token_introspection_endpoint"),
         )
     }
 
@@ -47,33 +42,6 @@ fun Module.externalSystemClients(config: ApplicationConfig) {
         Norg2Client(
             url = config.getString("norg2_url"),
             httpClient = get(),
-        )
-    }
-
-    single {
-        val azureClient: AuthClient = get()
-        SafJournalpostClient(
-            httpClient = get(),
-            basePath = config.getString("saf_journal_url"),
-            getAccessToken = azureClient.fetchToken(IdentityProvider.AZURE_AD, config.getString("auth.safscope")),
-        )
-    }
-
-    single {
-        val azureClient: AuthClient = get()
-        SafDokumentClient(
-            url = config.getString("saf_dokument_url"),
-            httpClient = get(),
-            getAccessToken = azureClient.fetchToken(IdentityProvider.AZURE_AD, config.getString("auth.safscope")),
-        )
-    }
-
-    single {
-        val azureClient: AuthClient = get()
-        DokArkivClient(
-            url = config.getString("dokarkiv_url"),
-            httpClient = get(),
-            getAccessToken = azureClient.fetchToken(IdentityProvider.AZURE_AD, config.getString("auth.dokarkivscope")),
         )
     }
 }

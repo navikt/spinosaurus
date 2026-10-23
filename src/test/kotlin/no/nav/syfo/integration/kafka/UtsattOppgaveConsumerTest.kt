@@ -6,6 +6,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import no.nav.hag.utils.bakgrunnsjobb.BakgrunnsjobbRepository
+import no.nav.syfo.util.kafkaConsumerTestProps
 import no.nav.syfo.utsattoppgave.DokumentTypeDTO
 import no.nav.syfo.utsattoppgave.OppdateringstypeDTO
 import no.nav.syfo.utsattoppgave.UtsattOppgaveDTO
@@ -19,7 +20,7 @@ import java.util.UUID
 class UtsattOppgaveConsumerTest {
     lateinit var consumer: UtsattOppgaveConsumer
     val om: ObjectMapper = mockk(relaxed = true)
-    val props = joarkLocalProperties().toMap()
+    val props = kafkaConsumerTestProps().toMap()
     val utsattOppgaveService: UtsattOppgaveService = mockk(relaxed = true)
     val bakgrunnsjobbRepo: BakgrunnsjobbRepository = mockk(relaxed = true)
     val topicName = "topic"
