@@ -14,13 +14,8 @@ import io.ktor.server.routing.routing
 import io.ktor.server.testing.testApplication
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
-import no.nav.helsearbeidsgiver.utils.test.wrapper.genererGyldig
-import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
-import no.nav.inntektsmeldingkontrakt.Inntektsmelding
 import no.nav.syfo.service.InntektsmeldingService
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
 import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -28,69 +23,6 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon as Refusjonsk
 
 class InnteksmeldingRouteTest {
     val inntektsmeldingService = mockk<InntektsmeldingService>(relaxed = true)
-
-    @Test
-    fun finnInntektsmeldingerReturnsOK() {
-        every { inntektsmeldingService.finnInntektsmeldinger(any()) }
-            .returns(listOf(mockk<Inntektsmelding>(relaxed = true)))
-        testApplication {
-            application {
-                install(ContentNegotiation) {
-                    jackson {
-                        registerModule(JavaTimeModule())
-                    }
-                }
-                routing {
-                    finnInntektsmeldinger(inntektsmeldingService)
-                }
-            }
-            val request =
-                FinnInntektsmeldingerRequest(
-                    fnr = Fnr.genererGyldig().verdi,
-                    fom = LocalDate.now().minusDays(10),
-                    tom = LocalDate.now(),
-                )
-            val response =
-                client.post("/soek") {
-                    contentType(io.ktor.http.ContentType.Application.Json)
-                    setBody(
-                        jacksonObjectMapper().registerModule(JavaTimeModule()).writeValueAsString(request),
-                    )
-                }
-            assertEquals(HttpStatusCode.OK, response.status)
-            verify { inntektsmeldingService.finnInntektsmeldinger(any()) }
-        }
-    }
-
-    @Test
-    fun finnInntektsmeldingerBadrequestUgyldigFnr() {
-        testApplication {
-            application {
-                install(ContentNegotiation) {
-                    jackson {
-                        registerModule(JavaTimeModule())
-                    }
-                }
-                routing {
-                    finnInntektsmeldinger(inntektsmeldingService)
-                }
-            }
-            val request =
-                FinnInntektsmeldingerRequest(
-                    fnr = "1111111111",
-                    fom = LocalDate.now().minusDays(10),
-                    tom = LocalDate.now(),
-                )
-            val response =
-                client.post("/soek") {
-                    contentType(io.ktor.http.ContentType.Application.Json)
-                    setBody(
-                        jacksonObjectMapper().registerModule(JavaTimeModule()).writeValueAsString(request),
-                    )
-                }
-            assertEquals(HttpStatusCode.BadRequest, response.status)
-        }
-    }
 
     private fun refusjonskravRequest(ider: List<UUID>) = jacksonObjectMapper().writeValueAsString(RefusjonskravRequest(ider))
 

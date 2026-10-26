@@ -29,8 +29,6 @@ spec:
     inbound:
       rules:
         - application: refusjon
-        - application: bakrommet
-          namespace: speilvendt
     outbound:
       external:
         - host: oppgave-q1.dev-fss-pub.nais.io

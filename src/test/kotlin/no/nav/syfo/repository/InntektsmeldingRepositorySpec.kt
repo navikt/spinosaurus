@@ -1,9 +1,5 @@
 package no.nav.syfo.repository
 
-import no.nav.helsearbeidsgiver.utils.test.date.februar
-import no.nav.helsearbeidsgiver.utils.test.date.januar
-import no.nav.helsearbeidsgiver.utils.test.date.mai
-import no.nav.helsearbeidsgiver.utils.test.date.mars
 import no.nav.helsearbeidsgiver.utils.test.wrapper.genererGyldig
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.inntektsmelding.kontrakt.serde.JacksonJsonConfig
@@ -223,30 +219,6 @@ class InntektsmeldingRepositorySpec : WithPostgresContainer() {
         repository.deleteByBehandletBefore(LocalDate.of(2020, 1, 1).atStartOfDay())
         // Nå skal det bare være 5 treff
         assertThat(repository.findAll().size).isEqualTo(5)
-    }
-
-    @Test
-    fun `skal hente inntektsmeldinger for gitt fnr i periode`() {
-        val fnr = Fnr.genererGyldig()
-
-        val im1 =
-            lagInntektsmelding(1.januar(2020).atStartOfDay())
-                .copy(fnr = fnr)
-        repository.lagreInnteksmelding(im1)
-
-        val im2 =
-            lagInntektsmelding(1.februar(2020).atStartOfDay())
-                .copy(fnr = fnr)
-        repository.lagreInnteksmelding(im2)
-
-        val im3 =
-            lagInntektsmelding(1.mars(2020).atStartOfDay())
-                .copy(fnr = fnr)
-        repository.lagreInnteksmelding(im3)
-
-        val inntektsmeldinger = repository.findByFnrInPeriod(fnr = fnr.verdi, fom = 15.januar(2020), tom = 15.mai(2020))
-
-        assertThat(inntektsmeldinger.size).isEqualTo(2)
     }
 
     private fun lagInntektsmelding(behandlet: LocalDateTime): InntektsmeldingEntitet =

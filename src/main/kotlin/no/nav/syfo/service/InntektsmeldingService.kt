@@ -1,16 +1,12 @@
 package no.nav.syfo.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import no.nav.helsearbeidsgiver.utils.log.logger
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 import no.nav.syfo.dto.InntektsmeldingEntitet
-import no.nav.syfo.mapping.mapInntektsmeldingKontrakt
 import no.nav.syfo.mapping.tilRefusjonskrav
 import no.nav.syfo.mapping.toInntektsmelding
 import no.nav.syfo.mapping.toInntektsmeldingEntitet
 import no.nav.syfo.repository.InntektsmeldingRepository
-import no.nav.syfo.util.validerInntektsmelding
-import no.nav.syfo.web.api.FinnInntektsmeldingerRequest
 import no.nav.syfo.web.api.InntektsmeldingRefusjonskrav
 import java.util.UUID
 
@@ -43,25 +39,6 @@ class InntektsmeldingService(
                 InntektsmeldingRefusjonskrav(
                     inntektsmeldingId = id,
                     refusjonskrav = toInntektsmelding(it, objectMapper).tilRefusjonskrav(id.toString()),
-                )
-            }
-        }
-    }
-
-    fun finnInntektsmeldinger(request: FinnInntektsmeldingerRequest): List<no.nav.inntektsmeldingkontrakt.Inntektsmelding> {
-        val results = repository.findByFnrInPeriod(request.fnr, request.fom, request.tom)
-        return if (results.isEmpty()) {
-            logger().info("Fant ingen inntektsmeldinger!")
-            emptyList()
-        } else {
-            results.map { dto ->
-                val inntektsmelding = toInntektsmelding(dto, objectMapper)
-                mapInntektsmeldingKontrakt(
-                    inntektsmelding,
-                    dto.aktorId,
-                    validerInntektsmelding(inntektsmelding),
-                    inntektsmelding.arkivRefereranse,
-                    dto.uuid,
                 )
             }
         }
