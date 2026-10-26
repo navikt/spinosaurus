@@ -11,7 +11,6 @@ import java.time.Duration
 class LeaderElectionBakgrunnsjobbProcessor(
     val bakgrunnsjobbService: BakgrunnsjobbService,
     val finnAlleUtgaandeOppgaverProcessor: FinnAlleUtgaandeOppgaverProcessor,
-    val fjernInntektsmeldingByBehandletProcessor: FjernInntektsmeldingByBehandletProcessor,
     val feiletUtsattOppgaveMeldingProsessor: FeiletUtsattOppgaveMeldingProsessor,
 ) : RecurringJob(CoroutineScope(Dispatchers.IO), Duration.ofMinutes(5).toMillis()) {
     var started = false
@@ -22,7 +21,6 @@ class LeaderElectionBakgrunnsjobbProcessor(
             finnAlleUtgaandeOppgaverProcessor.startAsync(true)
             bakgrunnsjobbService.apply {
                 registrer(feiletUtsattOppgaveMeldingProsessor)
-                registrer(fjernInntektsmeldingByBehandletProcessor)
                 startAsync(true)
             }
         }

@@ -13,10 +13,7 @@ import no.nav.syfo.integration.kafka.commonAivenProperties
 import no.nav.syfo.integration.kafka.utsattOppgaveAivenProperties
 import no.nav.syfo.producer.InntektsmeldingAivenProducer
 import no.nav.syfo.prosesser.FinnAlleUtgaandeOppgaverProcessor
-import no.nav.syfo.prosesser.FjernInntektsmeldingByBehandletProcessor
 import no.nav.syfo.prosesser.LeaderElectionBakgrunnsjobbProcessor
-import no.nav.syfo.repository.ArbeidsgiverperiodeRepository
-import no.nav.syfo.repository.ArbeidsgiverperiodeRepositoryImp
 import no.nav.syfo.repository.InntektsmeldingRepository
 import no.nav.syfo.repository.InntektsmeldingRepositoryImp
 import no.nav.syfo.repository.UtsattOppgaveRepositoryImp
@@ -58,7 +55,6 @@ fun prodConfig(config: ApplicationConfig) =
         single { BehandlendeEnhetConsumer(get(), get(), get()) }
         single { InntektsmeldingRepositoryImp(get()) } bind InntektsmeldingRepository::class
         single { InntektsmeldingService(get(), get()) }
-        single { ArbeidsgiverperiodeRepositoryImp(get()) } bind ArbeidsgiverperiodeRepository::class
 
         single {
             UtsattOppgaveConsumer(
@@ -92,13 +88,6 @@ fun prodConfig(config: ApplicationConfig) =
         single { FeiletUtsattOppgaveMeldingProsessor(om = get(), oppgaveService = get()) }
 
         single {
-            FjernInntektsmeldingByBehandletProcessor(
-                InntektsmeldingRepositoryImp(get()),
-                config.getString("lagringstidMåneder").toInt(),
-            )
-        }
-
-        single {
             FinnAlleUtgaandeOppgaverProcessor(
                 utsattOppgaveDAO = get(),
                 oppgaveService = get(),
@@ -113,7 +102,6 @@ fun prodConfig(config: ApplicationConfig) =
             LeaderElectionBakgrunnsjobbProcessor(
                 bakgrunnsjobbService = get(),
                 finnAlleUtgaandeOppgaverProcessor = get(),
-                fjernInntektsmeldingByBehandletProcessor = get(),
                 feiletUtsattOppgaveMeldingProsessor = get(),
             )
         }

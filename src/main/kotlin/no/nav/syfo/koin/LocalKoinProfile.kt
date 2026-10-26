@@ -13,10 +13,7 @@ import no.nav.syfo.integration.kafka.producerLocalProperties
 import no.nav.syfo.integration.kafka.utsattOppgaveLocalProperties
 import no.nav.syfo.producer.InntektsmeldingAivenProducer
 import no.nav.syfo.prosesser.FinnAlleUtgaandeOppgaverProcessor
-import no.nav.syfo.prosesser.FjernInntektsmeldingByBehandletProcessor
 import no.nav.syfo.prosesser.LeaderElectionBakgrunnsjobbProcessor
-import no.nav.syfo.repository.ArbeidsgiverperiodeRepository
-import no.nav.syfo.repository.ArbeidsgiverperiodeRepositoryImp
 import no.nav.syfo.repository.InntektsmeldingRepository
 import no.nav.syfo.repository.InntektsmeldingRepositoryImp
 import no.nav.syfo.repository.InntektsmeldingRepositoryMock
@@ -68,7 +65,6 @@ fun localDevConfig(config: ApplicationConfig) =
             LeaderElectionBakgrunnsjobbProcessor(
                 bakgrunnsjobbService = get(),
                 finnAlleUtgaandeOppgaverProcessor = get(),
-                fjernInntektsmeldingByBehandletProcessor = get(),
                 feiletUtsattOppgaveMeldingProsessor = get(),
             )
         }
@@ -102,16 +98,12 @@ fun localDevConfig(config: ApplicationConfig) =
         }
         single { FeiletUtsattOppgaveMeldingProsessor(om = get(), oppgaveService = get()) }
 
-        single { FjernInntektsmeldingByBehandletProcessor(repository = get(), lagringstidMåneder = 1) }
-
         single { Metrikk() } bind Metrikk::class
         single { InntektsmeldingService(InntektsmeldingRepositoryImp(ds = get()), get()) }
 
         single {
             InntektsmeldingAivenProducer(producerLocalProperties(config.getString("kafka_bootstrap_servers")))
         }
-
-        single { ArbeidsgiverperiodeRepositoryImp(get()) } bind ArbeidsgiverperiodeRepository::class
 
         single {
             InntektsmeldingConsumer(
