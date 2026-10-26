@@ -7,10 +7,9 @@ import io.mockk.unmockkStatic
 import io.mockk.verify
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding
 import no.nav.helsearbeidsgiver.pdl.PdlClient
-import no.nav.syfo.behandling.OPPRETT_OPPGAVE_FORSINKELSE
-import no.nav.syfo.integration.kafka.joarkLocalProperties
 import no.nav.syfo.producer.InntektsmeldingAivenProducer
 import no.nav.syfo.service.InntektsmeldingService
+import no.nav.syfo.util.kafkaConsumerTestProps
 import no.nav.syfo.utsattoppgave.UtsattOppgaveService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -22,7 +21,7 @@ import java.util.UUID
 
 class InntektsmeldingConsumerTest {
     lateinit var consumer: InntektsmeldingConsumer
-    val props = joarkLocalProperties().toMap()
+    val props = kafkaConsumerTestProps().toMap()
     val inntektsmeldingService: InntektsmeldingService = mockk(relaxed = true)
     val inntektsmeldingAivenProducer: InntektsmeldingAivenProducer = mockk(relaxed = true)
     val utsattOppgaveService: UtsattOppgaveService = mockk(relaxed = true)

@@ -11,10 +11,8 @@ import no.nav.helsearbeidsgiver.oppgave.domain.Tema
 import no.nav.helsearbeidsgiver.utils.log.logger
 import no.nav.helsearbeidsgiver.utils.log.sikkerLogger
 import no.nav.syfo.behandling.HentOppgaveException
-import no.nav.syfo.behandling.OpprettFordelingsOppgaveException
 import no.nav.syfo.behandling.OpprettOppgaveException
 import no.nav.syfo.domain.OppgaveResultat
-import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 import no.nav.syfo.util.Metrikk
 import no.nav.syfo.utsattoppgave.BehandlingsKategori
 import java.time.DayOfWeek
@@ -43,10 +41,8 @@ class OppgaveService(
                 ),
             ).also { logger.info("Hentet oppgave for journalpostId {}", journalpostId) }
 
-    private suspend fun hentHvisOppgaveFinnes(
-        oppgavetype: String,
-        journalpostId: String,
-    ): OppgaveResultat? {
+    private suspend fun hentHvisOppgaveFinnes(journalpostId: String): OppgaveResultat? {
+        val oppgavetype = Oppgavetype.INNTEKTSMELDING
         try {
             val oppgaveResponse = hentOppgave(oppgavetype = oppgavetype, journalpostId = journalpostId)
             return oppgaveResponse.oppgaver
@@ -68,7 +64,7 @@ class OppgaveService(
         behandlingsKategori: BehandlingsKategori,
         oppgaveBeskrivelse: String,
     ): OppgaveResultat {
-        val eksisterendeOppgave = hentHvisOppgaveFinnes(Oppgavetype.INNTEKTSMELDING, journalpostId)
+        val eksisterendeOppgave = hentHvisOppgaveFinnes(journalpostId)
         metrikk.tellOpprettOppgave(eksisterendeOppgave != null)
         if (eksisterendeOppgave != null) {
             logger.info("Det finnes allerede journalføringsoppgave for journalpost $journalpostId")
@@ -98,33 +94,6 @@ class OppgaveService(
             return OppgaveResultat(oppgaveClient.opprettOppgave(opprettOppgaveRequest).id, false, behandlingsKategori.getUtbetalingBruker())
         } catch (ex: Exception) {
             throw OpprettOppgaveException(journalpostId, ex)
-        }
-    }
-
-    suspend fun opprettFordelingsOppgave(journalpostId: String): OppgaveResultat {
-        val eksisterendeOppgave = hentHvisOppgaveFinnes(Oppgavetype.FORDELINGSOPPGAVE, journalpostId)
-
-        if (eksisterendeOppgave != null) {
-            logger.info("Det finnes allerede fordelingsoppgave for journalpost $journalpostId")
-            return eksisterendeOppgave
-        }
-
-        val opprettOppgaveRequest =
-            OpprettOppgaveRequest(
-                journalpostId = journalpostId,
-                behandlesAvApplikasjon = "FS22",
-                beskrivelse = "Fordelingsoppgave for inntektsmelding på sykepenger",
-                tema = Tema.SYK,
-                oppgavetype = Oppgavetype.FORDELINGSOPPGAVE,
-                aktivDato = LocalDate.now(),
-                fristFerdigstillelse = leggTilEnVirkeuke(LocalDate.now()),
-                prioritet = Prioritet.NORM,
-            )
-        logger.info("Oppretter fordelingsoppgave for journalpost $journalpostId")
-        try {
-            return OppgaveResultat(oppgaveClient.opprettOppgave(opprettOppgaveRequest).id, false, false)
-        } catch (ex: Exception) {
-            throw OpprettFordelingsOppgaveException(journalpostId, ex)
         }
     }
 

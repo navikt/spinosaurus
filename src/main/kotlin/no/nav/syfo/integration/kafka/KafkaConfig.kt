@@ -1,8 +1,5 @@
 package no.nav.syfo.integration.kafka
 
-import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig
-import io.confluent.kafka.serializers.KafkaAvroSerializerConfig
-import io.confluent.kafka.streams.serdes.avro.GenericAvroDeserializer
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
@@ -23,15 +20,6 @@ fun consumerLocalProperties() =
         CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG to LOCALHOSTBOOTSTRAPSERVER,
     )
 
-fun joarkLocalProperties() =
-    consumerLocalProperties() +
-        mapOf(
-            ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to GenericAvroDeserializer::class.java,
-            "schema.registry.url" to "http://kafka-schema-registry.tpa.svc.nais.local:8081",
-            ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
-            ConsumerConfig.GROUP_ID_CONFIG to "syfoinntektsmelding-v2",
-        )
-
 fun inntektsmeldingFraSimbaLocalProperties() =
     consumerLocalProperties() +
         mapOf(
@@ -40,22 +28,6 @@ fun inntektsmeldingFraSimbaLocalProperties() =
             ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
             ConsumerConfig.CLIENT_ID_CONFIG to "syfoinntektsmelding",
             ConsumerConfig.GROUP_ID_CONFIG to "syfoinntektsmelding-v1",
-        )
-
-fun joarkAivenProperties() =
-    commonAivenProperties() +
-        mapOf(
-            ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to GenericAvroDeserializer::class.java,
-            KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG to System.getenv("KAFKA_SCHEMA_REGISTRY"),
-            SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE to "USER_INFO",
-            SchemaRegistryClientConfig.USER_INFO_CONFIG to System.getenv(
-                "KAFKA_SCHEMA_REGISTRY_USER",
-            ) + ":" + System.getenv("KAFKA_SCHEMA_REGISTRY_PASSWORD"),
-            ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
-            ConsumerConfig.CLIENT_ID_CONFIG to "syfoinntektsmelding",
-            ConsumerConfig.GROUP_ID_CONFIG to "syfoinntektsmelding-v1",
-            ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
-            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
         )
 
 fun utsattOppgaveLocalProperties() =

@@ -74,37 +74,6 @@ class InntektsmeldingRepositorySpec : WithPostgresContainer() {
     }
 
     @Test
-    fun findByAktorId() {
-        val behandlet = LocalDateTime.of(2019, 10, 1, 5, 18, 45, 0)
-        val inntektsmelding =
-            InntektsmeldingEntitet(
-                uuid = UUID.randomUUID().toString(),
-                journalpostId = "journalpostId",
-                behandlet = behandlet,
-                orgnummer = "orgnummer",
-                arbeidsgiverPrivat = "arbeidsgiverPrivat",
-                fnr = Fnr.genererGyldig(),
-                aktorId = "aktorId1",
-            )
-        inntektsmelding.leggtilArbeidsgiverperiode(fom = LocalDate.of(2019, 10, 5), tom = LocalDate.of(2019, 10, 25))
-        repository.lagreInnteksmelding(inntektsmelding)
-        val inntektsmeldinger = repository.findByAktorId("aktorId1")
-        assertThat(inntektsmeldinger.size).isEqualTo(1)
-        val i = inntektsmeldinger[0]
-        assertThat(i.uuid).isNotNull
-        assertThat(i.journalpostId).isEqualTo("journalpostId")
-        assertThat(i.orgnummer).isEqualTo("orgnummer")
-        assertThat(i.arbeidsgiverPrivat).isEqualTo("arbeidsgiverPrivat")
-        assertThat(i.aktorId).isEqualTo("aktorId1")
-        assertThat(i.behandlet).isEqualTo(LocalDateTime.of(2019, 10, 1, 5, 18, 45, 0))
-        assertThat(i.arbeidsgiverperioder.size).isEqualTo(1)
-        //  assertThat(i.arbeidsgiverperioder[0].inntektsmelding).isEqualTo(i)
-        assertThat(i.arbeidsgiverperioder[0].uuid).isNotNull
-        assertThat(i.arbeidsgiverperioder[0].fom).isEqualTo(LocalDate.of(2019, 10, 5))
-        assertThat(i.arbeidsgiverperioder[0].tom).isEqualTo(LocalDate.of(2019, 10, 25))
-    }
-
-    @Test
     fun lagre_flere_arbeidsgiverperioder() {
         val behandlet = LocalDateTime.of(2019, 10, 1, 5, 18, 45, 0)
         val inntektsmelding =
@@ -120,9 +89,7 @@ class InntektsmeldingRepositorySpec : WithPostgresContainer() {
         inntektsmelding.leggtilArbeidsgiverperiode(fom = LocalDate.of(2019, 10, 5), tom = LocalDate.of(2019, 10, 25))
         inntektsmelding.leggtilArbeidsgiverperiode(fom = LocalDate.of(2018, 10, 5), tom = LocalDate.of(2018, 10, 25))
         repository.lagreInnteksmelding(inntektsmelding)
-        val inntektsmeldinger = repository.findByAktorId("aktorId2")
-        assertThat(inntektsmeldinger.size).isEqualTo(1)
-        val i = inntektsmeldinger[0]
+        val i = repository.findByUuid(inntektsmelding.uuid)!!
         assertThat(i.arbeidsgiverperioder.size).isEqualTo(2)
         // assertThat(i.arbeidsgiverperioder[0].inntektsmelding).isEqualTo(i)
         assertThat(i.arbeidsgiverperioder[0].uuid).isNotNull
@@ -144,9 +111,7 @@ class InntektsmeldingRepositorySpec : WithPostgresContainer() {
                 aktorId = "aktorId3",
             )
         repository.lagreInnteksmelding(inntektsmelding)
-        val inntektsmeldinger = repository.findByAktorId("aktorId3")
-        val i = inntektsmeldinger[0]
-        assertThat(inntektsmeldinger.size).isEqualTo(1)
+        val i = repository.findByUuid(inntektsmelding.uuid)!!
         assertThat(i.arbeidsgiverperioder.size).isEqualTo(0)
     }
 
@@ -198,7 +163,7 @@ class InntektsmeldingRepositorySpec : WithPostgresContainer() {
                 aktorId = "aktør-123",
                 begrunnelseRedusert = "Grunn til reduksjon",
             )
-        val mapper = JacksonJsonConfig.objectMapperFactory.opprettObjectMapper()
+        val mapper = JacksonJsonConfig.opprettObjectMapper()
         val inntektsmelding =
             InntektsmeldingEntitet(
                 uuid = UUID.randomUUID().toString(),
@@ -211,9 +176,7 @@ class InntektsmeldingRepositorySpec : WithPostgresContainer() {
                 data = mapper.writeValueAsString(im),
             )
         repository.lagreInnteksmelding(inntektsmelding)
-        val inntektsmeldinger = repository.findByAktorId("aktorId-repo-test")
-        val i = inntektsmeldinger[0]
-        assertThat(inntektsmeldinger.size).isEqualTo(1)
+        val i = repository.findByUuid(inntektsmelding.uuid)!!
 
         val data = mapper.readTree(i.data)
 

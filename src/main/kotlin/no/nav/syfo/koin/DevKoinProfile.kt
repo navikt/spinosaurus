@@ -7,29 +7,21 @@ import no.nav.hag.utils.bakgrunnsjobb.BakgrunnsjobbRepository
 import no.nav.hag.utils.bakgrunnsjobb.BakgrunnsjobbService
 import no.nav.hag.utils.bakgrunnsjobb.PostgresBakgrunnsjobbRepository
 import no.nav.syfo.MetrikkVarsler
-import no.nav.syfo.behandling.InntektsmeldingBehandler
 import no.nav.syfo.client.oppgave.OppgaveService
 import no.nav.syfo.integration.kafka.UtsattOppgaveConsumer
 import no.nav.syfo.integration.kafka.commonAivenProperties
-import no.nav.syfo.integration.kafka.joarkAivenProperties
-import no.nav.syfo.integration.kafka.journalpost.JournalpostHendelseConsumer
 import no.nav.syfo.integration.kafka.utsattOppgaveAivenProperties
 import no.nav.syfo.producer.InntektsmeldingAivenProducer
 import no.nav.syfo.prosesser.FinnAlleUtgaandeOppgaverProcessor
 import no.nav.syfo.prosesser.FjernInntektsmeldingByBehandletProcessor
-import no.nav.syfo.prosesser.JoarkInntektsmeldingHendelseProsessor
 import no.nav.syfo.prosesser.LeaderElectionBakgrunnsjobbProcessor
 import no.nav.syfo.repository.ArbeidsgiverperiodeRepository
 import no.nav.syfo.repository.ArbeidsgiverperiodeRepositoryImp
 import no.nav.syfo.repository.InntektsmeldingRepository
 import no.nav.syfo.repository.InntektsmeldingRepositoryImp
 import no.nav.syfo.repository.UtsattOppgaveRepositoryImp
-import no.nav.syfo.service.BehandleInngaaendeJournalConsumer
 import no.nav.syfo.service.BehandlendeEnhetConsumer
-import no.nav.syfo.service.InngaaendeJournalConsumer
 import no.nav.syfo.service.InntektsmeldingService
-import no.nav.syfo.service.JournalConsumer
-import no.nav.syfo.service.JournalpostService
 import no.nav.syfo.simba.InntektsmeldingConsumer
 import no.nav.syfo.util.Metrikk
 import no.nav.syfo.util.getString
@@ -62,52 +54,12 @@ fun devConfig(config: ApplicationConfig) =
             )
         } bind DataSource::class
 
-        single {
-            JoarkInntektsmeldingHendelseProsessor(
-                om = get(),
-                metrikk = get(),
-                inntektsmeldingBehandler = get(),
-                oppgaveService = get(),
-            )
-        }
-
-        single {
-            InntektsmeldingBehandler(
-                journalpostService = get(),
-                metrikk = get(),
-                inntektsmeldingService = get(),
-                inntektsmeldingAivenProducer = get(),
-                utsattOppgaveService = get(),
-                pdlClient = get(),
-            )
-        }
-
-        single { InngaaendeJournalConsumer(safJournalpostClient = get()) }
-        single { BehandleInngaaendeJournalConsumer(dokArkivClient = get()) }
-        single { JournalConsumer(safDokumentClient = get(), safJournalpostClient = get(), pdlClient = get()) }
         single { Metrikk() }
         single { BehandlendeEnhetConsumer(pdlClient = get(), norg2Client = get(), metrikk = get()) }
-        single {
-            JournalpostService(
-                inngaaendeJournalConsumer = get(),
-                behandleInngaaendeJournalConsumer = get(),
-                journalConsumer = get(),
-                behandlendeEnhetConsumer = get(),
-                metrikk = get(),
-            )
-        }
         single { InntektsmeldingRepositoryImp(ds = get()) } bind InntektsmeldingRepository::class
         single { InntektsmeldingService(repository = get(), objectMapper = get()) }
         single { ArbeidsgiverperiodeRepositoryImp(ds = get()) } bind ArbeidsgiverperiodeRepository::class
 
-        single {
-            JournalpostHendelseConsumer(
-                props = joarkAivenProperties(),
-                topicName = config.getString("kafka_joark_hendelse_topic"),
-                bakgrunnsjobbRepo = get(),
-                om = get(),
-            )
-        }
         single {
             UtsattOppgaveConsumer(
                 props = utsattOppgaveAivenProperties(),
@@ -159,7 +111,6 @@ fun devConfig(config: ApplicationConfig) =
                 bakgrunnsjobbService = get(),
                 finnAlleUtgaandeOppgaverProcessor = get(),
                 fjernInntektsmeldingByBehandletProcessor = get(),
-                joarkInntektsmeldingHendelseProsessor = get(),
                 feiletUtsattOppgaveMeldingProsessor = get(),
             )
         }

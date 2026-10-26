@@ -1,7 +1,6 @@
 package no.nav.syfo.repository
 
 import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.metrics.prometheus.PrometheusMetricsTrackerFactory
 
 fun createHikariConfig(
     jdbcUrl: String,

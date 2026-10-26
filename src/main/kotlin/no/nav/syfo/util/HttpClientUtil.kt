@@ -7,8 +7,6 @@ import io.ktor.client.engine.apache5.Apache5
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.serialization.jackson.JacksonConverter
 import io.ktor.serialization.jackson.jackson
@@ -38,8 +36,4 @@ internal fun HttpClientConfig<*>.configure(retries: Int) {
         requestTimeoutMillis = 1000
         socketTimeoutMillis = 1000
     }
-}
-
-internal fun HttpRequestBuilder.navCallId(callId: String) {
-    header("Nav-Call-Id", callId)
 }

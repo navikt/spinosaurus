@@ -40,58 +40,6 @@ class OppgaveServiceTest {
     }
 
     @Test
-    fun `skal opprette fordelingsoppgave uten feil`() {
-        val journalpostId = "123"
-
-        coEvery { oppgaveClient.hentOppgaver(any()) } returns OppgaveListeResponse(0, emptyList())
-        coEvery { oppgaveClient.opprettOppgave(any<OpprettOppgaveRequest>()) } returns OpprettOppgaveResponse(1)
-
-        val result =
-            runBlocking {
-                oppgaveService.opprettFordelingsOppgave(journalpostId)
-            }
-
-        coVerify { oppgaveClient.opprettOppgave(match { it.behandlingstype == null }) }
-        coVerify { oppgaveClient.opprettOppgave(match { it.journalpostId == journalpostId }) }
-        coVerify { oppgaveClient.opprettOppgave(match { it.oppgavetype == Oppgavetype.FORDELINGSOPPGAVE }) }
-        assertNotNull(result)
-        assertEquals(1, result.oppgaveId)
-        assertFalse(result.utbetalingBruker)
-        assertFalse(result.duplikat)
-    }
-
-    @Test
-    fun `skal returnere eksistrende fordelingsoppgave dersom det finnes fra før`() {
-        val journalpostId = "123"
-
-        coEvery { oppgaveClient.hentOppgaver(any()) } returns
-            OppgaveListeResponse(
-                1,
-                listOf(
-                    Oppgave(
-                        id = 1,
-                        oppgavetype = Oppgavetype.INNTEKTSMELDING,
-                        prioritet = Prioritet.NORM.name,
-                        aktivDato = LocalDate.now(),
-                    ),
-                ),
-            )
-
-        val result =
-            runBlocking {
-                oppgaveService.opprettFordelingsOppgave(journalpostId)
-            }
-
-        coVerify(exactly = 0) {
-            oppgaveClient.opprettOppgave(any<OpprettOppgaveRequest>())
-        }
-        assertNotNull(result)
-        assertEquals(1, result.oppgaveId)
-        assertFalse(result.utbetalingBruker)
-        assertTrue(result.duplikat)
-    }
-
-    @Test
     fun `skal ikke opprette oppgave dersom oppgave finnes fra før`() {
         val behandlingsKategori = BehandlingsKategori.UTLAND
         val oppgave = UtsattOppgaveTestData.oppgave
