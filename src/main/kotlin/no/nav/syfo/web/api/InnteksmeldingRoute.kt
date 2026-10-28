@@ -10,7 +10,6 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import no.nav.helsearbeidsgiver.utils.log.logger
 import no.nav.helsearbeidsgiver.utils.log.sikkerLogger
-import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.syfo.mapping.mapInntektsmeldingKontrakt
 import no.nav.syfo.mapping.toInntektsmelding
 import no.nav.syfo.repository.InntektsmeldingRepository
@@ -79,43 +78,6 @@ fun Route.refusjonskrav(inntektsmeldingService: InntektsmeldingService) {
             call.respond(
                 HttpStatusCode.InternalServerError,
                 mapOf("code" to HttpStatusCode.InternalServerError.value, "message" to "Feil ved henting av refusjonskrav"),
-            )
-        }
-    }
-}
-
-fun Route.finnInntektsmeldinger(inntektsmeldingService: InntektsmeldingService) {
-    post("/soek") {
-        try {
-            logger().info("Mottatt request for å finne inntektsmeldinger")
-            val request = call.receive<FinnInntektsmeldingerRequest>()
-            val inntektsmeldinger: List<no.nav.inntektsmeldingkontrakt.Inntektsmelding> = inntektsmeldingService.finnInntektsmeldinger(request)
-
-            try {
-                Fnr(request.fnr)
-            } catch (e: IllegalArgumentException) {
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    mapOf("code" to HttpStatusCode.BadRequest.value, "message" to "Ugyldig fødselsnummer"),
-                )
-                return@post
-            }
-
-            if (inntektsmeldinger.isEmpty()) {
-                call.respond(
-                    HttpStatusCode.NotFound,
-                    mapOf("code" to HttpStatusCode.NotFound.value, "message" to "Ingen inntektsmeldinger funnet"),
-                )
-                return@post
-            }
-
-            call.respond(HttpStatusCode.OK, inntektsmeldinger)
-        } catch (e: Exception) {
-            logger().error("Feil ved henting av inntektsmelding (se securelogs for mer detaljer)")
-            sikkerLogger().error("Feil ved henting av inntektsmelding - ${e.message}", e)
-            call.respond(
-                HttpStatusCode.InternalServerError,
-                mapOf("code" to HttpStatusCode.InternalServerError.value, "message" to "Feil ved henting av inntektsmeldinger"),
             )
         }
     }

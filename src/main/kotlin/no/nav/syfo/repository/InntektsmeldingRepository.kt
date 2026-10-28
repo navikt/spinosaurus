@@ -4,7 +4,6 @@ import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.syfo.dto.InntektsmeldingEntitet
 import java.sql.ResultSet
 import java.sql.Timestamp
-import java.time.LocalDate
 import javax.sql.DataSource
 
 interface InntektsmeldingRepository {
@@ -15,12 +14,6 @@ interface InntektsmeldingRepository {
     fun findByUuid(uuid: String): InntektsmeldingEntitet?
 
     fun findByUuids(uuids: List<String>): List<InntektsmeldingEntitet>
-
-    fun findByFnrInPeriod(
-        fnr: String,
-        fom: LocalDate? = null,
-        tom: LocalDate? = null,
-    ): List<InntektsmeldingEntitet>
 
     fun deleteAll()
 }
@@ -36,12 +29,6 @@ class InntektsmeldingRepositoryMock : InntektsmeldingRepository {
     override fun findByUuid(uuid: String): InntektsmeldingEntitet? = findByUuids((listOf(uuid))).firstOrNull()
 
     override fun findByUuids(uuids: List<String>): List<InntektsmeldingEntitet> = mockrepo.filter { it.uuid in uuids }
-
-    override fun findByFnrInPeriod(
-        fnr: String,
-        fom: LocalDate?,
-        tom: LocalDate?,
-    ): List<InntektsmeldingEntitet> = TODO("Not yet implemented")
 
     override fun findByJournalpost(journalpostId: String): InntektsmeldingEntitet? {
         TODO("Not yet implemented")
@@ -107,37 +94,6 @@ class InntektsmeldingRepositoryImp(
         }
 
         return innteksmelding
-    }
-
-    override fun findByFnrInPeriod(
-        fnr: String,
-        fom: LocalDate?,
-        tom: LocalDate?,
-    ): List<InntektsmeldingEntitet> {
-        val query =
-            buildString {
-                append(
-                    """
-                    SELECT * FROM INNTEKTSMELDING
-                    WHERE FNR = ?
-                    """.trimIndent(),
-                )
-                if (fom != null) append(" AND BEHANDLET >= ?")
-                if (tom != null) append(" AND BEHANDLET <= ?")
-            }
-
-        return ds.connection.use { conn ->
-            conn.prepareStatement(query).use { ps ->
-                var index = 1
-                ps.setString(index++, fnr)
-                if (fom != null) ps.setDate(index++, java.sql.Date.valueOf(fom))
-                if (tom != null) ps.setDate(index, java.sql.Date.valueOf(tom))
-
-                ps.executeQuery().use { rs ->
-                    resultLoop(rs)
-                }
-            }
-        }
     }
 
     override fun deleteAll() {

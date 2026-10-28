@@ -34,43 +34,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /api/v1/inntektsmelding/soek:
-    post:
-      summary: Søk etter inntektsmeldinger med FNR og periode
-      description: Returnerer en liste over inntektsmeldinger for gitt fødselsnummer og periode.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FinnInntektsmeldingerRequest'
-      responses:
-        '200':
-          description: Liste over inntektsmeldinger
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Inntektsmelding'
-        '404':
-          description: Ingen inntektsmeldinger funnet
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '400':
-          description: Ugyldig fødselsnummer
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Intern serverfeil
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
   /api/v1/inntektsmelding/refusjonskrav:
     post:
       summary: Hent refusjonskrav for inntektsmeldinger
@@ -150,22 +113,6 @@ components:
       required:
         - beloep
         - startdato
-    FinnInntektsmeldingerRequest:
-      type: object
-      properties:
-        fnr:
-          type: string
-          description: Fødselsnummer
-        fom:
-          type: string
-          format: date
-          description: Valgfri startdato
-        tom:
-          type: string
-          format: date
-          description: Valgfri sluttdato
-      required:
-        - fnr
     Inntektsmelding:
       type: object
       properties:
