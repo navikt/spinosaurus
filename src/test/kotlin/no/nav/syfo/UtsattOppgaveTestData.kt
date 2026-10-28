@@ -36,9 +36,6 @@ object UtsattOppgaveTestData {
         InntektsmeldingEntitet(
             uuid = UUID.randomUUID().toString(),
             aktorId = "aktoerid-123",
-            behandlet = LocalDateTime.now(),
-            orgnummer = "arb-org-123",
-            journalpostId = "jp-123",
             fnr = Fnr.genererGyldig(),
             data = buildObjectMapper().writeValueAsString(buildIM()),
         )

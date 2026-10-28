@@ -13,11 +13,8 @@ fun toInntektsmeldingEntitet(inntektsmelding: Inntektsmelding): InntektsmeldingE
         InntektsmeldingEntitet(
             uuid = inntektsmelding.id.ifEmpty { UUID.randomUUID().toString() },
             aktorId = inntektsmelding.aktorId ?: "",
-            journalpostId = inntektsmelding.journalpostId,
-            arbeidsgiverPrivat = inntektsmelding.arbeidsgiverPrivatFnr,
-            orgnummer = inntektsmelding.arbeidsgiverOrgnummer,
-            behandlet = inntektsmelding.mottattDato,
             fnr = Fnr(inntektsmelding.fnr),
+            data = "{}",
         )
     return entitet
 }
