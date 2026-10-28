@@ -14,10 +14,10 @@ import no.nav.syfo.domain.inntektsmelding.OpphoerAvNaturalytelse
 import no.nav.syfo.domain.inntektsmelding.Refusjon
 import no.nav.syfo.dto.InntektsmeldingEntitet
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertNotNull
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -45,6 +45,7 @@ class InntektsmeldingRepositorySpec : WithPostgresContainer() {
                     arbeidsgiverPrivat = "arbeidsgiverPrivat",
                     fnr = Fnr.genererGyldig(),
                     aktorId = "aktorId1",
+                    data = "{}",
                 ),
             )
         }
@@ -67,48 +68,6 @@ class InntektsmeldingRepositorySpec : WithPostgresContainer() {
             )
         repository.lagreInnteksmelding(inntektsmelding)
         assertNotNull(repository.findByJournalpost("jp-123-987"))
-    }
-
-    @Test
-    fun lagre_flere_arbeidsgiverperioder() {
-        val behandlet = LocalDateTime.of(2019, 10, 1, 5, 18, 45, 0)
-        val inntektsmelding =
-            InntektsmeldingEntitet(
-                uuid = UUID.randomUUID().toString(),
-                journalpostId = "journalpostId",
-                behandlet = behandlet,
-                orgnummer = "orgnummer",
-                arbeidsgiverPrivat = "arbeidsgiverPrivat",
-                fnr = Fnr.genererGyldig(),
-                aktorId = "aktorId2",
-            )
-        inntektsmelding.leggtilArbeidsgiverperiode(fom = LocalDate.of(2019, 10, 5), tom = LocalDate.of(2019, 10, 25))
-        inntektsmelding.leggtilArbeidsgiverperiode(fom = LocalDate.of(2018, 10, 5), tom = LocalDate.of(2018, 10, 25))
-        repository.lagreInnteksmelding(inntektsmelding)
-        val i = repository.findByUuid(inntektsmelding.uuid)!!
-        assertThat(i.arbeidsgiverperioder.size).isEqualTo(2)
-        // assertThat(i.arbeidsgiverperioder[0].inntektsmelding).isEqualTo(i)
-        assertThat(i.arbeidsgiverperioder[0].uuid).isNotNull
-        assertThat(i.arbeidsgiverperioder[0].fom).isEqualTo(LocalDate.of(2019, 10, 5))
-        assertThat(i.arbeidsgiverperioder[0].tom).isEqualTo(LocalDate.of(2019, 10, 25))
-    }
-
-    @Test
-    fun lagre_uten_arbeidsgiverperioder() {
-        val behandlet = LocalDateTime.of(2019, 10, 1, 5, 18, 45, 0)
-        val inntektsmelding =
-            InntektsmeldingEntitet(
-                uuid = UUID.randomUUID().toString(),
-                journalpostId = "journalpostId",
-                behandlet = behandlet,
-                orgnummer = "orgnummer",
-                arbeidsgiverPrivat = "arbeidsgiverPrivat",
-                fnr = Fnr.genererGyldig(),
-                aktorId = "aktorId3",
-            )
-        repository.lagreInnteksmelding(inntektsmelding)
-        val i = repository.findByUuid(inntektsmelding.uuid)!!
-        assertThat(i.arbeidsgiverperioder.size).isEqualTo(0)
     }
 
     @Test
@@ -189,46 +148,4 @@ class InntektsmeldingRepositorySpec : WithPostgresContainer() {
         assertThat(data.get("førsteFraværsdag").asText()).isEqualTo("2010-02-10")
         assertThat(data.get("arsakTilInnsending").asText()).isEqualTo("Ingen årsak")
     }
-
-    @Test
-    fun `skal kun slette inntektsmeldinger eldre enn gitt dato`() {
-        // Lagre 5 inntektsmeldinger i 2019
-        val imMedPeriodeGammel = lagInntektsmelding(LocalDate.of(2019, 12, 31).atStartOfDay())
-        imMedPeriodeGammel.leggtilArbeidsgiverperiode(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 2, 1))
-        repository.lagreInnteksmelding(imMedPeriodeGammel)
-        repository.lagreInnteksmelding(lagInntektsmelding(LocalDate.of(2019, 12, 30).atStartOfDay()))
-        repository.lagreInnteksmelding(lagInntektsmelding(LocalDate.of(2019, 11, 25).atStartOfDay()))
-        repository.lagreInnteksmelding(lagInntektsmelding(LocalDate.of(2019, 10, 14).atStartOfDay()))
-        repository.lagreInnteksmelding(lagInntektsmelding(LocalDate.of(2019, 3, 15).atStartOfDay()))
-
-        // Lagre 5 inntektsmeldinger i 2020
-        val imMedPeriodeNy = lagInntektsmelding(LocalDate.of(2020, 1, 1).atStartOfDay())
-        imMedPeriodeNy.leggtilArbeidsgiverperiode(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 2, 1))
-        repository.lagreInnteksmelding(imMedPeriodeNy)
-        repository.lagreInnteksmelding(lagInntektsmelding(LocalDate.of(2020, 1, 5).atStartOfDay()))
-        repository.lagreInnteksmelding(lagInntektsmelding(LocalDate.of(2020, 2, 25).atStartOfDay()))
-        repository.lagreInnteksmelding(lagInntektsmelding(LocalDate.of(2020, 4, 14).atStartOfDay()))
-        repository.lagreInnteksmelding(lagInntektsmelding(LocalDate.of(2020, 5, 15).atStartOfDay()))
-
-        // 10 tilsammen
-        assertThat(repository.findAll().size).isEqualTo(10)
-        // 5 før 2020
-        assertThat(repository.findFirst100ByBehandletBefore(LocalDate.of(2020, 1, 1).atStartOfDay()).size).isEqualTo(5)
-
-        // Slett alle før 2020
-        repository.deleteByBehandletBefore(LocalDate.of(2020, 1, 1).atStartOfDay())
-        // Nå skal det bare være 5 treff
-        assertThat(repository.findAll().size).isEqualTo(5)
-    }
-
-    private fun lagInntektsmelding(behandlet: LocalDateTime): InntektsmeldingEntitet =
-        InntektsmeldingEntitet(
-            uuid = UUID.randomUUID().toString(),
-            journalpostId = "journalpostId",
-            behandlet = behandlet,
-            orgnummer = "orgnummer",
-            arbeidsgiverPrivat = "arbeidsgiverPrivat",
-            fnr = Fnr.genererGyldig(),
-            aktorId = "aktorId1",
-        )
 }

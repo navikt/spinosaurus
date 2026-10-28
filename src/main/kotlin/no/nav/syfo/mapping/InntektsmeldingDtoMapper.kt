@@ -19,7 +19,6 @@ fun toInntektsmeldingEntitet(inntektsmelding: Inntektsmelding): InntektsmeldingE
             behandlet = inntektsmelding.mottattDato,
             fnr = Fnr(inntektsmelding.fnr),
         )
-    inntektsmelding.arbeidsgiverperioder.forEach { p -> entitet.leggtilArbeidsgiverperiode(p.fom, p.tom) }
     return entitet
 }
 

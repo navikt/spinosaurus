@@ -1,7 +1,6 @@
 package no.nav.syfo.dto
 
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class InntektsmeldingEntitet(
@@ -13,15 +12,4 @@ data class InntektsmeldingEntitet(
     val behandlet: LocalDateTime? = LocalDateTime.now(),
     val fnr: Fnr,
     var data: String? = null,
-) {
-    var arbeidsgiverperioder: MutableList<ArbeidsgiverperiodeEntitet> = ArrayList()
-
-    fun leggtilArbeidsgiverperiode(
-        fom: LocalDate,
-        tom: LocalDate,
-    ) {
-        val periode = ArbeidsgiverperiodeEntitet(fom = fom, tom = tom)
-        periode.inntektsmelding = this
-        arbeidsgiverperioder.add(periode)
-    }
-}
+)
