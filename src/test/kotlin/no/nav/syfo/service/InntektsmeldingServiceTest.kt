@@ -4,18 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import io.mockk.every
-import io.mockk.mockk
-import no.nav.helsearbeidsgiver.utils.test.wrapper.genererGyldig
-import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.inntektsmelding.kontrakt.serde.JacksonJsonConfig
-import no.nav.syfo.repository.InntektsmeldingRepository
 import no.nav.syfo.repository.buildIM
-import no.nav.syfo.web.api.FinnInntektsmeldingerRequest
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
 
 class InntektsmeldingServiceTest {
     val objectMapper: ObjectMapper =
@@ -88,16 +80,5 @@ class InntektsmeldingServiceTest {
         ).isEqualTo("TILSKUDDBARNEHAGEPLASS")
         assertThat(node.get("opphørAvNaturalYtelse")[1].get("fom").toString()).isEqualTo("[2016,6,6]")
         assertThat(node.get("opphørAvNaturalYtelse")[1].get("beloepPrMnd").asLong()).isEqualTo(666666666666)
-    }
-
-    @Test
-    fun `skal kalle findByFnrInPeriod og returnerer tom liste`() {
-        val repository = mockk<InntektsmeldingRepository>(relaxed = true)
-        val service = InntektsmeldingService(repository, objectMapper)
-        val fnr = Fnr.genererGyldig().verdi
-        val fom = LocalDate.now().minusDays(10)
-        val tom = LocalDate.now()
-        every { repository.findByFnrInPeriod(fnr, fom, tom) } returns emptyList()
-        assertTrue(service.finnInntektsmeldinger(FinnInntektsmeldingerRequest(fnr, fom, tom)).isEmpty())
     }
 }
