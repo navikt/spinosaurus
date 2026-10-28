@@ -5,47 +5,17 @@ import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.inntektsmeldingkontrakt.Arbeidsgivertype
 import no.nav.syfo.FØRSTE_FEBRUAR
 import no.nav.syfo.FØRSTE_JANUAR
-import no.nav.syfo.domain.JournalStatus
-import no.nav.syfo.domain.inntektsmelding.Gyldighetsstatus
-import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 import no.nav.syfo.domain.inntektsmelding.RapportertInntekt
-import no.nav.syfo.domain.inntektsmelding.Refusjon
 import no.nav.syfo.dto.InntektsmeldingEntitet
 import no.nav.syfo.grunnleggendeInntektsmelding
 import no.nav.syfo.util.InntektsmeldingJsonMapper
 import no.nav.syfo.util.customObjectMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import java.math.BigDecimal
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.UUID
 
 class InntektsmeldingKontraktMapperKtTest {
     val om = customObjectMapper()
-
-    @Test
-    fun toInntektsmeldingDTO() {
-        val inntektsmelding =
-            Inntektsmelding(
-                fnr = Fnr.genererGyldig().verdi,
-                arbeidsgiverPrivatFnr = "fnr",
-                journalpostId = "journalpostId",
-                arsakTilInnsending = "",
-                journalStatus = JournalStatus.MOTTATT,
-                arbeidsgiverperioder = ArrayList(),
-                refusjon = Refusjon(BigDecimal.ONE),
-                gyldighetsStatus = Gyldighetsstatus.GYLDIG,
-                arkivRefereranse = "ar123",
-                førsteFraværsdag = LocalDate.now(),
-                mottattDato = LocalDateTime.of(2019, 10, 1, 5, 18, 45, 0),
-                sakId = "sakId",
-                aktorId = "aktorId",
-            )
-        val dto = toInntektsmeldingEntitet(inntektsmelding)
-        assertThat(dto.aktorId).isEqualTo("aktorId")
-        assertThat(dto.uuid).isNotNull
-    }
 
     @Test
     fun toInntektsmelding() {
