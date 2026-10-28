@@ -4,10 +4,16 @@ import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.syfo.dto.InntektsmeldingEntitet
 import java.sql.ResultSet
 import java.sql.Timestamp
+import java.time.LocalDateTime
 import javax.sql.DataSource
 
 interface InntektsmeldingRepository {
-    fun lagreInnteksmelding(innteksmelding: InntektsmeldingEntitet): InntektsmeldingEntitet
+    fun lagreInnteksmelding(
+        innteksmelding: InntektsmeldingEntitet,
+        journalpostId: String,
+        orgnr: String,
+        behandlet: LocalDateTime,
+    )
 
     fun findByJournalpost(journalpostId: String): InntektsmeldingEntitet?
 
@@ -21,9 +27,13 @@ interface InntektsmeldingRepository {
 class InntektsmeldingRepositoryMock : InntektsmeldingRepository {
     private val mockrepo = mutableSetOf<InntektsmeldingEntitet>()
 
-    override fun lagreInnteksmelding(innteksmelding: InntektsmeldingEntitet): InntektsmeldingEntitet {
+    override fun lagreInnteksmelding(
+        innteksmelding: InntektsmeldingEntitet,
+        journalpostId: String,
+        orgnr: String,
+        behandlet: LocalDateTime,
+    ) {
         mockrepo.add(innteksmelding)
-        return innteksmelding
     }
 
     override fun findByUuid(uuid: String): InntektsmeldingEntitet? = findByUuids((listOf(uuid))).firstOrNull()
@@ -72,7 +82,12 @@ class InntektsmeldingRepositoryImp(
         }
     }
 
-    override fun lagreInnteksmelding(innteksmelding: InntektsmeldingEntitet): InntektsmeldingEntitet {
+    override fun lagreInnteksmelding(
+        innteksmelding: InntektsmeldingEntitet,
+        journalpostId: String,
+        orgnr: String,
+        behandlet: LocalDateTime,
+    ) {
         val insertStatement =
             """INSERT INTO INNTEKTSMELDING (INNTEKTSMELDING_UUID, AKTOR_ID, ORGNUMMER, JOURNALPOST_ID, BEHANDLET, ARBEIDSGIVER_PRIVAT,FNR, DATA)
         VALUES (?, ?, ?, ?, ?, ?,?, ?::jsonb)
@@ -83,17 +98,15 @@ class InntektsmeldingRepositoryImp(
             val ps = it.prepareStatement(insertStatement)
             ps.setString(1, innteksmelding.uuid)
             ps.setString(2, innteksmelding.aktorId)
-            ps.setString(3, innteksmelding.orgnummer)
-            ps.setString(4, innteksmelding.journalpostId)
-            ps.setTimestamp(5, Timestamp.valueOf(innteksmelding.behandlet))
-            ps.setString(6, innteksmelding.arbeidsgiverPrivat)
+            ps.setString(3, orgnr)
+            ps.setString(4, journalpostId)
+            ps.setTimestamp(5, Timestamp.valueOf(behandlet))
+            ps.setString(6, null)
             ps.setString(7, innteksmelding.fnr.toString())
             ps.setString(8, innteksmelding.data)
 
             ps.executeQuery()
         }
-
-        return innteksmelding
     }
 
     override fun deleteAll() {
@@ -111,10 +124,6 @@ class InntektsmeldingRepositoryImp(
                 InntektsmeldingEntitet(
                     uuid = res.getString("INNTEKTSMELDING_UUID"),
                     aktorId = res.getString("AKTOR_ID"),
-                    orgnummer = res.getString("ORGNUMMER"),
-                    journalpostId = res.getString("JOURNALPOST_ID"),
-                    behandlet = res.getTimestamp("BEHANDLET").toLocalDateTime(),
-                    arbeidsgiverPrivat = res.getString("ARBEIDSGIVER_PRIVAT"),
                     fnr = Fnr(res.getString("FNR")),
                     data = res.getString("data"),
                 ),

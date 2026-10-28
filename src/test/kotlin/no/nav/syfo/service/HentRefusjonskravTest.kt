@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
-import java.time.LocalDateTime
 import java.util.UUID
 
 class HentRefusjonskravTest {
@@ -33,10 +32,6 @@ class HentRefusjonskravTest {
             InntektsmeldingEntitet(
                 uuid = kjentId.toString(),
                 aktorId = "aktor",
-                journalpostId = "jp",
-                orgnummer = "org",
-                arbeidsgiverPrivat = null,
-                behandlet = LocalDateTime.now(),
                 fnr = Fnr.genererGyldig(),
                 data = objectMapper.writeValueAsString(im),
             )
@@ -55,7 +50,6 @@ class HentRefusjonskravTest {
             InntektsmeldingEntitet(
                 uuid = kjentId.toString(),
                 aktorId = "aktor",
-                journalpostId = "jp",
                 fnr = Fnr.genererGyldig(),
                 data = objectMapper.writeValueAsString(im),
             )
