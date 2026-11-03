@@ -118,6 +118,12 @@ dependencies {
     val tokenSupportVersion = project.property("tokenSupportVersion") as String
     val testcontainersVersion = project.property("testcontainersVersion") as String
 
+    constraints {
+        implementation("io.netty:netty-handler:4.2.17.Final") {
+            because("Fixes CVE-2026-75595")
+        }
+    }
+
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
@@ -154,7 +160,11 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion")
     implementation("org.postgresql:postgresql:$postgresVersion")
     implementation("org.slf4j:slf4j-api:$slf4Version")
-
+    constraints {
+        implementation("io.netty:netty-handler:4.2.17.Final") {
+            because("Fikse CVE-2026-75595")
+        }
+    }
     runtimeOnly("ch.qos.logback:logback-classic:$logbackClassicVersion")
 
     testImplementation(testFixtures("no.nav.helsearbeidsgiver:utils:$hagUtilsVersion"))
