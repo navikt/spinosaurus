@@ -154,7 +154,11 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion")
     implementation("org.postgresql:postgresql:$postgresVersion")
     implementation("org.slf4j:slf4j-api:$slf4Version")
-
+    constraints {
+        implementation("io.netty:netty-handler:4.2.17.Final") {
+            because("Fikse CVE-2026-75595")
+        }
+    }
     runtimeOnly("ch.qos.logback:logback-classic:$logbackClassicVersion")
 
     testImplementation(testFixtures("no.nav.helsearbeidsgiver:utils:$hagUtilsVersion"))
