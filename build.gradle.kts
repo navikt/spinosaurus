@@ -155,7 +155,7 @@ dependencies {
     implementation("org.postgresql:postgresql:$postgresVersion")
     implementation("org.slf4j:slf4j-api:$slf4Version")
     constraints {
-        implementation("io.netty:netty-handler:4.2.19.Final") {
+        implementation("io.netty:netty-handler:4.2.20.Final") {
             because("Fikse CVE-2026-75595")
         }
     }
