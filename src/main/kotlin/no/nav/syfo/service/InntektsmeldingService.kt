@@ -1,14 +1,13 @@
 package no.nav.syfo.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 import no.nav.syfo.dto.InntektsmeldingEntitet
 import no.nav.syfo.mapping.tilRefusjonskrav
 import no.nav.syfo.mapping.toInntektsmelding
-import no.nav.syfo.mapping.toInntektsmeldingEntitet
 import no.nav.syfo.repository.InntektsmeldingRepository
 import no.nav.syfo.web.api.InntektsmeldingRefusjonskrav
 import java.util.UUID
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding as InntektsmeldingFraSimba
 
 class InntektsmeldingService(
     private val repository: InntektsmeldingRepository,
@@ -17,13 +16,25 @@ class InntektsmeldingService(
     fun findByJournalpost(journalpostId: String): InntektsmeldingEntitet? = repository.findByJournalpost(journalpostId)
 
     fun lagreBehandling(
-        inntektsmelding: Inntektsmelding,
-        aktorid: String,
-    ): InntektsmeldingEntitet {
-        val dto = toInntektsmeldingEntitet(inntektsmelding)
-        dto.aktorId = aktorid
-        dto.data = inntektsmelding.asJsonString(objectMapper)
-        return repository.lagreInnteksmelding(dto)
+        inntektsmeldingFraSimba: InntektsmeldingFraSimba,
+        aktorId: String,
+        journalpostId: String,
+        inntektsmeldingJson: String,
+    ) {
+        val dto =
+            InntektsmeldingEntitet(
+                uuid = inntektsmeldingFraSimba.id.toString(),
+                aktorId = aktorId,
+                fnr = inntektsmeldingFraSimba.sykmeldt.fnr,
+                data = inntektsmeldingJson,
+            )
+
+        repository.lagreInnteksmelding(
+            innteksmelding = dto,
+            journalpostId = journalpostId,
+            orgnr = inntektsmeldingFraSimba.avsender.orgnr.verdi,
+            behandlet = inntektsmeldingFraSimba.mottatt.toLocalDateTime(),
+        )
     }
 
     fun hentRefusjonskrav(inntektsmeldingIder: List<UUID>): List<InntektsmeldingRefusjonskrav> {
@@ -44,5 +55,3 @@ class InntektsmeldingService(
         }
     }
 }
-
-fun Inntektsmelding.asJsonString(objectMapper: ObjectMapper): String = objectMapper.writeValueAsString(this)

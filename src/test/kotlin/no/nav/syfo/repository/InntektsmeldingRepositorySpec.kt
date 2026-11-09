@@ -39,14 +39,13 @@ class InntektsmeldingRepositorySpec : WithPostgresContainer() {
             repository.lagreInnteksmelding(
                 InntektsmeldingEntitet(
                     uuid = id,
-                    journalpostId = "jp-uuids-$i",
-                    behandlet = LocalDateTime.of(2019, 10, 1, 5, 18, 45, 0),
-                    orgnummer = "orgnummer",
-                    arbeidsgiverPrivat = "arbeidsgiverPrivat",
                     fnr = Fnr.genererGyldig(),
                     aktorId = "aktorId1",
                     data = "{}",
                 ),
+                journalpostId = "jp-uuids-$i",
+                behandlet = LocalDateTime.of(2019, 10, 1, 5, 18, 45, 0),
+                orgnr = "orgnr",
             )
         }
         val resultat = repository.findByUuids(listOf(ids[0], ids[2], UUID.randomUUID().toString()))
@@ -59,14 +58,16 @@ class InntektsmeldingRepositorySpec : WithPostgresContainer() {
         val inntektsmelding =
             InntektsmeldingEntitet(
                 uuid = UUID.randomUUID().toString(),
-                journalpostId = "jp-123-987",
-                behandlet = LocalDateTime.of(2019, 10, 1, 5, 18, 45, 0),
-                orgnummer = "orgnummer",
-                arbeidsgiverPrivat = "arbeidsgiverPrivat",
                 fnr = Fnr.genererGyldig(),
                 aktorId = "aktorId1",
+                data = "{}",
             )
-        repository.lagreInnteksmelding(inntektsmelding)
+        repository.lagreInnteksmelding(
+            inntektsmelding,
+            journalpostId = "jp-123-987",
+            behandlet = LocalDateTime.of(2019, 10, 1, 5, 18, 45, 0),
+            orgnr = "orgnr",
+        )
         assertNotNull(repository.findByJournalpost("jp-123-987"))
     }
 
@@ -122,15 +123,17 @@ class InntektsmeldingRepositorySpec : WithPostgresContainer() {
         val inntektsmelding =
             InntektsmeldingEntitet(
                 uuid = UUID.randomUUID().toString(),
-                journalpostId = "journalpostId",
-                behandlet = LocalDateTime.now(),
-                orgnummer = "orgnummer",
-                arbeidsgiverPrivat = "arbeidsgiverPrivat",
                 aktorId = "aktorId-repo-test",
                 fnr = Fnr.genererGyldig(),
                 data = mapper.writeValueAsString(im),
             )
-        repository.lagreInnteksmelding(inntektsmelding)
+        repository.lagreInnteksmelding(
+            inntektsmelding,
+            journalpostId = "journalpostId",
+            behandlet = LocalDateTime.now(),
+            orgnr = "orgnr",
+        )
+
         val i = repository.findByUuid(inntektsmelding.uuid)!!
 
         val data = mapper.readTree(i.data)
