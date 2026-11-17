@@ -24,6 +24,9 @@ spec:
           - name: pgaudit.log_relation
             value: "on"
   accessPolicy:
+    inbound:
+      rules:
+        - application: refusjon
     outbound:
       external:
         - host: oppgave.prod-fss-pub.nais.io
