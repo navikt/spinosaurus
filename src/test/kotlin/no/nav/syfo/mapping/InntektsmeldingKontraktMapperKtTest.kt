@@ -5,68 +5,32 @@ import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.inntektsmeldingkontrakt.Arbeidsgivertype
 import no.nav.syfo.FØRSTE_FEBRUAR
 import no.nav.syfo.FØRSTE_JANUAR
-import no.nav.syfo.domain.JournalStatus
-import no.nav.syfo.domain.inntektsmelding.Gyldighetsstatus
-import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 import no.nav.syfo.domain.inntektsmelding.RapportertInntekt
-import no.nav.syfo.domain.inntektsmelding.Refusjon
 import no.nav.syfo.dto.InntektsmeldingEntitet
 import no.nav.syfo.grunnleggendeInntektsmelding
-import no.nav.syfo.koin.buildObjectMapper
+import no.nav.syfo.util.InntektsmeldingJsonMapper
+import no.nav.syfo.util.customObjectMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import java.math.BigDecimal
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.UUID
 
 class InntektsmeldingKontraktMapperKtTest {
-    val om = buildObjectMapper()
-
-    @Test
-    fun toInntektsmeldingDTO() {
-        val inntektsmelding =
-            Inntektsmelding(
-                fnr = Fnr.genererGyldig().verdi,
-                arbeidsgiverPrivatFnr = "fnr",
-                journalpostId = "journalpostId",
-                arsakTilInnsending = "",
-                journalStatus = JournalStatus.MOTTATT,
-                arbeidsgiverperioder = ArrayList(),
-                refusjon = Refusjon(BigDecimal.ONE),
-                gyldighetsStatus = Gyldighetsstatus.GYLDIG,
-                arkivRefereranse = "ar123",
-                førsteFraværsdag = LocalDate.now(),
-                mottattDato = LocalDateTime.of(2019, 10, 1, 5, 18, 45, 0),
-                sakId = "sakId",
-                aktorId = "aktorId",
-            )
-        val dto = toInntektsmeldingEntitet(inntektsmelding)
-        assertThat(dto.journalpostId).isEqualTo("journalpostId")
-        assertThat(dto.aktorId).isEqualTo("aktorId")
-        assertThat(dto.arbeidsgiverPrivat).isEqualTo("fnr")
-        assertThat(dto.uuid).isNotNull
-        assertThat(dto.behandlet).isEqualTo(LocalDateTime.of(2019, 10, 1, 5, 18, 45, 0))
-    }
+    val om = customObjectMapper()
 
     @Test
     fun toInntektsmelding() {
         val dto =
             InntektsmeldingEntitet(
                 uuid = UUID.randomUUID().toString(),
-                journalpostId = grunnleggendeInntektsmelding.journalpostId,
-                behandlet = LocalDateTime.of(2019, 10, 25, 0, 0, 0, 0),
-                orgnummer = grunnleggendeInntektsmelding.arbeidsgiverOrgnummer,
-                arbeidsgiverPrivat = "arbeidsgiverPrivat",
                 aktorId = grunnleggendeInntektsmelding.aktorId.toString(),
                 fnr = Fnr.genererGyldig(),
                 data = om.writeValueAsString(grunnleggendeInntektsmelding),
             )
-        val i = toInntektsmelding(dto, om)
+        val i = InntektsmeldingJsonMapper.fromJson(dto.data, dto.fnr)
         assertThat(i.journalpostId).isEqualTo("123")
         assertThat(i.sakId).isEqualTo("sakId")
         assertThat(i.arbeidsgiverOrgnummer).isEqualTo("1234")
-        assertThat(i.fnr).isEqualTo(grunnleggendeInntektsmelding.fnr)
+        assertThat(i.fnr).isEqualTo(dto.fnr.verdi)
         assertThat(i.aktorId).isEqualTo("aktorId")
         assertThat(i.arbeidsgiverperioder.size).isEqualTo(1)
     }
@@ -80,15 +44,11 @@ class InntektsmeldingKontraktMapperKtTest {
         val dto =
             InntektsmeldingEntitet(
                 uuid = UUID.randomUUID().toString(),
-                journalpostId = inntektsmeldingUtenFnr.journalpostId,
-                behandlet = LocalDateTime.of(2019, 10, 25, 0, 0, 0, 0),
-                orgnummer = inntektsmeldingUtenFnr.arbeidsgiverOrgnummer,
-                arbeidsgiverPrivat = "arbeidsgiverPrivat",
                 aktorId = inntektsmeldingUtenFnr.aktorId.toString(),
                 fnr = Fnr.genererGyldig(),
                 data = om.writeValueAsString(inntektsmeldingUtenFnr),
             )
-        val i = toInntektsmelding(dto, om)
+        val i = InntektsmeldingJsonMapper.fromJson(dto.data, dto.fnr)
         assertThat(i.journalpostId).isEqualTo("123")
         assertThat(i.sakId).isEqualTo("sakId")
         assertThat(i.arbeidsgiverOrgnummer).isEqualTo("1234")

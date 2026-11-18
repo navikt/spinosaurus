@@ -15,6 +15,7 @@ import no.nav.syfo.dto.UtsattOppgaveEntitet
 import no.nav.syfo.mapping.mapInntektsmeldingKontrakt
 import no.nav.syfo.producer.InntektsmeldingAivenProducer
 import no.nav.syfo.service.InntektsmeldingService
+import no.nav.syfo.util.InntektsmeldingJsonMapper
 import no.nav.syfo.util.LivenessComponent
 import no.nav.syfo.util.ReadynessComponent
 import no.nav.syfo.util.validerInntektsmelding
@@ -96,23 +97,31 @@ class InntektsmeldingConsumer(
         journalpostId: String,
         inntektsmeldingFraSimba: Inntektsmelding,
     ) {
-        val aktorid = hentAktoeridFraPDL(inntektsmeldingFraSimba.sykmeldt.fnr.verdi)
-        val arkivreferanse = "im_$journalpostId"
-        val inntektsmelding = mapInntektsmelding(arkivreferanse, aktorid, journalpostId, inntektsmeldingFraSimba)
+        val aktorId = hentAktoeridFraPDL(inntektsmeldingFraSimba.sykmeldt.fnr.verdi)
+        val arkivReferanse = "im_$journalpostId"
         val timeout =
             if (inntektsmeldingFraSimba.skalSendesTilSpleis()) {
                 LocalDateTime.now().plusHours(OPPRETT_OPPGAVE_FORSINKELSE)
             } else {
                 LocalDateTime.now() // opprett oppgave umiddelbart
             }
-        val dto = inntektsmeldingService.lagreBehandling(inntektsmelding, aktorid)
+
+        val inntektsmelding = mapInntektsmelding(arkivReferanse, aktorId, journalpostId, inntektsmeldingFraSimba)
+
+        inntektsmeldingService.lagreBehandling(
+            inntektsmeldingFraSimba,
+            aktorId,
+            journalpostId,
+            InntektsmeldingJsonMapper.toJson(inntektsmelding),
+        )
+
         utsattOppgaveService.opprett(
             UtsattOppgaveEntitet(
-                fnr = inntektsmelding.fnr,
-                aktørId = dto.aktorId,
-                journalpostId = inntektsmelding.journalpostId,
-                arkivreferanse = inntektsmelding.arkivRefereranse,
-                inntektsmeldingId = dto.uuid,
+                fnr = inntektsmeldingFraSimba.sykmeldt.fnr.verdi,
+                aktørId = aktorId,
+                journalpostId = journalpostId,
+                arkivreferanse = arkivReferanse,
+                inntektsmeldingId = inntektsmeldingFraSimba.id.toString(),
                 tilstand = Tilstand.Utsatt,
                 timeout = timeout,
                 gosysOppgaveId = null,
@@ -125,10 +134,10 @@ class InntektsmeldingConsumer(
         val mappedInntektsmelding =
             mapInntektsmeldingKontrakt(
                 inntektsmelding,
-                aktorid,
+                aktorId,
                 validerInntektsmelding(inntektsmelding),
-                arkivreferanse,
-                dto.uuid,
+                arkivReferanse,
+                inntektsmeldingFraSimba.id.toString(),
             )
 
         inntektsmeldingAivenProducer.sendTilTopicForBruker(mappedInntektsmelding)

@@ -8,10 +8,18 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 
-fun customObjectMapper(customPrettyPrinter: Boolean = true): ObjectMapper =
-    jacksonObjectMapper().apply {
+fun customObjectMapper(): ObjectMapper =
+    jacksonObjectMapper {
+        withReflectionCacheSize(512)
+            .configure(KotlinFeature.NullToEmptyCollection, false)
+            .configure(KotlinFeature.NullToEmptyMap, false)
+            .configure(KotlinFeature.NullIsSameAsDefault, false)
+            .configure(KotlinFeature.SingletonSupport, false)
+            .configure(KotlinFeature.StrictNullChecks, false)
+    }.apply {
         registerModules(
             Jdk8Module(),
             JavaTimeModule(),
@@ -22,14 +30,11 @@ fun customObjectMapper(customPrettyPrinter: Boolean = true): ObjectMapper =
 
         disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true) // pga aareg
 
-        if (customPrettyPrinter) {
-            setDefaultPrettyPrinter(
-                DefaultPrettyPrinter().apply {
-                    indentArraysWith(DefaultPrettyPrinter.FixedSpaceIndenter.instance)
-                    indentObjectsWith(DefaultIndenter("  ", "\n"))
-                },
-            )
-        }
+        setDefaultPrettyPrinter(
+            DefaultPrettyPrinter().apply {
+                indentArraysWith(DefaultPrettyPrinter.FixedSpaceIndenter.instance)
+                indentObjectsWith(DefaultIndenter("  ", "\n"))
+            },
+        )
     }
