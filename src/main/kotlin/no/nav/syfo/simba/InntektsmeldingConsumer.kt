@@ -84,12 +84,12 @@ class InntektsmeldingConsumer(
         logger.info("InntektsmeldingConsumer: Mottar record med key: $key fra Simba}")
         val meldingFraSimba = json.fromJson(JournalfoertInntektsmelding.serializer())
 
-        val im = inntektsmeldingService.findByJournalpost(meldingFraSimba.journalpostId)
+        val im = inntektsmeldingService.findById(meldingFraSimba.inntektsmelding.id)
         if (im != null) {
-            logger.info("InntektsmeldingConsumer: Behandler ikke ${meldingFraSimba.journalpostId}. Finnes allerede.")
+            logger.info("InntektsmeldingConsumer: Behandler ikke ${meldingFraSimba.inntektsmelding.id}. Finnes allerede.")
         } else {
             behandle(meldingFraSimba.journalpostId, meldingFraSimba.inntektsmelding)
-            logger.info("InntektsmeldingConsumer: Behandlet inntektsmelding med journalpostId: ${meldingFraSimba.journalpostId}")
+            logger.info("InntektsmeldingConsumer: Behandlet inntektsmelding med ID: ${meldingFraSimba.inntektsmelding.id}")
         }
     }
 

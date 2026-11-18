@@ -13,7 +13,7 @@ class InntektsmeldingService(
     private val repository: InntektsmeldingRepository,
     private val objectMapper: ObjectMapper,
 ) {
-    fun findByJournalpost(journalpostId: String): InntektsmeldingEntitet? = repository.findByJournalpost(journalpostId)
+    fun findById(inntektsmeldingId: UUID): InntektsmeldingEntitet? = repository.findByUuid(inntektsmeldingId.toString())
 
     fun lagreBehandling(
         inntektsmeldingFraSimba: InntektsmeldingFraSimba,
