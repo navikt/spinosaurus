@@ -1,17 +1,15 @@
 package no.nav.syfo.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.syfo.dto.InntektsmeldingEntitet
 import no.nav.syfo.mapping.tilRefusjonskrav
-import no.nav.syfo.mapping.toInntektsmelding
 import no.nav.syfo.repository.InntektsmeldingRepository
+import no.nav.syfo.util.InntektsmeldingJsonMapper
 import no.nav.syfo.web.api.InntektsmeldingRefusjonskrav
 import java.util.UUID
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding as InntektsmeldingFraSimba
 
 class InntektsmeldingService(
     private val repository: InntektsmeldingRepository,
-    private val objectMapper: ObjectMapper,
 ) {
     fun findByJournalpost(journalpostId: String): InntektsmeldingEntitet? = repository.findByJournalpost(journalpostId)
 
@@ -37,21 +35,21 @@ class InntektsmeldingService(
         )
     }
 
-    fun hentRefusjonskrav(inntektsmeldingIder: List<UUID>): List<InntektsmeldingRefusjonskrav> {
-        val distinkteInntektsmeldingIder = inntektsmeldingIder.distinct()
+    fun hentRefusjonskrav(inntektsmeldingIder: Set<UUID>): List<InntektsmeldingRefusjonskrav> =
+        repository
+            .findByUuids(inntektsmeldingIder.map { it.toString() })
+            .associateBy { it.uuid.let(UUID::fromString) }
+            .map {
+                val inntektsmelding = InntektsmeldingJsonMapper.fromJson(it.value.data, it.value.fnr)
 
-        val inntektsmeldingerFunnet =
-            repository
-                .findByUuids(distinkteInntektsmeldingIder.map { it.toString() })
-                .associateBy { it.uuid }
-
-        return distinkteInntektsmeldingIder.mapNotNull { id ->
-            inntektsmeldingerFunnet[id.toString()]?.let {
                 InntektsmeldingRefusjonskrav(
-                    inntektsmeldingId = id,
-                    refusjonskrav = toInntektsmelding(it, objectMapper).tilRefusjonskrav(id.toString()),
+                    inntektsmeldingId = it.key,
+                    refusjonskrav =
+                        tilRefusjonskrav(
+                            inntektsmelding.refusjon,
+                            inntektsmelding.endringerIRefusjon,
+                            it.key.toString(),
+                        ),
                 )
             }
-        }
-    }
 }

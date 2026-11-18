@@ -4,7 +4,7 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon
 import java.util.UUID
 
 data class RefusjonskravRequest(
-    val inntektsmeldingIder: List<UUID>,
+    val inntektsmeldingIder: Set<UUID>,
 )
 
 data class InntektsmeldingRefusjonskrav(

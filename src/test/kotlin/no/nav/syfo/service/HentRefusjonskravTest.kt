@@ -20,7 +20,7 @@ import java.util.UUID
 class HentRefusjonskravTest {
     private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
     private val repository = mockk<InntektsmeldingRepository>()
-    private val service = InntektsmeldingService(repository, objectMapper)
+    private val service = InntektsmeldingService(repository)
 
     private val kjentId = UUID.randomUUID()
     private val ukjentId = UUID.randomUUID()
@@ -37,7 +37,7 @@ class HentRefusjonskravTest {
             )
         every { repository.findByUuids(listOf(kjentId.toString(), ukjentId.toString())) } returns listOf(entitet)
 
-        val resultat = service.hentRefusjonskrav(listOf(kjentId, ukjentId, kjentId))
+        val resultat = service.hentRefusjonskrav(setOf(kjentId, ukjentId, kjentId))
 
         assertEquals(listOf(kjentId), resultat.map { it.inntektsmeldingId })
         assertEquals(1000.0, resultat[0].refusjonskrav?.beloepPerMaaned)
@@ -55,7 +55,7 @@ class HentRefusjonskravTest {
             )
         every { repository.findByUuids(listOf(kjentId.toString())) } returns listOf(entitet)
 
-        val resultat = service.hentRefusjonskrav(listOf(kjentId))
+        val resultat = service.hentRefusjonskrav(setOf(kjentId))
 
         assertEquals(listOf(InntektsmeldingRefusjonskrav(kjentId, null)), resultat)
     }
@@ -63,6 +63,6 @@ class HentRefusjonskravTest {
     @Test
     fun `tom liste gir tom liste`() {
         every { repository.findByUuids(emptyList()) } returns emptyList()
-        assertTrue(service.hentRefusjonskrav(emptyList()).isEmpty())
+        assertTrue(service.hentRefusjonskrav(emptySet()).isEmpty())
     }
 }
