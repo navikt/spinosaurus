@@ -3,6 +3,7 @@ package no.nav.syfo.util
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
+import no.nav.syfo.utsattoppgave.UtsattOppgaveDTO
 
 private val objectMapper = customObjectMapper()
 
@@ -18,4 +19,8 @@ object InntektsmeldingJsonMapper {
             .copy(
                 fnr = fnr.verdi,
             )
+}
+
+object UtsattOppgaveJsonMapper {
+    fun fromJson(json: String): UtsattOppgaveDTO = objectMapper.readValue(json)
 }

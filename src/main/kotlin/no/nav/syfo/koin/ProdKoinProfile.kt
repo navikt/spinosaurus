@@ -17,7 +17,7 @@ import no.nav.syfo.prosesser.LeaderElectionBakgrunnsjobbProcessor
 import no.nav.syfo.repository.InntektsmeldingRepository
 import no.nav.syfo.repository.InntektsmeldingRepositoryImp
 import no.nav.syfo.repository.UtsattOppgaveRepositoryImp
-import no.nav.syfo.service.BehandlendeEnhetConsumer
+import no.nav.syfo.service.BehandlendeEnhetService
 import no.nav.syfo.service.InntektsmeldingService
 import no.nav.syfo.simba.InntektsmeldingConsumer
 import no.nav.syfo.util.Metrikk
@@ -52,7 +52,7 @@ fun prodConfig(config: ApplicationConfig) =
         } bind DataSource::class
 
         single { Metrikk() }
-        single { BehandlendeEnhetConsumer(get(), get(), get()) }
+        single { BehandlendeEnhetService(get(), get(), get()) }
         single { InntektsmeldingRepositoryImp(get()) } bind InntektsmeldingRepository::class
         single { InntektsmeldingService(get()) }
 
@@ -60,7 +60,6 @@ fun prodConfig(config: ApplicationConfig) =
             UtsattOppgaveConsumer(
                 props = utsattOppgaveAivenProperties(),
                 topicName = config.getString("kafka_utsatt_oppgave_topic"),
-                om = get(),
                 utsattOppgaveService = get(),
                 bakgrunnsjobbRepo = get(),
             )
@@ -78,23 +77,21 @@ fun prodConfig(config: ApplicationConfig) =
             UtsattOppgaveService(
                 utsattOppgaveDAO = get(),
                 oppgaveService = get(),
-                behandlendeEnhetConsumer = get(),
+                behandlendeEnhetService = get(),
                 inntektsmeldingRepository = get(),
-                om = get(),
                 metrikk = get(),
             )
         }
 
-        single { FeiletUtsattOppgaveMeldingProsessor(om = get(), oppgaveService = get()) }
+        single { FeiletUtsattOppgaveMeldingProsessor(oppgaveService = get()) }
 
         single {
             FinnAlleUtgaandeOppgaverProcessor(
                 utsattOppgaveDAO = get(),
                 oppgaveService = get(),
-                behandlendeEnhetConsumer = get(),
+                behandlendeEnhetService = get(),
                 metrikk = get(),
                 inntektsmeldingRepository = get(),
-                om = get(),
             )
         }
 

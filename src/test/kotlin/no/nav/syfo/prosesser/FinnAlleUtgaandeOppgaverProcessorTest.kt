@@ -11,9 +11,8 @@ import no.nav.syfo.client.oppgave.OppgaveService
 import no.nav.syfo.domain.OppgaveResultat
 import no.nav.syfo.dto.Tilstand
 import no.nav.syfo.isEqualNullSafe
-import no.nav.syfo.koin.buildObjectMapper
 import no.nav.syfo.repository.InntektsmeldingRepository
-import no.nav.syfo.service.BehandlendeEnhetConsumer
+import no.nav.syfo.service.BehandlendeEnhetService
 import no.nav.syfo.utsattoppgave.UtsattOppgaveDAO
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,17 +22,17 @@ import kotlin.random.Random
 class FinnAlleUtgaandeOppgaverProcessorTest {
     val utsattOppgaveDAO: UtsattOppgaveDAO = mockk(relaxed = true)
     val oppgaveService: OppgaveService = mockk(relaxed = true)
-    val behandlendeEnhetConsumer: BehandlendeEnhetConsumer = mockk(relaxed = true)
+    val behandlendeEnhetService: BehandlendeEnhetService = mockk(relaxed = true)
     val inntektsmeldingRepository: InntektsmeldingRepository = mockk(relaxed = true)
 
     val processor =
+
         FinnAlleUtgaandeOppgaverProcessor(
             utsattOppgaveDAO = utsattOppgaveDAO,
             oppgaveService = oppgaveService,
-            behandlendeEnhetConsumer = behandlendeEnhetConsumer,
+            behandlendeEnhetService = behandlendeEnhetService,
             metrikk = mockk(relaxed = true),
             inntektsmeldingRepository = inntektsmeldingRepository,
-            om = buildObjectMapper(),
         )
 
     val oppgave = UtsattOppgaveTestData.oppgave
@@ -44,7 +43,7 @@ class FinnAlleUtgaandeOppgaverProcessorTest {
         clearAllMocks()
         every { utsattOppgaveDAO.finnAlleUtgaatteOppgaver() } returns listOf(oppgave)
         coEvery { oppgaveService.opprettOppgave(any(), any(), any(), any()) } returns OppgaveResultat(Random.nextInt(), false, false)
-        every { behandlendeEnhetConsumer.gjelderUtland(any()) } returns false
+        every { behandlendeEnhetService.gjelderUtland(any()) } returns false
         every { inntektsmeldingRepository.findByUuid(any()) } returns UtsattOppgaveTestData.inntektsmeldingEntitet
     }
 

@@ -1,6 +1,5 @@
 package no.nav.syfo.integration.kafka
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -19,7 +18,6 @@ import java.util.UUID
 
 class UtsattOppgaveConsumerTest {
     lateinit var consumer: UtsattOppgaveConsumer
-    val om: ObjectMapper = mockk(relaxed = true)
     val props = kafkaConsumerTestProps().toMap()
     val utsattOppgaveService: UtsattOppgaveService = mockk(relaxed = true)
     val bakgrunnsjobbRepo: BakgrunnsjobbRepository = mockk(relaxed = true)
@@ -30,7 +28,7 @@ class UtsattOppgaveConsumerTest {
 
     @BeforeEach
     fun before() {
-        consumer = UtsattOppgaveConsumer(props, topicName, om, utsattOppgaveService, bakgrunnsjobbRepo)
+        consumer = UtsattOppgaveConsumer(props, topicName, utsattOppgaveService, bakgrunnsjobbRepo)
     }
 
     @Test

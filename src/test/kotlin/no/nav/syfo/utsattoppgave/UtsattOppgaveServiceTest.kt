@@ -11,9 +11,8 @@ import no.nav.syfo.client.oppgave.OppgaveService
 import no.nav.syfo.domain.OppgaveResultat
 import no.nav.syfo.dto.Tilstand
 import no.nav.syfo.isEqualNullSafe
-import no.nav.syfo.koin.buildObjectMapper
 import no.nav.syfo.repository.InntektsmeldingRepository
-import no.nav.syfo.service.BehandlendeEnhetConsumer
+import no.nav.syfo.service.BehandlendeEnhetService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -23,16 +22,15 @@ import kotlin.random.Random
 class UtsattOppgaveServiceTest {
     val utsattOppgaveDAO: UtsattOppgaveDAO = mockk(relaxed = true)
     val oppgaveService: OppgaveService = mockk(relaxed = true)
-    val behandlendeEnhetConsumer: BehandlendeEnhetConsumer = mockk(relaxed = true)
+    val behandlendeEnhetService: BehandlendeEnhetService = mockk(relaxed = true)
     val inntektsmeldingRepository: InntektsmeldingRepository = mockk(relaxed = true)
 
     val utsattOppgaveService =
         UtsattOppgaveService(
             utsattOppgaveDAO = utsattOppgaveDAO,
             oppgaveService = oppgaveService,
-            behandlendeEnhetConsumer = behandlendeEnhetConsumer,
+            behandlendeEnhetService = behandlendeEnhetService,
             inntektsmeldingRepository = inntektsmeldingRepository,
-            om = buildObjectMapper(),
             metrikk = mockk(relaxed = true),
         )
 
@@ -44,7 +42,7 @@ class UtsattOppgaveServiceTest {
         clearAllMocks()
         every { utsattOppgaveDAO.finn(any()) } returns oppgave
         coEvery { oppgaveService.opprettOppgave(any(), any(), any(), any()) } returns OppgaveResultat(Random.nextInt(), false, false)
-        every { behandlendeEnhetConsumer.gjelderUtland(any()) } returns false
+        every { behandlendeEnhetService.gjelderUtland(any()) } returns false
         every { inntektsmeldingRepository.findByUuid(any()) } returns UtsattOppgaveTestData.inntektsmeldingEntitet
     }
 

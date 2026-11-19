@@ -17,7 +17,7 @@ import no.nav.syfo.util.Metrikk
 const val SYKEPENGER_UTLAND = "4474"
 const val SYKEPENGER = "SYK"
 
-class BehandlendeEnhetConsumer(
+class BehandlendeEnhetService(
     private val pdlClient: PdlClient,
     private val norg2Client: Norg2Client,
     private val metrikk: Metrikk,

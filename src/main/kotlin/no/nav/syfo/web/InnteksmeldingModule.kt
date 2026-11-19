@@ -21,7 +21,9 @@ import no.nav.syfo.web.api.syfoinntektsmelding
 import org.koin.ktor.ext.get
 
 fun Application.inntektsmeldingModule(config: ApplicationConfig = environment.config) {
-    val allowList = config.getString("aad_preauthorized_apps").let { customObjectMapper().readTree(it) }.map { it["clientId"].asText() }
+    val objectMapper = customObjectMapper()
+
+    val allowList = config.getString("aad_preauthorized_apps").let { objectMapper.readTree(it) }.map { it["clientId"].asText() }
 
     install(Authentication) {
         tokenValidationSupport(
@@ -34,7 +36,7 @@ fun Application.inntektsmeldingModule(config: ApplicationConfig = environment.co
         )
     }
     install(ContentNegotiation) {
-        register(ContentType.Application.Json, JacksonConverter(customObjectMapper()))
+        register(ContentType.Application.Json, JacksonConverter(objectMapper))
         // Kan denne fjernes? JavaTimeModule er allerede registrert i customObjectMapper
         jackson {
             registerModule(JavaTimeModule())
@@ -45,7 +47,7 @@ fun Application.inntektsmeldingModule(config: ApplicationConfig = environment.co
         route("/api/v1") {
             authenticate {
                 route("/inntektsmelding") {
-                    syfoinntektsmelding(get(), customObjectMapper())
+                    syfoinntektsmelding(get())
                     refusjonskrav(get())
                 }
             }
