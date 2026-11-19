@@ -11,7 +11,7 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding as Inn
 class InntektsmeldingService(
     private val repository: InntektsmeldingRepository,
 ) {
-    fun findByJournalpost(journalpostId: String): InntektsmeldingEntitet? = repository.findByJournalpost(journalpostId)
+    fun findById(inntektsmeldingId: UUID): InntektsmeldingEntitet? = repository.findByUuid(inntektsmeldingId.toString())
 
     fun lagreBehandling(
         inntektsmeldingFraSimba: InntektsmeldingFraSimba,

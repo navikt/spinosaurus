@@ -15,8 +15,6 @@ interface InntektsmeldingRepository {
         behandlet: LocalDateTime,
     )
 
-    fun findByJournalpost(journalpostId: String): InntektsmeldingEntitet?
-
     fun findByUuid(uuid: String): InntektsmeldingEntitet?
 
     fun findByUuids(uuids: List<String>): List<InntektsmeldingEntitet>
@@ -40,30 +38,12 @@ class InntektsmeldingRepositoryMock : InntektsmeldingRepository {
 
     override fun findByUuids(uuids: List<String>): List<InntektsmeldingEntitet> = mockrepo.filter { it.uuid in uuids }
 
-    override fun findByJournalpost(journalpostId: String): InntektsmeldingEntitet? {
-        TODO("Not yet implemented")
-    }
-
     override fun deleteAll() {}
 }
 
 class InntektsmeldingRepositoryImp(
     private val ds: DataSource,
 ) : InntektsmeldingRepository {
-    override fun findByJournalpost(journalpostId: String): InntektsmeldingEntitet? {
-        val findByAktorId = "SELECT * FROM INNTEKTSMELDING WHERE JOURNALPOST_ID = ?;"
-
-        return ds.connection.use {
-            val res =
-                it
-                    .prepareStatement(findByAktorId)
-                    .apply {
-                        setString(1, journalpostId)
-                    }.executeQuery()
-            resultLoop(res).firstOrNull()
-        }
-    }
-
     override fun findByUuid(uuid: String): InntektsmeldingEntitet? = findByUuids(listOf(uuid)).firstOrNull()
 
     override fun findByUuids(uuids: List<String>): List<InntektsmeldingEntitet> {
