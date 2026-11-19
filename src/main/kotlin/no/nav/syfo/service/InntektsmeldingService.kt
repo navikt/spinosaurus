@@ -46,9 +46,9 @@ class InntektsmeldingService(
                     inntektsmeldingId = it.key,
                     refusjonskrav =
                         tilRefusjonskrav(
-                            inntektsmelding.refusjon,
-                            inntektsmelding.endringerIRefusjon,
-                            it.key.toString(),
+                            refusjon = inntektsmelding.refusjon,
+                            endringerIRefusjon = inntektsmelding.endringerIRefusjon,
+                            inntektsmeldingId = it.key.toString(),
                         ),
                 )
             }
