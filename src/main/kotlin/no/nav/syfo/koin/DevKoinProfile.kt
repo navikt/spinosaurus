@@ -54,7 +54,7 @@ fun devConfig(config: ApplicationConfig) =
         single { Metrikk() }
         single { BehandlendeEnhetConsumer(pdlClient = get(), norg2Client = get(), metrikk = get()) }
         single { InntektsmeldingRepositoryImp(ds = get()) } bind InntektsmeldingRepository::class
-        single { InntektsmeldingService(repository = get(), objectMapper = get()) }
+        single { InntektsmeldingService(repository = get()) }
 
         single {
             UtsattOppgaveConsumer(

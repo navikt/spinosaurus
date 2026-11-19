@@ -1,11 +1,16 @@
 package no.nav.syfo.mapping
 
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring
 import no.nav.helsearbeidsgiver.utils.log.logger
-import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
+import no.nav.syfo.domain.inntektsmelding.EndringIRefusjon
+import no.nav.syfo.domain.inntektsmelding.Refusjon
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon as RefusjonSimba
 
-fun Inntektsmelding.tilRefusjonskrav(inntektsmeldingId: String): Refusjon? {
+fun tilRefusjonskrav(
+    refusjon: Refusjon,
+    endringerIRefusjon: List<EndringIRefusjon>,
+    inntektsmeldingId: String,
+): RefusjonSimba? {
     val beloepPerMaaned = refusjon.beloepPrMnd?.toDouble() ?: return null
 
     val refusjonsendringer =
@@ -17,12 +22,12 @@ fun Inntektsmelding.tilRefusjonskrav(inntektsmeldingId: String): Refusjon? {
 
     val refusjonsopphoer = refusjon.opphoersdato?.let { RefusjonEndring(0.0, it) }
 
-    return Refusjon(
+    return RefusjonSimba(
         beloepPerMaaned = beloepPerMaaned,
         endringer =
             refusjonsendringer
                 .adderHvisIkkeKollisjon(refusjonsopphoer) {
-                    logger().warn(
+                    "refusjonskrav".logger().warn(
                         "Opphørsdato ${refusjonsopphoer?.startdato} kolliderer med refusjonsendring for inntektsmelding $inntektsmeldingId. " +
                             "Opphørsdato ignoreres og refusjonsendring beholdes.",
                     )

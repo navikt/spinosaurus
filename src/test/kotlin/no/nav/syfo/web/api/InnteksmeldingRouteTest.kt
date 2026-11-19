@@ -24,13 +24,13 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon as Refusjonsk
 class InnteksmeldingRouteTest {
     val inntektsmeldingService = mockk<InntektsmeldingService>(relaxed = true)
 
-    private fun refusjonskravRequest(ider: List<UUID>) = jacksonObjectMapper().writeValueAsString(RefusjonskravRequest(ider))
+    private fun refusjonskravRequest(ider: Set<UUID>) = jacksonObjectMapper().writeValueAsString(RefusjonskravRequest(ider))
 
     @Test
     fun refusjonskravReturnerer200() {
         val a = UUID.randomUUID()
         val b = UUID.randomUUID()
-        every { inntektsmeldingService.hentRefusjonskrav(listOf(a, b)) } returns
+        every { inntektsmeldingService.hentRefusjonskrav(setOf(a, b)) } returns
             listOf(
                 InntektsmeldingRefusjonskrav(a, Refusjonskrav(100.0, emptyList())),
                 InntektsmeldingRefusjonskrav(b, null),
@@ -43,7 +43,7 @@ class InnteksmeldingRouteTest {
             val response =
                 client.post("/refusjonskrav") {
                     contentType(io.ktor.http.ContentType.Application.Json)
-                    setBody(refusjonskravRequest(listOf(a, b)))
+                    setBody(refusjonskravRequest(setOf(a, b)))
                 }
             assertEquals(HttpStatusCode.OK, response.status)
             val json = jacksonObjectMapper().readTree(response.bodyAsText())
@@ -71,7 +71,7 @@ class InnteksmeldingRouteTest {
 
     @Test
     fun refusjonskravTomListeGir200MedTomListe() {
-        every { inntektsmeldingService.hentRefusjonskrav(emptyList()) } returns emptyList()
+        every { inntektsmeldingService.hentRefusjonskrav(emptySet()) } returns emptyList()
         testApplication {
             application {
                 install(ContentNegotiation) { jackson { registerModule(JavaTimeModule()) } }
@@ -80,7 +80,7 @@ class InnteksmeldingRouteTest {
             val response =
                 client.post("/refusjonskrav") {
                     contentType(io.ktor.http.ContentType.Application.Json)
-                    setBody(refusjonskravRequest(emptyList()))
+                    setBody(refusjonskravRequest(emptySet()))
                 }
             assertEquals(HttpStatusCode.OK, response.status)
             assertEquals("[]", response.bodyAsText().replace(Regex("\\s"), ""))

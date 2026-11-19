@@ -99,7 +99,7 @@ fun localDevConfig(config: ApplicationConfig) =
         single { FeiletUtsattOppgaveMeldingProsessor(om = get(), oppgaveService = get()) }
 
         single { Metrikk() } bind Metrikk::class
-        single { InntektsmeldingService(InntektsmeldingRepositoryImp(ds = get()), get()) }
+        single { InntektsmeldingService(InntektsmeldingRepositoryImp(ds = get())) }
 
         single {
             InntektsmeldingAivenProducer(producerLocalProperties(config.getString("kafka_bootstrap_servers")))

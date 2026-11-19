@@ -54,7 +54,7 @@ fun prodConfig(config: ApplicationConfig) =
         single { Metrikk() }
         single { BehandlendeEnhetConsumer(get(), get(), get()) }
         single { InntektsmeldingRepositoryImp(get()) } bind InntektsmeldingRepository::class
-        single { InntektsmeldingService(get(), get()) }
+        single { InntektsmeldingService(get()) }
 
         single {
             UtsattOppgaveConsumer(
