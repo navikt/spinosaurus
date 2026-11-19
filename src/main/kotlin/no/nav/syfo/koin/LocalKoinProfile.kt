@@ -21,7 +21,7 @@ import no.nav.syfo.repository.UtsattOppgaveRepository
 import no.nav.syfo.repository.UtsattOppgaveRepositoryImp
 import no.nav.syfo.repository.UtsattOppgaveRepositoryMockk
 import no.nav.syfo.repository.createHikariConfig
-import no.nav.syfo.service.BehandlendeEnhetConsumer
+import no.nav.syfo.service.BehandlendeEnhetService
 import no.nav.syfo.service.InntektsmeldingService
 import no.nav.syfo.simba.InntektsmeldingConsumer
 import no.nav.syfo.util.Metrikk
@@ -54,10 +54,9 @@ fun localDevConfig(config: ApplicationConfig) =
             FinnAlleUtgaandeOppgaverProcessor(
                 utsattOppgaveDAO = get(),
                 oppgaveService = get(),
-                behandlendeEnhetConsumer = get(),
+                behandlendeEnhetService = get(),
                 metrikk = get(),
                 inntektsmeldingRepository = get(),
-                om = get(),
             )
         }
 
@@ -73,14 +72,13 @@ fun localDevConfig(config: ApplicationConfig) =
             UtsattOppgaveConsumer(
                 props = utsattOppgaveLocalProperties(),
                 topicName = config.getString("kafka_utsatt_oppgave_topic"),
-                om = get(),
                 utsattOppgaveService = get(),
                 bakgrunnsjobbRepo = get(),
             )
         }
         single { PostgresBakgrunnsjobbRepository(dataSource = get()) } bind BakgrunnsjobbRepository::class
         single { BakgrunnsjobbService(bakgrunnsjobbRepository = get()) }
-        single { BehandlendeEnhetConsumer(pdlClient = get(), norg2Client = get(), metrikk = get()) }
+        single { BehandlendeEnhetService(pdlClient = get(), norg2Client = get(), metrikk = get()) }
         single { UtsattOppgaveDAO(utsattOppgaveRepository = UtsattOppgaveRepositoryMockk()) }
 
         single { OppgaveService(oppgaveClient = get(), metrikk = get()) }
@@ -90,13 +88,12 @@ fun localDevConfig(config: ApplicationConfig) =
             UtsattOppgaveService(
                 utsattOppgaveDAO = get(),
                 oppgaveService = get(),
-                behandlendeEnhetConsumer = get(),
+                behandlendeEnhetService = get(),
                 inntektsmeldingRepository = get(),
-                om = get(),
                 metrikk = get(),
             )
         }
-        single { FeiletUtsattOppgaveMeldingProsessor(om = get(), oppgaveService = get()) }
+        single { FeiletUtsattOppgaveMeldingProsessor(oppgaveService = get()) }
 
         single { Metrikk() } bind Metrikk::class
         single { InntektsmeldingService(InntektsmeldingRepositoryImp(ds = get())) }

@@ -5,8 +5,8 @@ import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.syfo.dto.InntektsmeldingEntitet
 import no.nav.syfo.dto.Tilstand
 import no.nav.syfo.dto.UtsattOppgaveEntitet
-import no.nav.syfo.koin.buildObjectMapper
 import no.nav.syfo.repository.buildIM
+import no.nav.syfo.util.InntektsmeldingJsonMapper
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -37,10 +37,10 @@ object UtsattOppgaveTestData {
             uuid = UUID.randomUUID().toString(),
             aktorId = "aktoerid-123",
             fnr = Fnr.genererGyldig(),
-            data = buildObjectMapper().writeValueAsString(buildIM()),
+            data = InntektsmeldingJsonMapper.toJson(buildIM()),
         )
     val inntektsmeldingEntitetIkkeFravaer =
         inntektsmeldingEntitet.copy(
-            data = buildObjectMapper().writeValueAsString(buildIM().copy(begrunnelseRedusert = "IkkeFravaer")),
+            data = InntektsmeldingJsonMapper.toJson(buildIM().copy(begrunnelseRedusert = "IkkeFravaer")),
         )
 }

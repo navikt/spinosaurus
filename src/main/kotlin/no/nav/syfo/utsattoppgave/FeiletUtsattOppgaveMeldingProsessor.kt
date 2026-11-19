@@ -1,18 +1,16 @@
 package no.nav.syfo.utsattoppgave
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.hag.utils.bakgrunnsjobb.Bakgrunnsjobb
 import no.nav.hag.utils.bakgrunnsjobb.BakgrunnsjobbProsesserer
 import no.nav.helsearbeidsgiver.utils.log.MdcUtils
 import no.nav.helsearbeidsgiver.utils.log.logger
+import no.nav.syfo.util.UtsattOppgaveJsonMapper
 
 /**
  * En bakgrunnsjobb som tar feilede meldinger ang utsatt oppgave og prøver å prosessere dem på nytt
  */
 
 class FeiletUtsattOppgaveMeldingProsessor(
-    private val om: ObjectMapper,
     val oppgaveService: UtsattOppgaveService,
 ) : BakgrunnsjobbProsesserer {
     private val logger = this.logger()
@@ -24,7 +22,7 @@ class FeiletUtsattOppgaveMeldingProsessor(
     }
 
     override fun prosesser(jobb: Bakgrunnsjobb) {
-        val utsattOppgaveOppdatering = om.readValue<UtsattOppgaveDTO>(jobb.data)
+        val utsattOppgaveOppdatering = UtsattOppgaveJsonMapper.fromJson(jobb.data)
         val oppdatering =
             OppgaveOppdatering(
                 utsattOppgaveOppdatering.dokumentId,

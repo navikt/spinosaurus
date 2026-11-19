@@ -1,7 +1,5 @@
 package no.nav.syfo.utsattoppgave
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.coroutines.runBlocking
 import no.nav.helsearbeidsgiver.utils.log.logger
 import no.nav.helsearbeidsgiver.utils.log.sikkerLogger
@@ -12,7 +10,8 @@ import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 import no.nav.syfo.dto.Tilstand
 import no.nav.syfo.dto.UtsattOppgaveEntitet
 import no.nav.syfo.repository.InntektsmeldingRepository
-import no.nav.syfo.service.BehandlendeEnhetConsumer
+import no.nav.syfo.service.BehandlendeEnhetService
+import no.nav.syfo.util.InntektsmeldingJsonMapper
 import no.nav.syfo.util.Metrikk
 import java.time.LocalDateTime
 import java.util.UUID
@@ -20,9 +19,8 @@ import java.util.UUID
 class UtsattOppgaveService(
     private val utsattOppgaveDAO: UtsattOppgaveDAO,
     private val oppgaveService: OppgaveService,
-    private val behandlendeEnhetConsumer: BehandlendeEnhetConsumer,
+    private val behandlendeEnhetService: BehandlendeEnhetService,
     private val inntektsmeldingRepository: InntektsmeldingRepository,
-    private val om: ObjectMapper,
     private val metrikk: Metrikk,
 ) {
     private val logger = this.logger()
@@ -73,9 +71,9 @@ class UtsattOppgaveService(
             (Tilstand.Forkastet to Handling.Opprett),
             -> {
                 inntektsmeldingRepository
-                    .hentInntektsmelding(oppgave.inntektsmeldingId, om)
+                    .hentInntektsmelding(oppgave.inntektsmeldingId)
                     .onSuccess { inntektsmelding ->
-                        val gjelderUtland = behandlendeEnhetConsumer.gjelderUtland(oppgave)
+                        val gjelderUtland = behandlendeEnhetService.gjelderUtland(oppgave)
                         val behandlingsKategori = finnBehandlingsKategori(inntektsmelding, oppgave.speil, gjelderUtland)
                         if (behandlingsKategori != BehandlingsKategori.IKKE_FRAVAER) {
                             val resultat = oppgaveService.opprettOppgaveIGosys(oppgave, behandlingsKategori, inntektsmelding)
@@ -134,13 +132,10 @@ class UtsattOppgaveService(
     }
 }
 
-fun InntektsmeldingRepository.hentInntektsmelding(
-    inntektsmeldingId: String,
-    om: ObjectMapper,
-): Result<Inntektsmelding> {
-    val inntektsmeldingData = this.findByUuid(inntektsmeldingId)?.data
-    return if (inntektsmeldingData != null) {
-        Result.success(om.readValue<Inntektsmelding>(inntektsmeldingData))
+fun InntektsmeldingRepository.hentInntektsmelding(inntektsmeldingId: String): Result<Inntektsmelding> {
+    val inntektsmeldingDto = this.findByUuid(inntektsmeldingId)
+    return if (inntektsmeldingDto != null) {
+        Result.success(InntektsmeldingJsonMapper.fromJson(inntektsmeldingDto.data, inntektsmeldingDto.fnr))
     } else {
         Result.failure(Exception("Fant ikke inntektsmelding for ID '$inntektsmeldingId'."))
     }

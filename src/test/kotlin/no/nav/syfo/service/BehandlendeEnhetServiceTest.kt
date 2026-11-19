@@ -19,7 +19,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class BehandlendeEnhetConsumerTest {
+class BehandlendeEnhetServiceTest {
     val pdlClient = mockk<PdlClient>(relaxed = true)
     val norg2Client = mockk<Norg2Client>(relaxed = true)
     val metrikk = mockk<Metrikk>(relaxed = true)
@@ -40,7 +40,7 @@ class BehandlendeEnhetConsumerTest {
                 norg2Client.hentAlleArbeidsfordelinger(any(), any())
             }
         } returns arbeidsfordelinger
-        val enhet = BehandlendeEnhetConsumer(pdlClient, norg2Client, metrikk).gjelderUtland(mockUtsattOppgave())
+        val enhet = BehandlendeEnhetService(pdlClient, norg2Client, metrikk).gjelderUtland(mockUtsattOppgave())
         Assertions.assertThat(enhet).isEqualTo(true)
     }
 

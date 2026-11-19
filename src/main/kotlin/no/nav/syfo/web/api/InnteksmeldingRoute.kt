@@ -1,6 +1,5 @@
 package no.nav.syfo.web.api
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receive
@@ -11,15 +10,12 @@ import io.ktor.server.routing.post
 import no.nav.helsearbeidsgiver.utils.log.logger
 import no.nav.helsearbeidsgiver.utils.log.sikkerLogger
 import no.nav.syfo.mapping.mapInntektsmeldingKontrakt
-import no.nav.syfo.mapping.toInntektsmelding
 import no.nav.syfo.repository.InntektsmeldingRepository
 import no.nav.syfo.service.InntektsmeldingService
+import no.nav.syfo.util.InntektsmeldingJsonMapper
 import no.nav.syfo.util.validerInntektsmelding
 
-fun Route.syfoinntektsmelding(
-    imRepo: InntektsmeldingRepository,
-    om: ObjectMapper,
-) {
+fun Route.syfoinntektsmelding(imRepo: InntektsmeldingRepository) {
     get("/{inntektsmeldingId}") {
         val inntektsmeldingId =
             call.parameters["inntektsmeldingId"] ?: throw IllegalArgumentException(
@@ -30,7 +26,7 @@ fun Route.syfoinntektsmelding(
         try {
             val dto = imRepo.findByUuid(inntektsmeldingId)
             if (dto != null) {
-                val inntektsmelding = toInntektsmelding(dto, om)
+                val inntektsmelding = InntektsmeldingJsonMapper.fromJson(dto.data, dto.fnr)
 
                 val mappedInntektsmelding =
                     mapInntektsmeldingKontrakt(
@@ -67,7 +63,7 @@ fun Route.refusjonskrav(inntektsmeldingService: InntektsmeldingService) {
         try {
             val request = call.receive<RefusjonskravRequest>()
             call.respond(HttpStatusCode.OK, inntektsmeldingService.hentRefusjonskrav(request.inntektsmeldingIder))
-        } catch (e: BadRequestException) {
+        } catch (_: BadRequestException) {
             call.respond(
                 HttpStatusCode.BadRequest,
                 mapOf("code" to HttpStatusCode.BadRequest.value, "message" to "Ugyldig request. Forventet liste med inntektsmelding-UUIDer"),

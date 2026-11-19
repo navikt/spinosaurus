@@ -1,6 +1,5 @@
 package no.nav.syfo.prosesser
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import no.nav.hag.utils.bakgrunnsjobb.RecurringJob
@@ -9,7 +8,7 @@ import no.nav.syfo.behandling.OpprettOppgaveException
 import no.nav.syfo.client.oppgave.OppgaveService
 import no.nav.syfo.dto.Tilstand
 import no.nav.syfo.repository.InntektsmeldingRepository
-import no.nav.syfo.service.BehandlendeEnhetConsumer
+import no.nav.syfo.service.BehandlendeEnhetService
 import no.nav.syfo.util.Metrikk
 import no.nav.syfo.utsattoppgave.BehandlingsKategori
 import no.nav.syfo.utsattoppgave.UtsattOppgaveDAO
@@ -23,10 +22,9 @@ import java.time.LocalDateTime
 class FinnAlleUtgaandeOppgaverProcessor(
     private val utsattOppgaveDAO: UtsattOppgaveDAO,
     private val oppgaveService: OppgaveService,
-    private val behandlendeEnhetConsumer: BehandlendeEnhetConsumer,
+    private val behandlendeEnhetService: BehandlendeEnhetService,
     private val metrikk: Metrikk,
     private val inntektsmeldingRepository: InntektsmeldingRepository,
-    private val om: ObjectMapper,
 ) : RecurringJob(CoroutineScope(Dispatchers.IO), Duration.ofHours(6).toMillis()) {
     private val sikkerlogger = LoggerFactory.getLogger("tjenestekall")
 
@@ -37,7 +35,7 @@ class FinnAlleUtgaandeOppgaverProcessor(
                 .finnAlleUtgaatteOppgaver()
                 .forEach { oppgaveEntitet ->
                     inntektsmeldingRepository
-                        .hentInntektsmelding(oppgaveEntitet.inntektsmeldingId, om)
+                        .hentInntektsmelding(oppgaveEntitet.inntektsmeldingId)
                         .onFailure { e ->
                             "Fant ikke inntektsmelding for utsatt oppgave: ${oppgaveEntitet.arkivreferanse}".also {
                                 logger.error(it)
@@ -47,7 +45,7 @@ class FinnAlleUtgaandeOppgaverProcessor(
                         }.onSuccess { inntektsmelding ->
                             try {
                                 logger.info("Henter behandlende enhet for inntektsmelding: ${oppgaveEntitet.arkivreferanse}")
-                                val gjelderUtland = behandlendeEnhetConsumer.gjelderUtland(oppgaveEntitet)
+                                val gjelderUtland = behandlendeEnhetService.gjelderUtland(oppgaveEntitet)
 
                                 logger.info("Utleder behandlingskategori for inntektsmelding: ${oppgaveEntitet.arkivreferanse}")
                                 val behandlingsKategori = finnBehandlingsKategori(inntektsmelding, oppgaveEntitet.speil, gjelderUtland)

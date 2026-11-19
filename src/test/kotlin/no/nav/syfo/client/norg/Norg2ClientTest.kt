@@ -11,11 +11,10 @@ import io.ktor.http.headersOf
 import io.ktor.serialization.jackson.JacksonConverter
 import io.ktor.serialization.jackson.jackson
 import kotlinx.coroutines.runBlocking
-import no.nav.syfo.koin.buildObjectMapper
+import no.nav.helsearbeidsgiver.utils.test.json.removeJsonWhitespace
 import no.nav.syfo.util.customObjectMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
 
 class Norg2ClientTest {
     @Test
@@ -47,7 +46,7 @@ private fun buildHttpClientJson(): HttpClient =
         engine {
             addHandler {
                 respond(
-                    buildObjectMapper().writeValueAsString(lagResponse()),
+                    responseJson,
                     headers = headersOf("Content-Type" to listOf(ContentType.Application.Json.toString())),
                     status = HttpStatusCode.OK,
                 )
@@ -55,25 +54,27 @@ private fun buildHttpClientJson(): HttpClient =
         }
     }
 
-private fun lagResponse(): List<ArbeidsfordelingResponse> =
-    listOf(
-        ArbeidsfordelingResponse(
-            aktiveringsdato = LocalDate.of(2020, 12, 31),
-            antallRessurser = 0,
-            enhetId = 123456789,
-            enhetNr = "1234",
-            kanalstrategi = null,
-            navn = "NAV Område",
-            nedleggelsesdato = null,
-            oppgavebehandler = false,
-            orgNivaa = "SPESEN",
-            orgNrTilKommunaltNavKontor = "",
-            organisasjonsnummer = null,
-            sosialeTjenester = "",
-            status = "Aktiv",
-            type = "KO",
-            underAvviklingDato = null,
-            underEtableringDato = LocalDate.of(2020, 11, 30),
-            versjon = 1,
-        ),
-    )
+private val responseJson =
+    """
+    [
+        {
+            "aktiveringsdato": "2020-12-31",
+            "antallRessurser": 0,
+            "enhetId": 123456789,
+            "enhetNr": "1234",
+            "kanalstrategi": null,
+            "navn": "NAV Område",
+            "nedleggelsesdato": null,
+            "oppgavebehandler": false,
+            "orgNivaa": "SPESEN",
+            "orgNrTilKommunaltNavKontor": "",
+            "organisasjonsnummer": null,
+            "sosialeTjenester": "",
+            "status": "Aktiv",
+            "type": "KO",
+            "underAvviklingDato": null,
+            "underEtableringDato": "2020-11-30",
+            "versjon": 1
+        }
+    ]
+    """.removeJsonWhitespace()

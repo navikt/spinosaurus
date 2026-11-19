@@ -1,7 +1,5 @@
 package no.nav.syfo.integration.kafka
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.hag.utils.bakgrunnsjobb.Bakgrunnsjobb
 import no.nav.hag.utils.bakgrunnsjobb.BakgrunnsjobbRepository
 import no.nav.helsearbeidsgiver.utils.log.MdcUtils
@@ -9,6 +7,7 @@ import no.nav.helsearbeidsgiver.utils.log.logger
 import no.nav.helsearbeidsgiver.utils.log.sikkerLogger
 import no.nav.syfo.util.LivenessComponent
 import no.nav.syfo.util.ReadynessComponent
+import no.nav.syfo.util.UtsattOppgaveJsonMapper
 import no.nav.syfo.utsattoppgave.DokumentTypeDTO
 import no.nav.syfo.utsattoppgave.FeiletUtsattOppgaveMeldingProsessor
 import no.nav.syfo.utsattoppgave.OppgaveOppdatering
@@ -23,7 +22,6 @@ import java.time.LocalDateTime
 class UtsattOppgaveConsumer(
     props: Map<String, Any>,
     topicName: String,
-    val om: ObjectMapper,
     val utsattOppgaveService: UtsattOppgaveService,
     val bakgrunnsjobbRepo: BakgrunnsjobbRepository,
 ) : ReadynessComponent,
@@ -58,7 +56,7 @@ class UtsattOppgaveConsumer(
                     try {
                         val raw: String = record.value()
                         MdcUtils.withCallId {
-                            val utsattOppgaveDTO = om.readValue<UtsattOppgaveDTO>(raw)
+                            val utsattOppgaveDTO = UtsattOppgaveJsonMapper.fromJson(raw)
                             if (utsattOppgaveDTO.dokumentType == DokumentTypeDTO.Inntektsmelding) {
                                 behandle(utsattOppgaveDTO, raw)
                             }
@@ -90,7 +88,7 @@ class UtsattOppgaveConsumer(
                     hendelse.oppdateringstype,
                 ),
             )
-        } catch (ex: Exception) {
+        } catch (_: Exception) {
             logger.info("Det oppstod en feil ved behandling av UtsattOppgave. Oppretter bakgrunnsjobb.")
             bakgrunnsjobbRepo.save(
                 Bakgrunnsjobb(
