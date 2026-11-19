@@ -20,7 +20,6 @@ import java.time.LocalDate
 
 class OppgaveService(
     val oppgaveClient: OppgaveClient,
-    val metrikk: Metrikk,
 ) {
     private val logger = logger()
     private val sikkerlogger = sikkerLogger()
@@ -65,7 +64,7 @@ class OppgaveService(
         oppgaveBeskrivelse: String,
     ): OppgaveResultat {
         val eksisterendeOppgave = hentHvisOppgaveFinnes(journalpostId)
-        metrikk.tellOpprettOppgave(eksisterendeOppgave != null)
+        Metrikk.tellOpprettOppgave(eksisterendeOppgave != null)
         if (eksisterendeOppgave != null) {
             logger.info("Det finnes allerede journalføringsoppgave for journalpost $journalpostId")
             return eksisterendeOppgave

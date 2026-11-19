@@ -20,7 +20,6 @@ const val SYKEPENGER = "SYK"
 class BehandlendeEnhetService(
     private val pdlClient: PdlClient,
     private val norg2Client: Norg2Client,
-    private val metrikk: Metrikk,
 ) {
     private val logger = this.logger()
     private val sikkerlogger = sikkerLogger()
@@ -50,7 +49,7 @@ class BehandlendeEnhetService(
                     geografiskTilknytning.geografiskTilknytning,
                 )
             if (SYKEPENGER_UTLAND == behandlendeEnhet) {
-                metrikk.tellInntektsmeldingSykepengerUtland()
+                Metrikk.tellInntektsmeldingSykepengerUtland()
             }
             sikkerlogger.debug(
                 "Fant geografiskTilknytning ${geografiskTilknytning.geografiskTilknytning} med behandlendeEnhet $behandlendeEnhet for inntektsmelding $uuid",

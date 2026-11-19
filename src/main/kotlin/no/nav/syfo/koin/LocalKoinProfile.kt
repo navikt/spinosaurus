@@ -24,7 +24,6 @@ import no.nav.syfo.repository.createHikariConfig
 import no.nav.syfo.service.BehandlendeEnhetService
 import no.nav.syfo.service.InntektsmeldingService
 import no.nav.syfo.simba.InntektsmeldingConsumer
-import no.nav.syfo.util.Metrikk
 import no.nav.syfo.util.getString
 import no.nav.syfo.utsattoppgave.FeiletUtsattOppgaveMeldingProsessor
 import no.nav.syfo.utsattoppgave.UtsattOppgaveDAO
@@ -55,7 +54,6 @@ fun localDevConfig(config: ApplicationConfig) =
                 utsattOppgaveDAO = get(),
                 oppgaveService = get(),
                 behandlendeEnhetService = get(),
-                metrikk = get(),
                 inntektsmeldingRepository = get(),
             )
         }
@@ -78,10 +76,10 @@ fun localDevConfig(config: ApplicationConfig) =
         }
         single { PostgresBakgrunnsjobbRepository(dataSource = get()) } bind BakgrunnsjobbRepository::class
         single { BakgrunnsjobbService(bakgrunnsjobbRepository = get()) }
-        single { BehandlendeEnhetService(pdlClient = get(), norg2Client = get(), metrikk = get()) }
+        single { BehandlendeEnhetService(pdlClient = get(), norg2Client = get()) }
         single { UtsattOppgaveDAO(utsattOppgaveRepository = UtsattOppgaveRepositoryMockk()) }
 
-        single { OppgaveService(oppgaveClient = get(), metrikk = get()) }
+        single { OppgaveService(oppgaveClient = get()) }
         single { OppgaveClient(url = config.getString("oppgavebehandling_url"), getToken = { "local token" }) }
 
         single {
@@ -90,12 +88,10 @@ fun localDevConfig(config: ApplicationConfig) =
                 oppgaveService = get(),
                 behandlendeEnhetService = get(),
                 inntektsmeldingRepository = get(),
-                metrikk = get(),
             )
         }
         single { FeiletUtsattOppgaveMeldingProsessor(oppgaveService = get()) }
 
-        single { Metrikk() } bind Metrikk::class
         single { InntektsmeldingService(InntektsmeldingRepositoryImp(ds = get())) }
 
         single {

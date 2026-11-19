@@ -32,7 +32,7 @@ import java.time.LocalDate
 
 class OppgaveServiceTest {
     val oppgaveClient = mockk<OppgaveClient>()
-    val oppgaveService = OppgaveService(oppgaveClient, mockk(relaxed = true))
+    val oppgaveService = OppgaveService(oppgaveClient)
 
     @BeforeEach
     fun setUp() {

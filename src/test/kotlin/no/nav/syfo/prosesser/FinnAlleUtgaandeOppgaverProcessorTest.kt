@@ -31,7 +31,6 @@ class FinnAlleUtgaandeOppgaverProcessorTest {
             utsattOppgaveDAO = utsattOppgaveDAO,
             oppgaveService = oppgaveService,
             behandlendeEnhetService = behandlendeEnhetService,
-            metrikk = mockk(relaxed = true),
             inntektsmeldingRepository = inntektsmeldingRepository,
         )
 

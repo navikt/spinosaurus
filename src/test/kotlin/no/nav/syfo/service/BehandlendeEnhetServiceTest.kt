@@ -13,7 +13,6 @@ import no.nav.syfo.client.norg.ArbeidsfordelingResponse
 import no.nav.syfo.client.norg.Norg2Client
 import no.nav.syfo.dto.Tilstand
 import no.nav.syfo.dto.UtsattOppgaveEntitet
-import no.nav.syfo.util.Metrikk
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -22,7 +21,6 @@ import java.time.LocalDate
 class BehandlendeEnhetServiceTest {
     val pdlClient = mockk<PdlClient>(relaxed = true)
     val norg2Client = mockk<Norg2Client>(relaxed = true)
-    val metrikk = mockk<Metrikk>(relaxed = true)
 
     val fnr = "123456789"
     val uuid = "abcdefgh"
@@ -40,7 +38,7 @@ class BehandlendeEnhetServiceTest {
                 norg2Client.hentAlleArbeidsfordelinger(any(), any())
             }
         } returns arbeidsfordelinger
-        val enhet = BehandlendeEnhetService(pdlClient, norg2Client, metrikk).gjelderUtland(mockUtsattOppgave())
+        val enhet = BehandlendeEnhetService(pdlClient, norg2Client).gjelderUtland(mockUtsattOppgave())
         Assertions.assertThat(enhet).isEqualTo(true)
     }
 
