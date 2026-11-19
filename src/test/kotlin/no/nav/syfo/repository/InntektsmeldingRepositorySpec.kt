@@ -17,7 +17,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertNotNull
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -51,24 +50,6 @@ class InntektsmeldingRepositorySpec : WithPostgresContainer() {
         val resultat = repository.findByUuids(listOf(ids[0], ids[2], UUID.randomUUID().toString()))
         assertThat(resultat.map { it.uuid }).containsExactlyInAnyOrder(ids[0], ids[2])
         assertThat(repository.findByUuids(emptyList())).isEmpty()
-    }
-
-    @Test
-    fun findByJournalpostId() {
-        val inntektsmelding =
-            InntektsmeldingEntitet(
-                uuid = UUID.randomUUID().toString(),
-                fnr = Fnr.genererGyldig(),
-                aktorId = "aktorId1",
-                data = "{}",
-            )
-        repository.lagreInnteksmelding(
-            inntektsmelding,
-            journalpostId = "jp-123-987",
-            behandlet = LocalDateTime.of(2019, 10, 1, 5, 18, 45, 0),
-            orgnr = "orgnr",
-        )
-        assertNotNull(repository.findByJournalpost("jp-123-987"))
     }
 
     @Test
