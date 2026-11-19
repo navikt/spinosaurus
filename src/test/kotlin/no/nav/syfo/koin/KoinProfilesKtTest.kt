@@ -6,27 +6,18 @@ import io.mockk.mockk
 import no.nav.helsearbeidsgiver.pdl.PdlClient
 import no.nav.syfo.client.norg.Norg2Client
 import no.nav.syfo.client.oppgave.OppgaveService
-import no.nav.syfo.repository.InntektsmeldingRepository
 import no.nav.syfo.util.AppEnv
-import no.nav.syfo.util.Metrikk
 import org.junit.jupiter.api.Test
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
-import org.koin.core.module.Module
-import org.koin.dsl.bind
-import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
-import javax.sql.DataSource
 import kotlin.test.assertNotNull
 
 class KoinProfilesKtTest : KoinTest {
     val config = mockk<ApplicationConfig>(relaxed = true)
     val clientConfig = mockk<ApplicationConfig>(relaxed = true)
-    val metrikk = mockk<Metrikk>(relaxed = true)
 
-    val dataSource = mockk<DataSource>(relaxed = true)
-    val inntektsmeldingRepository: InntektsmeldingRepository by inject()
     val pdlClient: PdlClient by inject()
     val norg2Client: Norg2Client by inject()
     val oppgaveService: OppgaveService by inject()
@@ -36,7 +27,7 @@ class KoinProfilesKtTest : KoinTest {
         mockConfig(AppEnv.PROD)
 
         startKoin {
-            modules(selectModuleBasedOnProfile(config) + getTestModules())
+            modules(selectModuleBasedOnProfile(config))
         }
 
         assertKoin()
@@ -48,7 +39,7 @@ class KoinProfilesKtTest : KoinTest {
         mockConfig(AppEnv.DEV)
 
         startKoin {
-            modules(selectModuleBasedOnProfile(config) + getTestModules())
+            modules(selectModuleBasedOnProfile(config))
         }
 
         assertKoin()
@@ -60,7 +51,7 @@ class KoinProfilesKtTest : KoinTest {
         mockConfig(AppEnv.LOCAL)
 
         startKoin {
-            modules(selectModuleBasedOnProfile(config) + getTestModules())
+            modules(selectModuleBasedOnProfile(config))
         }
 
         assertKoin()
@@ -68,21 +59,9 @@ class KoinProfilesKtTest : KoinTest {
     }
 
     private fun assertKoin() {
-        assertNotNull(dataSource)
-        assertNotNull(inntektsmeldingRepository)
         assertNotNull(pdlClient)
         assertNotNull(norg2Client)
         assertNotNull(oppgaveService)
-    }
-
-    private fun getTestModules(): Module {
-        val testModule =
-            module {
-                single { dataSource } bind DataSource::class
-
-                single { metrikk }
-            }
-        return testModule
     }
 
     private fun mockConfig(appEnv: AppEnv) {

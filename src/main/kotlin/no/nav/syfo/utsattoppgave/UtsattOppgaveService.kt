@@ -21,7 +21,6 @@ class UtsattOppgaveService(
     private val oppgaveService: OppgaveService,
     private val behandlendeEnhetService: BehandlendeEnhetService,
     private val inntektsmeldingRepository: InntektsmeldingRepository,
-    private val metrikk: Metrikk,
 ) {
     private val logger = this.logger()
     private val sikkerlogger = sikkerLogger()
@@ -29,7 +28,7 @@ class UtsattOppgaveService(
     fun prosesser(oppdatering: OppgaveOppdatering) {
         val oppgave = utsattOppgaveDAO.finn(oppdatering.id.toString())
         if (oppgave == null) {
-            metrikk.tellUtsattOppgaveUkjent()
+            Metrikk.tellUtsattOppgaveUkjent()
             logger.info("Mottok oppdatering på en ukjent oppgave for id: ${oppdatering.id}")
             return
         }
@@ -49,7 +48,7 @@ class UtsattOppgaveService(
 
                 utsattOppgaveDAO.oppdater(oppdatertOppgave)
 
-                metrikk.tellUtsattOppgaveUtsett()
+                Metrikk.tellUtsattOppgaveUtsett()
                 logger.debug("Oppdaterte timeout på inntektsmelding: ${oppdatertOppgave.arkivreferanse} til ${oppdatertOppgave.timeout}")
             }
 
@@ -63,7 +62,7 @@ class UtsattOppgaveService(
 
                 utsattOppgaveDAO.oppdater(oppdatertOppgave)
 
-                metrikk.tellUtsattOppgaveForkast()
+                Metrikk.tellUtsattOppgaveForkast()
                 logger.debug("Endret oppgave: ${oppdatertOppgave.arkivreferanse} til tilstand: ${oppdatertOppgave.tilstand.name}")
             }
 
@@ -89,7 +88,7 @@ class UtsattOppgaveService(
 
                             utsattOppgaveDAO.oppdater(oppdatertOppgave)
 
-                            metrikk.tellUtsattOppgaveOpprett()
+                            Metrikk.tellUtsattOppgaveOpprett()
                             logger.info(
                                 "Endret oppgave: ${oppdatertOppgave.inntektsmeldingId} til tilstand: ${oppdatertOppgave.tilstand.name} gosys oppgaveID: ${oppdatertOppgave.gosysOppgaveId} duplikat? ${resultat.duplikat}",
                             )
@@ -121,7 +120,7 @@ class UtsattOppgaveService(
             }
 
             else -> {
-                metrikk.tellUtsattOppgaveIrrelevant()
+                Metrikk.tellUtsattOppgaveIrrelevant()
                 logger.info("Oppdatering på dokumentId: ${oppdatering.id} ikke relevant")
             }
         }

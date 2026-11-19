@@ -20,7 +20,6 @@ import no.nav.syfo.repository.UtsattOppgaveRepositoryImp
 import no.nav.syfo.service.BehandlendeEnhetService
 import no.nav.syfo.service.InntektsmeldingService
 import no.nav.syfo.simba.InntektsmeldingConsumer
-import no.nav.syfo.util.Metrikk
 import no.nav.syfo.util.getString
 import no.nav.syfo.utsattoppgave.FeiletUtsattOppgaveMeldingProsessor
 import no.nav.syfo.utsattoppgave.UtsattOppgaveDAO
@@ -51,8 +50,7 @@ fun prodConfig(config: ApplicationConfig) =
             )
         } bind DataSource::class
 
-        single { Metrikk() }
-        single { BehandlendeEnhetService(get(), get(), get()) }
+        single { BehandlendeEnhetService(get(), get()) }
         single { InntektsmeldingRepositoryImp(get()) } bind InntektsmeldingRepository::class
         single { InntektsmeldingService(get()) }
 
@@ -79,7 +77,6 @@ fun prodConfig(config: ApplicationConfig) =
                 oppgaveService = get(),
                 behandlendeEnhetService = get(),
                 inntektsmeldingRepository = get(),
-                metrikk = get(),
             )
         }
 
@@ -90,7 +87,6 @@ fun prodConfig(config: ApplicationConfig) =
                 utsattOppgaveDAO = get(),
                 oppgaveService = get(),
                 behandlendeEnhetService = get(),
-                metrikk = get(),
                 inntektsmeldingRepository = get(),
             )
         }
@@ -110,7 +106,6 @@ fun prodConfig(config: ApplicationConfig) =
         single {
             OppgaveService(
                 oppgaveClient = get(),
-                metrikk = get(),
             )
         }
 

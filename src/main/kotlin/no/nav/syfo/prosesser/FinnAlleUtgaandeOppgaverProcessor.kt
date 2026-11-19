@@ -23,7 +23,6 @@ class FinnAlleUtgaandeOppgaverProcessor(
     private val utsattOppgaveDAO: UtsattOppgaveDAO,
     private val oppgaveService: OppgaveService,
     private val behandlendeEnhetService: BehandlendeEnhetService,
-    private val metrikk: Metrikk,
     private val inntektsmeldingRepository: InntektsmeldingRepository,
 ) : RecurringJob(CoroutineScope(Dispatchers.IO), Duration.ofHours(6).toMillis()) {
     private val sikkerlogger = LoggerFactory.getLogger("tjenestekall")
@@ -83,7 +82,7 @@ class FinnAlleUtgaandeOppgaverProcessor(
                                     utsattOppgaveDAO.oppdater(oppdatertOppgave)
                                 }
 
-                                metrikk.tellUtsattOppgaveOpprettTimeout()
+                                Metrikk.tellUtsattOppgaveOpprettTimeout()
                             } catch (e: OpprettOppgaveException) {
                                 "Feilet ved opprettelse av oppgave ved timeout i gosys for inntektsmelding: ${oppgaveEntitet.arkivreferanse}".also {
                                     logger.error(it, e)
