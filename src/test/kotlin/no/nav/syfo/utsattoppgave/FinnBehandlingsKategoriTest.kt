@@ -1,8 +1,6 @@
 package no.nav.syfo.utsattoppgave
 
-import no.nav.syfo.domain.JournalStatus
 import no.nav.syfo.domain.inntektsmelding.AvsenderSystem
-import no.nav.syfo.domain.inntektsmelding.Gyldighetsstatus
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 import no.nav.syfo.domain.inntektsmelding.Kontaktinformasjon
 import no.nav.syfo.domain.inntektsmelding.Refusjon
@@ -129,34 +127,26 @@ class FinnBehandlingsKategoriTest {
         inntekt: BigDecimal?,
     ): Inntektsmelding =
         Inntektsmelding(
-            id = "",
             fnr = "",
             arbeidsgiverOrgnummer = "123",
             arbeidsgiverPrivatFnr = "",
             arbeidsgiverPrivatAktørId = "",
-            arbeidsforholdId = "",
-            journalpostId = "",
             arsakTilInnsending = "",
-            journalStatus = JournalStatus.MOTTATT,
             arbeidsgiverperioder = emptyList(),
             beregnetInntekt = inntekt,
             refusjon = refusjon,
             endringerIRefusjon = emptyList(),
             opphørAvNaturalYtelse = emptyList(),
             gjenopptakelserNaturalYtelse = emptyList(),
-            gyldighetsStatus = Gyldighetsstatus.GYLDIG,
             arkivRefereranse = "ar123",
             feriePerioder = emptyList(),
             førsteFraværsdag = LocalDate.now(),
             mottattDato = LocalDateTime.now(),
-            sakId = "sak123",
             aktorId = "aktor123",
             begrunnelseRedusert = "grunn",
             avsenderSystem = AvsenderSystem("", ""),
             nærRelasjon = false,
             kontaktinformasjon = Kontaktinformasjon("", ""),
-            innsendingstidspunkt = LocalDateTime.now(),
             bruttoUtbetalt = BigDecimal(123),
-            årsakEndring = "Ingen",
         )
 }

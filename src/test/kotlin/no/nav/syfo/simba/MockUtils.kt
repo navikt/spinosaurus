@@ -122,6 +122,5 @@ fun mockTilSpinoInntektsmelding(im: Inntektsmelding): SpinoInntektsmelding =
     mapInntektsmelding(
         arkivreferanse = "im1",
         aktorId = "2",
-        journalpostId = "3",
         im = im,
     )

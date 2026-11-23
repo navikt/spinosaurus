@@ -13,7 +13,6 @@ import no.nav.inntektsmeldingkontrakt.OpphoerAvNaturalytelse
 import no.nav.inntektsmeldingkontrakt.Periode
 import no.nav.inntektsmeldingkontrakt.Refusjon
 import no.nav.inntektsmeldingkontrakt.Status
-import no.nav.syfo.domain.inntektsmelding.Gyldighetsstatus
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 import no.nav.syfo.domain.inntektsmelding.SpinnInntektEndringAarsak
 import org.slf4j.LoggerFactory
@@ -24,7 +23,6 @@ private val logger = LoggerFactory.getLogger("InntektsmeldingMapper")
 fun mapInntektsmeldingKontrakt(
     inntektsmelding: Inntektsmelding,
     arbeidstakerAktørId: String,
-    gyldighetsstatus: Gyldighetsstatus,
     arkivreferanse: String,
     uuid: String,
 ): no.nav.inntektsmeldingkontrakt.Inntektsmelding =
@@ -37,7 +35,6 @@ fun mapInntektsmeldingKontrakt(
         arbeidsgiverFnr = inntektsmelding.arbeidsgiverPrivatFnr,
         arbeidsgiverAktorId = inntektsmelding.arbeidsgiverPrivatAktørId,
         arbeidsgivertype = mapArbeidsgivertype(inntektsmelding),
-        arbeidsforholdId = inntektsmelding.arbeidsforholdId,
         arbeidsgiverperioder = mapArbeidsgiverperioder(inntektsmelding),
         beregnetInntekt = inntektsmelding.beregnetInntekt,
         inntektsdato = inntektsmelding.inntektsdato,
@@ -45,7 +42,7 @@ fun mapInntektsmeldingKontrakt(
         endringIRefusjoner = mapEndringIRefusjon(inntektsmelding),
         opphoerAvNaturalytelser = mapOpphørAvNaturalytelser(inntektsmelding),
         gjenopptakelseNaturalytelser = mapGjenopptakelseAvNaturalytelser(inntektsmelding),
-        status = mapStatus(gyldighetsstatus),
+        status = mapStatus(inntektsmelding),
         arkivreferanse = arkivreferanse,
         ferieperioder = mapFerieperioder(inntektsmelding),
         foersteFravaersdag = inntektsmelding.førsteFraværsdag,
@@ -105,12 +102,15 @@ private fun SpinnInntektEndringAarsak.tilInntektEndringAarsak(): InntektEndringA
 
 private fun mapFerieperioder(inntektsmelding: Inntektsmelding): List<Periode> = inntektsmelding.feriePerioder.map { p -> Periode(p.fom, p.tom) }
 
-private fun mapStatus(status: Gyldighetsstatus): Status {
-    if (status == Gyldighetsstatus.GYLDIG) {
-        return Status.GYLDIG
+private fun mapStatus(inntektsmelding: Inntektsmelding): Status =
+    if (
+        inntektsmelding.arbeidsgiverOrgnummer.isNullOrEmpty() xor
+        inntektsmelding.arbeidsgiverPrivatFnr.isNullOrEmpty()
+    ) {
+        Status.GYLDIG
+    } else {
+        Status.MANGELFULL
     }
-    return Status.MANGELFULL
-}
 
 fun mapArbeidsgiverperioder(inntektsmelding: Inntektsmelding): List<Periode> = inntektsmelding.arbeidsgiverperioder.map { p -> Periode(p.fom, p.tom) }
 

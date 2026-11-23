@@ -6,7 +6,6 @@ import no.nav.inntektsmeldingkontrakt.Format
 import no.nav.inntektsmeldingkontrakt.MottaksKanal
 import no.nav.syfo.domain.Periode
 import no.nav.syfo.domain.inntektsmelding.AvsenderSystem
-import no.nav.syfo.domain.inntektsmelding.Gyldighetsstatus
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 import no.nav.syfo.domain.inntektsmelding.Kontaktinformasjon
 import no.nav.syfo.domain.inntektsmelding.RapportertInntekt
@@ -54,12 +53,8 @@ class InntektsmeldingMapperFraInternSyfoTilHAGKontraktTest {
                 avsenderSystem = AvsenderSystem("NAV_NO", "1.0"),
                 rapportertInntekt =
                     RapportertInntekt(
-                        bekreftet = true,
-                        beregnetInntekt = 39013.0,
-                        endringAarsak = "Ferie",
                         endringAarsakData = null,
                         endringAarsakerData = listOf(inntektEndringAarsak),
-                        manueltKorrigert = true,
                     ),
             )
         val inntektsmelding =
@@ -167,7 +162,6 @@ fun mapImKontrakt(inntektsmelding: Inntektsmelding) =
     mapInntektsmeldingKontrakt(
         inntektsmelding = inntektsmelding,
         arbeidstakerAktørId = MockData.AKTOER_ID,
-        gyldighetsstatus = MockData.gyldighetsstatus,
         arkivreferanse = MockData.ARKIVREFERANSE,
         uuid = MockData.uuid,
     )
@@ -175,7 +169,6 @@ fun mapImKontrakt(inntektsmelding: Inntektsmelding) =
 object MockData {
     const val AKTOER_ID = "123"
     const val ARKIVREFERANSE = "arkivref123"
-    val gyldighetsstatus = Gyldighetsstatus.GYLDIG
     val uuid = UUID.randomUUID().toString()
     val avsenderAltinn = AvsenderSystem("AltinnPortal", "1.0")
     val avsenderNavPortal = AvsenderSystem("NAV_PORTAL", "1.0")

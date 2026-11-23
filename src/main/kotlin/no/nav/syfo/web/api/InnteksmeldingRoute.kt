@@ -13,7 +13,6 @@ import no.nav.syfo.mapping.mapInntektsmeldingKontrakt
 import no.nav.syfo.repository.InntektsmeldingRepository
 import no.nav.syfo.service.InntektsmeldingService
 import no.nav.syfo.util.InntektsmeldingJsonMapper
-import no.nav.syfo.util.validerInntektsmelding
 
 fun Route.syfoinntektsmelding(imRepo: InntektsmeldingRepository) {
     get("/{inntektsmeldingId}") {
@@ -32,7 +31,6 @@ fun Route.syfoinntektsmelding(imRepo: InntektsmeldingRepository) {
                     mapInntektsmeldingKontrakt(
                         inntektsmelding,
                         dto.aktorId,
-                        validerInntektsmelding(inntektsmelding),
                         inntektsmelding.arkivRefereranse,
                         dto.uuid,
                     )

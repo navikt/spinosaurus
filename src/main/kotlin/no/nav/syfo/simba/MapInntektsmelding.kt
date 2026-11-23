@@ -16,7 +16,6 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Sykefravaer
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Tariffendring
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.VarigLoennsendring
 import no.nav.helsearbeidsgiver.utils.pipe.orDefault
-import no.nav.syfo.domain.JournalStatus
 import no.nav.syfo.domain.Periode
 import no.nav.syfo.domain.inntektsmelding.AvsenderSystem
 import no.nav.syfo.domain.inntektsmelding.EndringIRefusjon
@@ -41,7 +40,6 @@ object Avsender {
 fun mapInntektsmelding(
     arkivreferanse: String,
     aktorId: String,
-    journalpostId: String,
     im: InntektsmeldingV1,
 ): Inntektsmelding {
     val avsenderSystemNavn =
@@ -58,12 +56,8 @@ fun mapInntektsmelding(
         }
 
     return Inntektsmelding(
-        journalStatus = JournalStatus.FERDIGSTILT,
-        sakId = "",
         arkivRefereranse = arkivreferanse,
-        id = im.id.toString(),
         aktorId = aktorId,
-        journalpostId = journalpostId,
         avsenderSystem = AvsenderSystem(avsenderSystemNavn, im.type.avsenderSystem.versjon),
         vedtaksperiodeId = im.vedtaksperiodeId,
         fnr = im.sykmeldt.fnr.verdi,
@@ -99,7 +93,6 @@ fun mapInntektsmelding(
         førsteFraværsdag = null,
         arsakTilInnsending = im.aarsakInnsending.name,
         mottattDato = im.mottatt.toLocalDateTime(),
-        innsendingstidspunkt = im.mottatt.toLocalDateTime(),
         mottaksKanal = im.type.kanal.mapTilMottakskanal(),
         forespurt = im.type is InntektsmeldingV1.Type.Forespurt || im.type is InntektsmeldingV1.Type.ForespurtEkstern,
         harFlereArbeidsforhold = im.type.harFlereArbeidsforhold(),
@@ -118,12 +111,8 @@ private fun Inntekt.tilRapportertInntekt(): RapportertInntekt {
     val spinnEndringAarsak = spinnEndringAarsaker.firstOrNull()
 
     return RapportertInntekt(
-        bekreftet = true,
-        beregnetInntekt = beloep,
-        endringAarsak = spinnEndringAarsak?.aarsak,
         endringAarsakData = spinnEndringAarsak,
         endringAarsakerData = spinnEndringAarsaker,
-        manueltKorrigert = spinnEndringAarsaker.isNotEmpty(),
     )
 }
 

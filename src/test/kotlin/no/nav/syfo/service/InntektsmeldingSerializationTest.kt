@@ -6,32 +6,26 @@ import no.nav.syfo.util.InntektsmeldingJsonMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class InntektsmeldingServiceTest {
+class InntektsmeldingSerializationTest {
     @Test
     fun `Skal gi forventet JSON format`() {
         val im = buildIM()
         val json = InntektsmeldingJsonMapper.toJson(im)
         val mapper = JacksonJsonConfig.opprettObjectMapper()
         val node = mapper.readTree(json)
-        assertThat(node.get("id").asText()).isEqualTo("id-abc")
         assertThat(node.get("fnr").asText()).isEqualTo("fnr-123") // Skal ikke lagre fødselsnummer
         assertThat(node.get("aktorId").asText()).isEqualTo("aktør-123")
         assertThat(node.get("refusjon").get("beloepPrMnd").asLong()).isEqualTo(333333333333)
         assertThat(node.get("refusjon").get("opphoersdato").toString()).isEqualTo("\"2020-02-20\"")
         assertThat(node.get("begrunnelseRedusert").asText()).isEqualTo("Grunn til reduksjon")
-        assertThat(node.get("sakId").asText()).isEqualTo("sak-123")
         assertThat(node.get("mottattDato").toString()).isEqualTo("\"2010-05-04T03:02:01\"")
         assertThat(node.get("arkivRefereranse").asText()).isEqualTo("ar-123")
         assertThat(node.get("førsteFraværsdag").toString()).isEqualTo("\"2010-02-10\"")
         assertThat(node.get("arsakTilInnsending").asText()).isEqualTo("Ingen årsak")
-        assertThat(node.get("journalpostId").asText()).isEqualTo("jp-123")
-        assertThat(node.get("arbeidsforholdId").asText()).isEqualTo("arb-123")
         assertThat(node.get("arbeidsgiverPrivatFnr").asText()).isEqualTo("arb-priv-123")
         assertThat(node.get("arbeidsgiverOrgnummer").asText()).isEqualTo("arb-org-123")
         assertThat(node.get("arbeidsgiverPrivatAktørId").asText()).isEqualTo("arb-priv-aktør-123")
         assertThat(node.get("beregnetInntekt").asLong()).isEqualTo(999999999999)
-        assertThat(node.get("gyldighetsStatus").asText()).isEqualTo("GYLDIG")
-        assertThat(node.get("journalStatus").asText()).isEqualTo("MOTTATT")
         assertThat(node.get("arbeidsgiverperioder").size()).isEqualTo(2)
         assertThat(node.get("arbeidsgiverperioder")[0].get("fom").toString()).isEqualTo("\"2011-11-01\"")
         assertThat(node.get("arbeidsgiverperioder")[0].get("tom").toString()).isEqualTo("\"2012-12-02\"")
