@@ -31,7 +31,6 @@ class UtsattOppgaveServiceTest {
             oppgaveService = oppgaveService,
             behandlendeEnhetService = behandlendeEnhetService,
             inntektsmeldingRepository = inntektsmeldingRepository,
-            metrikk = mockk(relaxed = true),
         )
 
     val oppgave = UtsattOppgaveTestData.oppgave

@@ -2,97 +2,47 @@ package no.nav.syfo.util
 
 import io.prometheus.client.Counter
 
-class Metrikk {
-    private val metricsNs = "spinn"
-    val counters = HashMap<String, Counter>()
-
-    private fun proseseringsMetrikker(
-        metricName: String,
-        metricHelpText: String,
-        vararg labelNames: String,
-    ): Counter =
-        if (counters.containsKey(metricName)) {
-            counters[metricName]!!
-        } else {
-            val counter =
-                Counter
-                    .build()
-                    .namespace(metricsNs)
-                    .name(metricName)
-                    .labelNames(*labelNames)
-                    .help(metricHelpText)
-                    .register()
-
-            counters[metricName] = counter
-            counter
-        }
-
-    val inntektsmeldingSykepengerUtland =
-        proseseringsMetrikker(
-            "syfoinntektsmelding_sykepenger_utland",
+object Metrikk {
+    private val inntektsmeldingSykepengerUtland =
+        metrikk(
+            "sykepenger_utland",
             "Metrikker for sykepenger utland",
-            "type",
         )
-
-    val arbeidsgiverperioder =
-        proseseringsMetrikker(
-            "syfoinntektsmelding_arbeidsgiverperioder",
-            "Metrikker for arbeidsgiverperioder",
-            "type",
-            "antall",
-        )
-
-    val naturalytelse =
-        proseseringsMetrikker(
-            "syfoinntektsmelding_faar_naturalytelse",
-            "Metrikker for Naturalytelse",
-            "type",
-        )
-
-    val opprettOppgave =
-        proseseringsMetrikker(
-            "syfoinntektsmelding_opprett_oppgave",
+    private val opprettOppgave =
+        metrikk(
+            "opprett_oppgave",
             "Metrikker for OpprettOppgave",
-            "type",
             "eksisterer",
         )
-
-    val utsattOppgaveUkjent =
-        proseseringsMetrikker(
-            "syfoinntektsmelding_utsatt_oppgave_ukjent",
+    private val utsattOppgaveUkjent =
+        metrikk(
+            "utsatt_oppgave_ukjent",
             "Mottok oppdatering på en ukjent oppgave",
-            "type",
         )
-    val utsattOppgaveUtsett =
-        proseseringsMetrikker(
-            "syfoinntektsmelding_utsatt_oppgave_utsett",
+    private val utsattOppgaveUtsett =
+        metrikk(
+            "utsatt_oppgave_utsett",
             "Oppdaterte timeout for inntektsmelding",
-            "type",
         )
-    val utsattOppgaveForkast =
-        proseseringsMetrikker(
-            "syfoinntektsmelding_utsatt_oppgave_forkast",
+    private val utsattOppgaveForkast =
+        metrikk(
+            "utsatt_oppgave_forkast",
             "Forkaster oppgave",
-            "type",
         )
-    val utsattOppgaveOpprett =
-        proseseringsMetrikker(
-            "syfoinntektsmelding_utsatt_oppgave_opprett",
+    private val utsattOppgaveOpprett =
+        metrikk(
+            "utsatt_oppgave_opprett",
             "Oppretter oppgave",
-            "type",
         )
-
-    val utsattOppgaveOpprettTimeout =
-        proseseringsMetrikker(
-            "syfoinntektsmelding_utsatt_oppgave_opprett_timeout",
+    private val utsattOppgaveOpprettTimeout =
+        metrikk(
+            "utsatt_oppgave_opprett_timeout",
             "Oppretter oppgave pga timeout",
-            "type",
         )
-    val utsattOppgaveIrrelevant =
-        proseseringsMetrikker(
-            "syfoinntektsmelding_utsatt_oppgave_irrelevant",
+    private val utsattOppgaveIrrelevant =
+        metrikk(
+            "utsatt_oppgave_irrelevant",
             "Irrelevant dokumentid",
-            "type",
         )
 
     fun tellInntektsmeldingSykepengerUtland() = inntektsmeldingSykepengerUtland.labels("info").inc()
@@ -111,3 +61,17 @@ class Metrikk {
 
     fun tellUtsattOppgaveIrrelevant() = utsattOppgaveIrrelevant.labels("info").inc()
 }
+
+private fun metrikk(
+    nameSuffix: String,
+    helpText: String,
+    labelName: String? = null,
+): Counter =
+    Counter
+        .build()
+        .namespace("spinn")
+        .name("syfoinntektsmelding_$nameSuffix")
+        .help(helpText)
+        .labelNames(
+            *listOfNotNull("type", labelName).toTypedArray(),
+        ).register()
