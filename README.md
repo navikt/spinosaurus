@@ -27,17 +27,6 @@ i køen for Oppgave i avsnittet over.
 
 ## Utvikling
 
-### Kjøre applikasjonen lokalt
-Om du ønsker å kjøre applikasjonen lokalt, må du starte kafka, zookeeper og database fra lokal docker: 
-
-``
-cd docker/local
-docker-compose up --remove-orphans
-``
-
-Og deretter starte App.kt fra din IDE
-
-
 ### Ktlint
 
 Prosjektet bruker en [Ktlint](https://ktlint.github.io/)-plugin for Gradle som håndhever kodestilregler. Nyttige kommandoer er:

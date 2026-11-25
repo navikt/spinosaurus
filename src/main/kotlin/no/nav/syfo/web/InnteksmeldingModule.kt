@@ -6,35 +6,26 @@ import io.ktor.serialization.jackson.JacksonConverter
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
-import io.ktor.server.auth.Authentication
 import io.ktor.server.auth.authenticate
-import io.ktor.server.config.ApplicationConfig
+import io.ktor.server.auth.authentication
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import no.nav.security.token.support.v3.IssuerConfig
+import no.nav.security.token.support.v3.TokenSupportConfig
 import no.nav.security.token.support.v3.tokenValidationSupport
+import no.nav.syfo.Env
+import no.nav.syfo.Inntektsmelding
 import no.nav.syfo.util.customObjectMapper
-import no.nav.syfo.util.getString
 import no.nav.syfo.web.api.refusjonskrav
 import no.nav.syfo.web.api.syfoinntektsmelding
-import org.koin.ktor.ext.get
 
-fun Application.inntektsmeldingModule(config: ApplicationConfig = environment.config) {
-    val objectMapper = customObjectMapper()
+private val objectMapper = customObjectMapper()
 
-    val allowList = config.getString("aad_preauthorized_apps").let { objectMapper.readTree(it) }.map { it["clientId"].asText() }
+fun Application.inntektsmeldingModule() {
+    customAuthentication()
 
-    install(Authentication) {
-        tokenValidationSupport(
-            config = config,
-            additionalValidation = {
-                val claims = it.getClaims("hagproxy")
-                val clientId = claims.getStringClaim("azp")
-                clientId in allowList
-            },
-        )
-    }
     install(ContentNegotiation) {
         register(ContentType.Application.Json, JacksonConverter(objectMapper))
         // Kan denne fjernes? JavaTimeModule er allerede registrert i customObjectMapper
@@ -47,10 +38,44 @@ fun Application.inntektsmeldingModule(config: ApplicationConfig = environment.co
         route("/api/v1") {
             authenticate {
                 route("/inntektsmelding") {
-                    syfoinntektsmelding(get())
-                    refusjonskrav(get())
+                    syfoinntektsmelding(Inntektsmelding.service)
+                    refusjonskrav(Inntektsmelding.service)
                 }
             }
         }
     }
+}
+
+private fun Application.customAuthentication() {
+    val config =
+        TokenSupportConfig(
+            IssuerConfig(
+                name = Auth.ISSUER,
+                discoveryUrl = Env.Auth.discoveryUrl,
+                acceptedAudience = Env.Auth.acceptedAudience,
+            ),
+        )
+
+    val allowList =
+        Env.Auth.preauthorizedApps
+            .let { objectMapper.readTree(it) }
+            .map { it["clientId"].asText() }
+
+    authentication {
+        tokenValidationSupport(
+            config = config,
+            additionalValidation = {
+                val clientId =
+                    it
+                        .getClaims(Auth.ISSUER)
+                        .getStringClaim(Auth.CLAIM_AZP)
+                clientId in allowList
+            },
+        )
+    }
+}
+
+private object Auth {
+    const val ISSUER = "hagproxy"
+    const val CLAIM_AZP = "azp"
 }

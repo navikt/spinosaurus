@@ -30,12 +30,12 @@ class HentRefusjonskravTest {
         val im = buildIM().copy(refusjon = Refusjon(BigDecimal(1000), null), endringerIRefusjon = emptyList())
         val entitet =
             InntektsmeldingEntitet(
-                uuid = kjentId.toString(),
+                uuid = kjentId,
                 aktorId = "aktor",
                 fnr = Fnr.genererGyldig(),
                 data = objectMapper.writeValueAsString(im),
             )
-        every { repository.findByUuids(listOf(kjentId.toString(), ukjentId.toString())) } returns listOf(entitet)
+        every { repository.findByIds(setOf(kjentId, ukjentId)) } returns listOf(entitet)
 
         val resultat = service.hentRefusjonskrav(setOf(kjentId, ukjentId, kjentId))
 
@@ -48,12 +48,12 @@ class HentRefusjonskravTest {
         val im = buildIM().copy(refusjon = Refusjon(), endringerIRefusjon = emptyList())
         val entitet =
             InntektsmeldingEntitet(
-                uuid = kjentId.toString(),
+                uuid = kjentId,
                 aktorId = "aktor",
                 fnr = Fnr.genererGyldig(),
                 data = objectMapper.writeValueAsString(im),
             )
-        every { repository.findByUuids(listOf(kjentId.toString())) } returns listOf(entitet)
+        every { repository.findByIds(setOf(kjentId)) } returns listOf(entitet)
 
         val resultat = service.hentRefusjonskrav(setOf(kjentId))
 
@@ -62,7 +62,7 @@ class HentRefusjonskravTest {
 
     @Test
     fun `tom liste gir tom liste`() {
-        every { repository.findByUuids(emptyList()) } returns emptyList()
+        every { repository.findByIds(emptySet()) } returns emptyList()
         assertTrue(service.hentRefusjonskrav(emptySet()).isEmpty())
     }
 }

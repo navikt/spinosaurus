@@ -9,6 +9,7 @@ import no.nav.syfo.utsattoppgave.FeiletUtsattOppgaveMeldingProsessor
 import java.time.Duration
 
 class LeaderElectionBakgrunnsjobbProcessor(
+    val leaderElectionManager: LeaderElectionManager,
     val bakgrunnsjobbService: BakgrunnsjobbService,
     val finnAlleUtgaandeOppgaverProcessor: FinnAlleUtgaandeOppgaverProcessor,
     val feiletUtsattOppgaveMeldingProsessor: FeiletUtsattOppgaveMeldingProsessor,
@@ -16,7 +17,7 @@ class LeaderElectionBakgrunnsjobbProcessor(
     var started = false
 
     override fun doJob() {
-        if (LeaderElectionManager.isLeader() && !started) {
+        if (leaderElectionManager.isLeader() && !started) {
             started = true
             finnAlleUtgaandeOppgaverProcessor.startAsync(true)
             bakgrunnsjobbService.apply {
@@ -24,5 +25,15 @@ class LeaderElectionBakgrunnsjobbProcessor(
                 startAsync(true)
             }
         }
+    }
+
+    fun stopAll() {
+        stop()
+        finnAlleUtgaandeOppgaverProcessor.stop()
+
+        // Et forsøk på at bakgrunnsjobber skal kunne ferdigstilles OK, før stopp. Ingen garantier.
+        bakgrunnsjobbService.stop()
+        logger.info("Venter ${bakgrunnsjobbService.delayMillis} ms på at bakgrunnsjobbService stoppes!")
+        Thread.sleep(bakgrunnsjobbService.delayMillis)
     }
 }

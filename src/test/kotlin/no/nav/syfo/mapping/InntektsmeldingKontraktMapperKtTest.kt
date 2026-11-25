@@ -21,7 +21,7 @@ class InntektsmeldingKontraktMapperKtTest {
     fun toInntektsmelding() {
         val dto =
             InntektsmeldingEntitet(
-                uuid = UUID.randomUUID().toString(),
+                uuid = UUID.randomUUID(),
                 aktorId = grunnleggendeInntektsmelding.aktorId.toString(),
                 fnr = Fnr.genererGyldig(),
                 data = om.writeValueAsString(grunnleggendeInntektsmelding),
@@ -43,7 +43,7 @@ class InntektsmeldingKontraktMapperKtTest {
             )
         val dto =
             InntektsmeldingEntitet(
-                uuid = UUID.randomUUID().toString(),
+                uuid = UUID.randomUUID(),
                 aktorId = inntektsmeldingUtenFnr.aktorId.toString(),
                 fnr = Fnr.genererGyldig(),
                 data = om.writeValueAsString(inntektsmeldingUtenFnr),

@@ -33,14 +33,15 @@ fun genererKafkaMeldinger() {
     Producer.kafkaProducer.close()
 }
 
-object Producer {
-    val props =
+private object Producer {
+    private val props =
         Properties().apply {
-            put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, System.getProperty("KAFKA_BOOTSTRAP_SERVERS") ?: "localhost:9092")
+            put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
             put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer::class.java.name)
             put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer::class.java.name)
             put(ProducerConfig.CLIENT_ID_CONFIG, "syfoinntektsmelding")
         }
+
     val kafkaProducer = KafkaProducer<String, String>(props)
 
     fun sendMelding(record: ProducerRecord<String, String>) {
@@ -54,21 +55,19 @@ object Producer {
     }
 }
 
-fun buildJournalfoertInntektsmelding(
+private fun buildJournalfoertInntektsmelding(
     inntektsmeldingId: UUID = UUID.randomUUID(),
     forespoerselId: UUID = UUID.randomUUID(),
     sykemeldtFnr: Fnr = Fnr.genererGyldig(),
     orgNr: Orgnr = Orgnr(DEFAULT_ORG),
-): String {
-    val filePath = "journalfoertInntektsmelding.json"
-    return readJsonFromResources(filePath)
+): String =
+    readJsonFromResources()
         .replace(INNTEKTSMELDING_ID, inntektsmeldingId.toString())
         .replace(FORESPOERSEL_ID, forespoerselId.toString())
         .replace(SYKMELDT_FNR, sykemeldtFnr.verdi)
         .replace(ORGNUMMER, orgNr.verdi)
-}
 
-fun readJsonFromResources(fileName: String): String {
-    val resource = KafkaProducer::class.java.getResource("/$fileName")
+private fun readJsonFromResources(): String {
+    val resource = KafkaProducer::class.java.getResource("/journalfoertInntektsmelding.json")
     return File(resource!!.toURI()).readText(Charsets.UTF_8)
 }

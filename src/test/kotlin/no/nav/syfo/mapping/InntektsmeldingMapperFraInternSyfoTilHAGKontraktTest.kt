@@ -176,7 +176,7 @@ object MockData {
     const val AKTOER_ID = "123"
     const val ARKIVREFERANSE = "arkivref123"
     val gyldighetsstatus = Gyldighetsstatus.GYLDIG
-    val uuid = UUID.randomUUID().toString()
+    val uuid: UUID = UUID.randomUUID()
     val avsenderAltinn = AvsenderSystem("AltinnPortal", "1.0")
     val avsenderNavPortal = AvsenderSystem("NAV_PORTAL", "1.0")
     val avsenderTigerSys = AvsenderSystem("Tigersys", "3.0")

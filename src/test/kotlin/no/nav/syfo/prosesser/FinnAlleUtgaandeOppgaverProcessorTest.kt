@@ -11,8 +11,8 @@ import no.nav.syfo.client.oppgave.OppgaveService
 import no.nav.syfo.domain.OppgaveResultat
 import no.nav.syfo.dto.Tilstand
 import no.nav.syfo.isEqualNullSafe
-import no.nav.syfo.repository.InntektsmeldingRepository
 import no.nav.syfo.service.BehandlendeEnhetService
+import no.nav.syfo.service.InntektsmeldingService
 import no.nav.syfo.utsattoppgave.UtsattOppgaveDAO
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,7 +23,7 @@ class FinnAlleUtgaandeOppgaverProcessorTest {
     val utsattOppgaveDAO: UtsattOppgaveDAO = mockk(relaxed = true)
     val oppgaveService: OppgaveService = mockk(relaxed = true)
     val behandlendeEnhetService: BehandlendeEnhetService = mockk(relaxed = true)
-    val inntektsmeldingRepository: InntektsmeldingRepository = mockk(relaxed = true)
+    val inntektsmeldingService: InntektsmeldingService = mockk(relaxed = true)
 
     val processor =
 
@@ -31,7 +31,7 @@ class FinnAlleUtgaandeOppgaverProcessorTest {
             utsattOppgaveDAO = utsattOppgaveDAO,
             oppgaveService = oppgaveService,
             behandlendeEnhetService = behandlendeEnhetService,
-            inntektsmeldingRepository = inntektsmeldingRepository,
+            inntektsmeldingService = inntektsmeldingService,
         )
 
     val oppgave = UtsattOppgaveTestData.oppgave
@@ -43,7 +43,7 @@ class FinnAlleUtgaandeOppgaverProcessorTest {
         every { utsattOppgaveDAO.finnAlleUtgaatteOppgaver() } returns listOf(oppgave)
         coEvery { oppgaveService.opprettOppgave(any(), any(), any(), any()) } returns OppgaveResultat(Random.nextInt(), false, false)
         every { behandlendeEnhetService.gjelderUtland(any()) } returns false
-        every { inntektsmeldingRepository.findByUuid(any()) } returns UtsattOppgaveTestData.inntektsmeldingEntitet
+        every { inntektsmeldingService.findById(any()) } returns UtsattOppgaveTestData.inntektsmeldingEntitet
     }
 
     @Test
@@ -64,7 +64,7 @@ class FinnAlleUtgaandeOppgaverProcessorTest {
 
     @Test
     fun `Oppretter ikke oppgave ved timeout hvis begrunnelseRedusert = IkkeFravaer`() {
-        every { inntektsmeldingRepository.findByUuid(any()) } returns UtsattOppgaveTestData.inntektsmeldingEntitetIkkeFravaer
+        every { inntektsmeldingService.findById(any()) } returns UtsattOppgaveTestData.inntektsmeldingEntitetIkkeFravaer
         processor.doJob()
         verify {
             utsattOppgaveDAO.oppdater(

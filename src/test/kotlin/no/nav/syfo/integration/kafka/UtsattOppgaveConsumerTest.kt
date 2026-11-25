@@ -18,7 +18,6 @@ import java.util.UUID
 
 class UtsattOppgaveConsumerTest {
     lateinit var consumer: UtsattOppgaveConsumer
-    val props = kafkaConsumerTestProps().toMap()
     val utsattOppgaveService: UtsattOppgaveService = mockk(relaxed = true)
     val bakgrunnsjobbRepo: BakgrunnsjobbRepository = mockk(relaxed = true)
     val topicName = "topic"
@@ -28,7 +27,7 @@ class UtsattOppgaveConsumerTest {
 
     @BeforeEach
     fun before() {
-        consumer = UtsattOppgaveConsumer(props, topicName, utsattOppgaveService, bakgrunnsjobbRepo)
+        consumer = UtsattOppgaveConsumer(kafkaConsumerTestProps(), topicName, utsattOppgaveService, bakgrunnsjobbRepo)
     }
 
     @Test

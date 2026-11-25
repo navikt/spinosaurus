@@ -24,18 +24,18 @@ import java.util.UUID
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class InntektsmeldingRepositorySpec : WithPostgresContainer() {
-    val repository = InntektsmeldingRepositoryImp(dataSource)
+    val repository = InntektsmeldingRepository(dataSource)
 
     @BeforeEach
     fun setup() {
-        repository.deleteAll()
+        deleteAll()
     }
 
     @Test
     fun findByUuids() {
-        val ids = (1..3).map { UUID.randomUUID().toString() }
+        val ids = (1..3).map { UUID.randomUUID() }
         ids.forEachIndexed { i, id ->
-            repository.lagreInnteksmelding(
+            repository.lagreInntektsmelding(
                 InntektsmeldingEntitet(
                     uuid = id,
                     fnr = Fnr.genererGyldig(),
@@ -47,9 +47,9 @@ class InntektsmeldingRepositorySpec : WithPostgresContainer() {
                 orgnr = "orgnr",
             )
         }
-        val resultat = repository.findByUuids(listOf(ids[0], ids[2], UUID.randomUUID().toString()))
+        val resultat = repository.findByIds(setOf(ids[0], ids[2], UUID.randomUUID()))
         assertThat(resultat.map { it.uuid }).containsExactlyInAnyOrder(ids[0], ids[2])
-        assertThat(repository.findByUuids(emptyList())).isEmpty()
+        assertThat(repository.findByIds(emptySet())).isEmpty()
     }
 
     @Test
@@ -103,19 +103,19 @@ class InntektsmeldingRepositorySpec : WithPostgresContainer() {
         val mapper = JacksonJsonConfig.opprettObjectMapper()
         val inntektsmelding =
             InntektsmeldingEntitet(
-                uuid = UUID.randomUUID().toString(),
+                uuid = UUID.randomUUID(),
                 aktorId = "aktorId-repo-test",
                 fnr = Fnr.genererGyldig(),
                 data = mapper.writeValueAsString(im),
             )
-        repository.lagreInnteksmelding(
+        repository.lagreInntektsmelding(
             inntektsmelding,
             journalpostId = "journalpostId",
             behandlet = LocalDateTime.now(),
             orgnr = "orgnr",
         )
 
-        val i = repository.findByUuid(inntektsmelding.uuid)!!
+        val i = repository.findById(inntektsmelding.uuid)!!
 
         val data = mapper.readTree(i.data)
 
@@ -131,5 +131,12 @@ class InntektsmeldingRepositorySpec : WithPostgresContainer() {
         assertThat(data.get("arkivRefereranse").asText()).isEqualTo("ar-123")
         assertThat(data.get("førsteFraværsdag").asText()).isEqualTo("2010-02-10")
         assertThat(data.get("arsakTilInnsending").asText()).isEqualTo("Ingen årsak")
+    }
+
+    fun deleteAll() {
+        val deleteStatement = "DELETE FROM INNTEKTSMELDING;"
+        dataSource.connection.use {
+            it.prepareStatement(deleteStatement).executeUpdate()
+        }
     }
 }

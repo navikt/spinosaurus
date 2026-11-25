@@ -9,8 +9,8 @@ import no.nav.syfo.domain.OppgaveResultat
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 import no.nav.syfo.dto.Tilstand
 import no.nav.syfo.dto.UtsattOppgaveEntitet
-import no.nav.syfo.repository.InntektsmeldingRepository
 import no.nav.syfo.service.BehandlendeEnhetService
+import no.nav.syfo.service.InntektsmeldingService
 import no.nav.syfo.util.InntektsmeldingJsonMapper
 import no.nav.syfo.util.Metrikk
 import java.time.LocalDateTime
@@ -20,7 +20,7 @@ class UtsattOppgaveService(
     private val utsattOppgaveDAO: UtsattOppgaveDAO,
     private val oppgaveService: OppgaveService,
     private val behandlendeEnhetService: BehandlendeEnhetService,
-    private val inntektsmeldingRepository: InntektsmeldingRepository,
+    private val inntektsmeldingService: InntektsmeldingService,
 ) {
     private val logger = this.logger()
     private val sikkerlogger = sikkerLogger()
@@ -69,7 +69,7 @@ class UtsattOppgaveService(
             (Tilstand.Utsatt to Handling.Opprett),
             (Tilstand.Forkastet to Handling.Opprett),
             -> {
-                inntektsmeldingRepository
+                inntektsmeldingService
                     .hentInntektsmelding(oppgave.inntektsmeldingId)
                     .onSuccess { inntektsmelding ->
                         val gjelderUtland = behandlendeEnhetService.gjelderUtland(oppgave)
@@ -131,8 +131,8 @@ class UtsattOppgaveService(
     }
 }
 
-fun InntektsmeldingRepository.hentInntektsmelding(inntektsmeldingId: String): Result<Inntektsmelding> {
-    val inntektsmeldingDto = this.findByUuid(inntektsmeldingId)
+fun InntektsmeldingService.hentInntektsmelding(inntektsmeldingId: String): Result<Inntektsmelding> {
+    val inntektsmeldingDto = this.findById(inntektsmeldingId.let(UUID::fromString))
     return if (inntektsmeldingDto != null) {
         Result.success(InntektsmeldingJsonMapper.fromJson(inntektsmeldingDto.data, inntektsmeldingDto.fnr))
     } else {
