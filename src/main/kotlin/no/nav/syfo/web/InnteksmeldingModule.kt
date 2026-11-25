@@ -16,14 +16,14 @@ import no.nav.security.token.support.v3.IssuerConfig
 import no.nav.security.token.support.v3.TokenSupportConfig
 import no.nav.security.token.support.v3.tokenValidationSupport
 import no.nav.syfo.Env
-import no.nav.syfo.Inntektsmelding
+import no.nav.syfo.service.InntektsmeldingService
 import no.nav.syfo.util.customObjectMapper
 import no.nav.syfo.web.api.refusjonskrav
 import no.nav.syfo.web.api.syfoinntektsmelding
 
 private val objectMapper = customObjectMapper()
 
-fun Application.inntektsmeldingModule() {
+fun Application.inntektsmeldingModule(inntektsmeldingService: InntektsmeldingService) {
     customAuthentication()
 
     install(ContentNegotiation) {
@@ -38,8 +38,8 @@ fun Application.inntektsmeldingModule() {
         route("/api/v1") {
             authenticate {
                 route("/inntektsmelding") {
-                    syfoinntektsmelding(Inntektsmelding.service)
-                    refusjonskrav(Inntektsmelding.service)
+                    syfoinntektsmelding(inntektsmeldingService)
+                    refusjonskrav(inntektsmeldingService)
                 }
             }
         }

@@ -5,19 +5,24 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import no.nav.helsearbeidsgiver.utils.log.logger
 import no.nav.helsearbeidsgiver.utils.log.sikkerLogger
+import no.nav.syfo.integration.kafka.UtsattOppgaveConsumer
+import no.nav.syfo.simba.InntektsmeldingConsumer
 import no.nav.syfo.util.KubernetesProbeManager
 import no.nav.syfo.web.inntektsmeldingModule
 import no.nav.syfo.web.nais.nais
 import org.flywaydb.core.Flyway
+import javax.sql.DataSource
 import kotlin.concurrent.thread
 
 private val logger = "spinosaurus-main".logger()
 private val sikkerlogger = sikkerLogger()
 
 fun main() {
-    migrateDatabase()
-    UtsattOppgave.leaderElectionBakgrunnsjobbProcessor.startAsync(true)
-    startKafkaConsumer()
+    val components = AppComponents()
+
+    migrateDatabase(components.dataSource)
+    components.leaderElectionBakgrunnsjobbProcessor.startAsync(true)
+    startKafkaConsumer(components.inntektsmeldingConsumer, components.utsattOppgaveConsumer)
 
     val server =
         embeddedServer(
@@ -25,11 +30,11 @@ fun main() {
             port = 8080,
             module = {
                 nais()
-                inntektsmeldingModule()
+                inntektsmeldingModule(components.inntektsmeldingService)
             },
         ).also {
             it.addShutdownHook {
-                UtsattOppgave.leaderElectionBakgrunnsjobbProcessor.stopAll()
+                components.leaderElectionBakgrunnsjobbProcessor.stopAll()
             }
         }.start(wait = false)
 
@@ -49,34 +54,37 @@ fun main() {
     )
 }
 
-private fun migrateDatabase() {
+private fun migrateDatabase(dataSource: DataSource) {
     logger.info("Starter databasemigrering")
 
     Flyway
         .configure()
         .baselineOnMigrate(true)
-        .dataSource(hikariDataSource)
+        .dataSource(dataSource)
         .load()
         .migrate()
 
     logger.info("Databasemigrering slutt")
 }
 
-private fun startKafkaConsumer() {
+private fun startKafkaConsumer(
+    inntektsmeldingConsumer: InntektsmeldingConsumer,
+    utsattOppgaveConsumer: UtsattOppgaveConsumer,
+) {
     logger.info("Starter lytting for UtsattOppgave hendelser...")
     thread(start = true) {
-        UtsattOppgave.consumer.start()
+        utsattOppgaveConsumer.start()
     }
 
     logger.info("Starter lytting for mottak fra simba...")
-    logger.info("InntektsmeldingConsumer = ${Inntektsmelding.consumer}")
+    logger.info("InntektsmeldingConsumer = $inntektsmeldingConsumer")
     thread(start = true) {
         logger.info("Starter inntektsmeldingConsumer-tråd")
-        Inntektsmelding.consumer.start()
+        inntektsmeldingConsumer.start()
     }
 
     logger.info("Registrerer helsesjekker for kafka konsumentene...")
-    val list = listOf(UtsattOppgave.consumer, Inntektsmelding.consumer)
+    val list = listOf(utsattOppgaveConsumer, inntektsmeldingConsumer)
     list.forEach {
         logger.info("Registrerer helsesjekker for ${it.javaClass}")
         KubernetesProbeManager.registerLivenessComponent(it)

@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource
 import no.nav.auth.AuthClient
 import no.nav.auth.IdentityProvider
 import no.nav.auth.fetchToken
+import no.nav.hag.utils.bakgrunnsjobb.BakgrunnsjobbRepository
 import no.nav.hag.utils.bakgrunnsjobb.BakgrunnsjobbService
 import no.nav.hag.utils.bakgrunnsjobb.PostgresBakgrunnsjobbRepository
 import no.nav.helsearbeidsgiver.oppgave.OppgaveClient
@@ -30,9 +31,52 @@ import no.nav.syfo.util.createHttpClient
 import no.nav.syfo.utsattoppgave.FeiletUtsattOppgaveMeldingProsessor
 import no.nav.syfo.utsattoppgave.UtsattOppgaveDAO
 import no.nav.syfo.utsattoppgave.UtsattOppgaveService
+import javax.sql.DataSource
 import kotlin.time.Duration.Companion.days
 
-val hikariDataSource =
+class AppComponents {
+    val dataSource = createDataSource()
+    private val clients = Clients()
+
+    val inntektsmeldingService = createInntektsmeldingService(dataSource)
+    private val utsattOppgaveRepository = UtsattOppgaveRepositoryImp(dataSource)
+    private val utsattOppgaveDao = UtsattOppgaveDAO(utsattOppgaveRepository)
+    private val behandlendeEnhetService = BehandlendeEnhetService(clients.pdl, clients.norg2)
+    private val oppgaveService = OppgaveService(clients.oppgave)
+    private val utsattOppgaveService =
+        UtsattOppgaveService(
+            utsattOppgaveDao,
+            oppgaveService,
+            behandlendeEnhetService,
+            inntektsmeldingService,
+        )
+    val inntektsmeldingConsumer =
+        createInntektsmeldingConsumer(
+            clients.pdl,
+            inntektsmeldingService,
+            utsattOppgaveService,
+        )
+    private val bakgrunnsjobbRepository = PostgresBakgrunnsjobbRepository(dataSource)
+    val leaderElectionBakgrunnsjobbProcessor =
+        createLeaderElectionBakgrunnsjobbProcessor(
+            clients.leaderElectionManager,
+            bakgrunnsjobbRepository,
+            utsattOppgaveDao,
+            inntektsmeldingService,
+            behandlendeEnhetService,
+            oppgaveService,
+            utsattOppgaveService,
+        )
+    val utsattOppgaveConsumer =
+        UtsattOppgaveConsumer(
+            utsattOppgaveAivenProps(),
+            Env.Kafka.topicUtsattOppgave,
+            utsattOppgaveService,
+            bakgrunnsjobbRepository,
+        )
+}
+
+private fun createDataSource(): HikariDataSource =
     HikariDataSource(
         HikariConfig().apply {
             jdbcUrl = Env.Database.url
@@ -47,7 +91,7 @@ val hikariDataSource =
         },
     )
 
-private object Client {
+private class Clients {
     private val httpClient =
         createHttpClient(maxRetries = 3)
 
@@ -84,62 +128,51 @@ private object Client {
         )
 }
 
-object Inntektsmelding {
-    private val aivenProducer = InntektsmeldingAivenProducer(commonAivenProps())
-    private val repository = InntektsmeldingRepository(hikariDataSource)
-
-    val service = InntektsmeldingService(repository)
-    val consumer =
-        InntektsmeldingConsumer(
-            inntektsmeldingAivenProps(),
-            Env.Kafka.topicInntektsmelding,
-            service,
-            aivenProducer,
-            UtsattOppgave.service,
-            Client.pdl,
-        )
+private fun createInntektsmeldingService(dataSource: DataSource): InntektsmeldingService {
+    val repository = InntektsmeldingRepository(dataSource)
+    return InntektsmeldingService(repository)
 }
 
-object UtsattOppgave {
-    // repo
-    private val bakgrunnsjobbRepository = PostgresBakgrunnsjobbRepository(hikariDataSource)
-    private val utsattOppgaveRepository = UtsattOppgaveRepositoryImp(hikariDataSource)
-    private val utsattOppgaveDao = UtsattOppgaveDAO(utsattOppgaveRepository)
+private fun createInntektsmeldingConsumer(
+    pdlClient: PdlClient,
+    inntektsmeldingService: InntektsmeldingService,
+    utsattOppgaveService: UtsattOppgaveService,
+): InntektsmeldingConsumer {
+    val aivenProducer = InntektsmeldingAivenProducer(commonAivenProps())
 
-    // service
-    private val bakgrunnsjobbService = BakgrunnsjobbService(bakgrunnsjobbRepository, bakgrunnsvarsler = MetrikkVarsler())
-    private val behandlendeEnhetService = BehandlendeEnhetService(Client.pdl, Client.norg2)
-    private val oppgaveService = OppgaveService(Client.oppgave)
+    return InntektsmeldingConsumer(
+        inntektsmeldingAivenProps(),
+        Env.Kafka.topicInntektsmelding,
+        inntektsmeldingService,
+        aivenProducer,
+        utsattOppgaveService,
+        pdlClient,
+    )
+}
 
-    val service =
-        UtsattOppgaveService(
-            utsattOppgaveDao,
-            oppgaveService,
-            behandlendeEnhetService,
-            Inntektsmelding.service,
-        )
-    val consumer =
-        UtsattOppgaveConsumer(
-            utsattOppgaveAivenProps(),
-            Env.Kafka.topicUtsattOppgave,
-            service,
-            bakgrunnsjobbRepository,
-        )
-
-    private val feiletUtsattOppgaveMeldingProsessor = FeiletUtsattOppgaveMeldingProsessor(service)
-    private val finnAlleUtgaandeOppgaverProcessor =
+private fun createLeaderElectionBakgrunnsjobbProcessor(
+    leaderElectionManager: LeaderElectionManager,
+    bakgrunnsjobbRepository: BakgrunnsjobbRepository,
+    utsattOppgaveDao: UtsattOppgaveDAO,
+    inntektsmeldingService: InntektsmeldingService,
+    behandlendeEnhetService: BehandlendeEnhetService,
+    oppgaveService: OppgaveService,
+    utsattOppgaveService: UtsattOppgaveService,
+): LeaderElectionBakgrunnsjobbProcessor {
+    val bakgrunnsjobbService = BakgrunnsjobbService(bakgrunnsjobbRepository, bakgrunnsvarsler = MetrikkVarsler())
+    val feiletUtsattOppgaveMeldingProsessor = FeiletUtsattOppgaveMeldingProsessor(utsattOppgaveService)
+    val finnAlleUtgaandeOppgaverProcessor =
         FinnAlleUtgaandeOppgaverProcessor(
             utsattOppgaveDao,
             oppgaveService,
             behandlendeEnhetService,
-            Inntektsmelding.service,
+            inntektsmeldingService,
         )
 
-    val leaderElectionBakgrunnsjobbProcessor =
-        LeaderElectionBakgrunnsjobbProcessor(
-            Client.leaderElectionManager,
-            bakgrunnsjobbService,
-            finnAlleUtgaandeOppgaverProcessor,
-            feiletUtsattOppgaveMeldingProsessor,
-        )
+    return LeaderElectionBakgrunnsjobbProcessor(
+        leaderElectionManager,
+        bakgrunnsjobbService,
+        finnAlleUtgaandeOppgaverProcessor,
+        feiletUtsattOppgaveMeldingProsessor,
+    )
 }
