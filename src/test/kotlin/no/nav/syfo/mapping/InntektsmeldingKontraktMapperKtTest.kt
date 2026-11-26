@@ -27,8 +27,6 @@ class InntektsmeldingKontraktMapperKtTest {
                 data = om.writeValueAsString(grunnleggendeInntektsmelding),
             )
         val i = InntektsmeldingJsonMapper.fromJson(dto.data, dto.fnr)
-        assertThat(i.journalpostId).isEqualTo("123")
-        assertThat(i.sakId).isEqualTo("sakId")
         assertThat(i.arbeidsgiverOrgnummer).isEqualTo("1234")
         assertThat(i.fnr).isEqualTo(dto.fnr.verdi)
         assertThat(i.aktorId).isEqualTo("aktorId")
@@ -49,8 +47,6 @@ class InntektsmeldingKontraktMapperKtTest {
                 data = om.writeValueAsString(inntektsmeldingUtenFnr),
             )
         val i = InntektsmeldingJsonMapper.fromJson(dto.data, dto.fnr)
-        assertThat(i.journalpostId).isEqualTo("123")
-        assertThat(i.sakId).isEqualTo("sakId")
         assertThat(i.arbeidsgiverOrgnummer).isEqualTo("1234")
         assertThat(i.fnr).isEqualTo(dto.fnr.verdi)
         assertThat(i.aktorId).isEqualTo("aktorId")
@@ -98,7 +94,6 @@ class InntektsmeldingKontraktMapperKtTest {
             """.trimIndent()
         val rapportertInntekt = om.readValue(rapportertInntektJson, RapportertInntekt::class.java)
         assertThat(rapportertInntekt.endringAarsakerData).isNotEmpty()
-        assertThat(rapportertInntekt.manueltKorrigert).isTrue()
         assertThat(rapportertInntekt.endringAarsakerData.first().aarsak).isEqualTo("NyStillingsprosent")
         assertThat(rapportertInntekt.endringAarsakerData.first().gjelderFra).isEqualTo("2024-11-01")
         assertThat(rapportertInntekt.endringAarsakerData.first().bleKjent).isNull()

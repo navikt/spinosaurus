@@ -18,7 +18,6 @@ import no.nav.syfo.service.InntektsmeldingService
 import no.nav.syfo.util.InntektsmeldingJsonMapper
 import no.nav.syfo.util.LivenessComponent
 import no.nav.syfo.util.ReadynessComponent
-import no.nav.syfo.util.validerInntektsmelding
 import no.nav.syfo.utsattoppgave.UtsattOppgaveService
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -105,7 +104,7 @@ class InntektsmeldingConsumer(
                 LocalDateTime.now() // opprett oppgave umiddelbart
             }
 
-        val inntektsmelding = mapInntektsmelding(arkivReferanse, aktorId, journalpostId, inntektsmeldingFraSimba)
+        val inntektsmelding = mapInntektsmelding(arkivReferanse, aktorId, inntektsmeldingFraSimba)
 
         inntektsmeldingService.lagreBehandling(
             inntektsmeldingFraSimba,
@@ -134,7 +133,6 @@ class InntektsmeldingConsumer(
             mapInntektsmeldingKontrakt(
                 inntektsmelding,
                 aktorId,
-                validerInntektsmelding(inntektsmelding),
                 arkivReferanse,
                 inntektsmeldingFraSimba.id,
             )

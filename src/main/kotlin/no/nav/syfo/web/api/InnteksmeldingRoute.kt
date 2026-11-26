@@ -12,7 +12,6 @@ import no.nav.helsearbeidsgiver.utils.log.sikkerLogger
 import no.nav.syfo.mapping.mapInntektsmeldingKontrakt
 import no.nav.syfo.service.InntektsmeldingService
 import no.nav.syfo.util.InntektsmeldingJsonMapper
-import no.nav.syfo.util.validerInntektsmelding
 import java.util.UUID
 
 fun Route.syfoinntektsmelding(inntektsmeldingService: InntektsmeldingService) {
@@ -34,7 +33,6 @@ fun Route.syfoinntektsmelding(inntektsmeldingService: InntektsmeldingService) {
                     mapInntektsmeldingKontrakt(
                         inntektsmelding,
                         dto.aktorId,
-                        validerInntektsmelding(inntektsmelding),
                         inntektsmelding.arkivRefereranse,
                         dto.uuid,
                     )
