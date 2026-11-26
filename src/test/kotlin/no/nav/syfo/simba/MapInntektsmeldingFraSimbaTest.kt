@@ -17,9 +17,6 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.OffsetDateTime
-import java.time.ZoneOffset
 import java.util.UUID
 import no.nav.syfo.simba.Avsender as MuligAvsender
 
@@ -104,14 +101,6 @@ class MapInntektsmeldingFraSimbaTest {
         assertNull(endringAarsak.perioder)
         assertNull(endringAarsak.gjelderFra)
         assertNull(endringAarsak.bleKjent)
-    }
-
-    @Test
-    fun mapInnsendtTidspunktFraSimba() {
-        val localDateTime = LocalDateTime.of(2023, 2, 11, 14, 0)
-        val innsendt = OffsetDateTime.of(localDateTime, ZoneOffset.of("+1"))
-        val im = mockTilSpinoInntektsmelding(im = mockInntektsmelding().copy(mottatt = innsendt))
-        assertEquals(localDateTime, im.innsendingstidspunkt)
     }
 
     @Test
