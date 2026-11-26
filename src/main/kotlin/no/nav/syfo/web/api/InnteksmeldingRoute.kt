@@ -19,8 +19,8 @@ fun Route.syfoinntektsmelding(inntektsmeldingService: InntektsmeldingService) {
     get("/{inntektsmeldingId}") {
         val inntektsmeldingId =
             call.parameters["inntektsmeldingId"]
-                .runCatching(UUID::fromString)
-                .getOrNull()
+                ?.runCatching(UUID::fromString)
+                ?.getOrNull()
                 ?: throw IllegalArgumentException("Forventet inntektsmeldingId som path parameter")
 
         logger().debug("Fikk request om å hente inntektsmelding med id: $inntektsmeldingId")
