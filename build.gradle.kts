@@ -103,7 +103,6 @@ dependencies {
     val imkontraktVersion = project.property("imkontraktVersion") as String
     val jacksonVersion = project.property("jacksonVersion") as String
     val junitJupiterVersion = project.property("junitJupiterVersion") as String
-    val koinVersion = project.property("koinVersion") as String
     val kotlinxCoroutinesVersion = project.property("kotlinxCoroutinesVersion") as String
     val kotlinxSerializationVersion = project.property("kotlinxSerializationVersion") as String
     val ktorVersion = project.property("ktorVersion") as String
@@ -122,8 +121,6 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("com.zaxxer:HikariCP:$hikariVersion")
-    implementation("io.insert-koin:koin-core:$koinVersion")
-    implementation("io.insert-koin:koin-ktor:$koinVersion")
     implementation("io.ktor:ktor-client-apache5:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-client-core:$ktorVersion")
@@ -162,7 +159,6 @@ dependencies {
     runtimeOnly("ch.qos.logback:logback-classic:$logbackClassicVersion")
 
     testImplementation(testFixtures("no.nav.helsearbeidsgiver:utils:$hagUtilsVersion"))
-    testImplementation("io.insert-koin:koin-test:$koinVersion")
     testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.assertj:assertj-core:$assertJVersion")

@@ -11,7 +11,7 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding as Inn
 class InntektsmeldingService(
     private val repository: InntektsmeldingRepository,
 ) {
-    fun findById(inntektsmeldingId: UUID): InntektsmeldingEntitet? = repository.findByUuid(inntektsmeldingId.toString())
+    fun findById(inntektsmeldingId: UUID): InntektsmeldingEntitet? = repository.findById(inntektsmeldingId)
 
     fun lagreBehandling(
         inntektsmeldingFraSimba: InntektsmeldingFraSimba,
@@ -21,14 +21,14 @@ class InntektsmeldingService(
     ) {
         val dto =
             InntektsmeldingEntitet(
-                uuid = inntektsmeldingFraSimba.id.toString(),
+                uuid = inntektsmeldingFraSimba.id,
                 aktorId = aktorId,
                 fnr = inntektsmeldingFraSimba.sykmeldt.fnr,
                 data = inntektsmeldingJson,
             )
 
-        repository.lagreInnteksmelding(
-            innteksmelding = dto,
+        repository.lagreInntektsmelding(
+            inntektsmelding = dto,
             journalpostId = journalpostId,
             orgnr = inntektsmeldingFraSimba.avsender.orgnr.verdi,
             behandlet = inntektsmeldingFraSimba.mottatt.toLocalDateTime(),
@@ -37,8 +37,8 @@ class InntektsmeldingService(
 
     fun hentRefusjonskrav(inntektsmeldingIder: Set<UUID>): List<InntektsmeldingRefusjonskrav> =
         repository
-            .findByUuids(inntektsmeldingIder.map { it.toString() })
-            .associateBy { it.uuid.let(UUID::fromString) }
+            .findByIds(inntektsmeldingIder)
+            .associateBy { it.uuid }
             .map {
                 val inntektsmelding = InntektsmeldingJsonMapper.fromJson(it.value.data, it.value.fnr)
 

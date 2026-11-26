@@ -16,6 +16,7 @@ import no.nav.inntektsmeldingkontrakt.Status
 import no.nav.syfo.domain.inntektsmelding.Inntektsmelding
 import no.nav.syfo.domain.inntektsmelding.SpinnInntektEndringAarsak
 import org.slf4j.LoggerFactory
+import java.util.UUID
 import no.nav.syfo.domain.inntektsmelding.MottaksKanal as Kanal
 
 private val logger = LoggerFactory.getLogger("InntektsmeldingMapper")
@@ -24,10 +25,10 @@ fun mapInntektsmeldingKontrakt(
     inntektsmelding: Inntektsmelding,
     arbeidstakerAktørId: String,
     arkivreferanse: String,
-    uuid: String,
+    uuid: UUID,
 ): no.nav.inntektsmeldingkontrakt.Inntektsmelding =
     no.nav.inntektsmeldingkontrakt.Inntektsmelding(
-        inntektsmeldingId = uuid,
+        inntektsmeldingId = uuid.toString(),
         vedtaksperiodeId = inntektsmelding.vedtaksperiodeId,
         arbeidstakerFnr = inntektsmelding.fnr,
         arbeidstakerAktorId = arbeidstakerAktørId,

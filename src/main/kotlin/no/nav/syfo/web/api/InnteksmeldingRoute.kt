@@ -10,20 +10,22 @@ import io.ktor.server.routing.post
 import no.nav.helsearbeidsgiver.utils.log.logger
 import no.nav.helsearbeidsgiver.utils.log.sikkerLogger
 import no.nav.syfo.mapping.mapInntektsmeldingKontrakt
-import no.nav.syfo.repository.InntektsmeldingRepository
 import no.nav.syfo.service.InntektsmeldingService
 import no.nav.syfo.util.InntektsmeldingJsonMapper
+import java.util.UUID
 
-fun Route.syfoinntektsmelding(imRepo: InntektsmeldingRepository) {
+fun Route.syfoinntektsmelding(inntektsmeldingService: InntektsmeldingService) {
     get("/{inntektsmeldingId}") {
         val inntektsmeldingId =
-            call.parameters["inntektsmeldingId"] ?: throw IllegalArgumentException(
-                "Forventet inntektsmeldingId som path parameter",
-            )
+            call.parameters["inntektsmeldingId"]
+                ?.runCatching(UUID::fromString)
+                ?.getOrNull()
+                ?: throw IllegalArgumentException("Forventet inntektsmeldingId som path parameter")
+
         logger().debug("Fikk request om å hente inntektsmelding med id: $inntektsmeldingId")
 
         try {
-            val dto = imRepo.findByUuid(inntektsmeldingId)
+            val dto = inntektsmeldingService.findById(inntektsmeldingId)
             if (dto != null) {
                 val inntektsmelding = InntektsmeldingJsonMapper.fromJson(dto.data, dto.fnr)
 

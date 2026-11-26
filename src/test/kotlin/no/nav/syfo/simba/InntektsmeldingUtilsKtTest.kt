@@ -1,10 +1,10 @@
 package no.nav.syfo.simba
 
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.util.UUID
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 class InntektsmeldingUtilsKtTest {
     @Test

@@ -7,8 +7,8 @@ import no.nav.helsearbeidsgiver.utils.log.MdcUtils
 import no.nav.syfo.behandling.OpprettOppgaveException
 import no.nav.syfo.client.oppgave.OppgaveService
 import no.nav.syfo.dto.Tilstand
-import no.nav.syfo.repository.InntektsmeldingRepository
 import no.nav.syfo.service.BehandlendeEnhetService
+import no.nav.syfo.service.InntektsmeldingService
 import no.nav.syfo.util.Metrikk
 import no.nav.syfo.utsattoppgave.BehandlingsKategori
 import no.nav.syfo.utsattoppgave.UtsattOppgaveDAO
@@ -23,7 +23,7 @@ class FinnAlleUtgaandeOppgaverProcessor(
     private val utsattOppgaveDAO: UtsattOppgaveDAO,
     private val oppgaveService: OppgaveService,
     private val behandlendeEnhetService: BehandlendeEnhetService,
-    private val inntektsmeldingRepository: InntektsmeldingRepository,
+    private val inntektsmeldingService: InntektsmeldingService,
 ) : RecurringJob(CoroutineScope(Dispatchers.IO), Duration.ofHours(6).toMillis()) {
     private val sikkerlogger = LoggerFactory.getLogger("tjenestekall")
 
@@ -33,7 +33,7 @@ class FinnAlleUtgaandeOppgaverProcessor(
             utsattOppgaveDAO
                 .finnAlleUtgaatteOppgaver()
                 .forEach { oppgaveEntitet ->
-                    inntektsmeldingRepository
+                    inntektsmeldingService
                         .hentInntektsmelding(oppgaveEntitet.inntektsmeldingId)
                         .onFailure { e ->
                             "Fant ikke inntektsmelding for utsatt oppgave: ${oppgaveEntitet.arkivreferanse}".also {

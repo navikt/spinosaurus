@@ -52,9 +52,9 @@ spec:
         - application: sparkel-dokumenter
           namespace: tbd
   env:
-    - name: RUN_BACKGROUND_WORKERS
-      value: "true"
-    - name: KAFKA_UTSATT_OPPGAVE_TOPIC
+    - name: KAFKA_TOPIC_INNTEKTSMELDING
+      value: helsearbeidsgiver.inntektsmelding
+    - name: KAFKA_TOPIC_UTSATT_OPPGAVE
       value: tbd.spre-oppgaver
     - name: NORG2_URL
       value: http://norg2.org/norg2/api/v1/arbeidsfordeling/enheter/bestmatch

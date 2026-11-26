@@ -15,13 +15,13 @@ import io.ktor.server.testing.testApplication
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.syfo.service.InntektsmeldingService
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.util.UUID
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon as Refusjonskrav
 
-class InnteksmeldingRouteTest {
+class InntektsmeldingRouteTest {
     val inntektsmeldingService = mockk<InntektsmeldingService>(relaxed = true)
 
     private fun refusjonskravRequest(ider: Set<UUID>) = jacksonObjectMapper().writeValueAsString(RefusjonskravRequest(ider))

@@ -34,7 +34,7 @@ object UtsattOppgaveTestData {
 
     val inntektsmeldingEntitet =
         InntektsmeldingEntitet(
-            uuid = UUID.randomUUID().toString(),
+            uuid = UUID.randomUUID(),
             aktorId = "aktoerid-123",
             fnr = Fnr.genererGyldig(),
             data = InntektsmeldingJsonMapper.toJson(buildIM()),

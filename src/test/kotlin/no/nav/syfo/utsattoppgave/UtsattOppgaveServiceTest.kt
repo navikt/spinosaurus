@@ -11,8 +11,8 @@ import no.nav.syfo.client.oppgave.OppgaveService
 import no.nav.syfo.domain.OppgaveResultat
 import no.nav.syfo.dto.Tilstand
 import no.nav.syfo.isEqualNullSafe
-import no.nav.syfo.repository.InntektsmeldingRepository
 import no.nav.syfo.service.BehandlendeEnhetService
+import no.nav.syfo.service.InntektsmeldingService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -23,14 +23,14 @@ class UtsattOppgaveServiceTest {
     val utsattOppgaveDAO: UtsattOppgaveDAO = mockk(relaxed = true)
     val oppgaveService: OppgaveService = mockk(relaxed = true)
     val behandlendeEnhetService: BehandlendeEnhetService = mockk(relaxed = true)
-    val inntektsmeldingRepository: InntektsmeldingRepository = mockk(relaxed = true)
+    val inntektsmeldingService: InntektsmeldingService = mockk(relaxed = true)
 
     val utsattOppgaveService =
         UtsattOppgaveService(
             utsattOppgaveDAO = utsattOppgaveDAO,
             oppgaveService = oppgaveService,
             behandlendeEnhetService = behandlendeEnhetService,
-            inntektsmeldingRepository = inntektsmeldingRepository,
+            inntektsmeldingService = inntektsmeldingService,
         )
 
     val oppgave = UtsattOppgaveTestData.oppgave
@@ -42,7 +42,7 @@ class UtsattOppgaveServiceTest {
         every { utsattOppgaveDAO.finn(any()) } returns oppgave
         coEvery { oppgaveService.opprettOppgave(any(), any(), any(), any()) } returns OppgaveResultat(Random.nextInt(), false, false)
         every { behandlendeEnhetService.gjelderUtland(any()) } returns false
-        every { inntektsmeldingRepository.findByUuid(any()) } returns UtsattOppgaveTestData.inntektsmeldingEntitet
+        every { inntektsmeldingService.findById(any()) } returns UtsattOppgaveTestData.inntektsmeldingEntitet
     }
 
     @Test
@@ -118,7 +118,7 @@ class UtsattOppgaveServiceTest {
 
     @Test
     fun `Oppretter Ikke Oppgave hvis begrunnelseRedusert = IkkeFravaer hvis oppgave utsatt`() {
-        every { inntektsmeldingRepository.findByUuid(any()) } returns UtsattOppgaveTestData.inntektsmeldingEntitetIkkeFravaer
+        every { inntektsmeldingService.findById(any()) } returns UtsattOppgaveTestData.inntektsmeldingEntitetIkkeFravaer
         val oppgaveOppdatering =
             OppgaveOppdatering(
                 UUID.randomUUID(),
@@ -133,7 +133,7 @@ class UtsattOppgaveServiceTest {
 
     @Test
     fun `Oppretter Ikke Oppgave hvis begrunnelseRedusert = IkkeFravaer og oppgave allerede forkastet`() {
-        every { inntektsmeldingRepository.findByUuid(any()) } returns UtsattOppgaveTestData.inntektsmeldingEntitetIkkeFravaer
+        every { inntektsmeldingService.findById(any()) } returns UtsattOppgaveTestData.inntektsmeldingEntitetIkkeFravaer
         val forkastetTidspunkt = LocalDateTime.of(2023, 4, 6, 9, 0)
         val forkastetOppgave = oppgave.copy(tilstand = Tilstand.Forkastet, oppdatert = forkastetTidspunkt)
         every { utsattOppgaveDAO.finn(any()) } returns forkastetOppgave

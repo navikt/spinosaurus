@@ -33,7 +33,6 @@ class InntektsmeldingConsumer(
     private val inntektsmeldingAivenProducer: InntektsmeldingAivenProducer,
     private val utsattOppgaveService: UtsattOppgaveService,
     private val pdlClient: PdlClient,
-    private val skalKasteExceptionVedPDLFeil: Boolean = true,
 ) : ReadynessComponent,
     LivenessComponent {
     private val consumer = KafkaConsumer<String, String>(props)
@@ -96,7 +95,7 @@ class InntektsmeldingConsumer(
         journalpostId: String,
         inntektsmeldingFraSimba: Inntektsmelding,
     ) {
-        val aktorId = hentAktoeridFraPDL(inntektsmeldingFraSimba.sykmeldt.fnr.verdi)
+        val aktorId = hentAktoerIdFraPdl(inntektsmeldingFraSimba.sykmeldt.fnr.verdi)
         val arkivReferanse = "im_$journalpostId"
         val timeout =
             if (inntektsmeldingFraSimba.skalSendesTilSpleis()) {
@@ -135,7 +134,7 @@ class InntektsmeldingConsumer(
                 inntektsmelding,
                 aktorId,
                 arkivReferanse,
-                inntektsmeldingFraSimba.id.toString(),
+                inntektsmeldingFraSimba.id,
             )
 
         inntektsmeldingAivenProducer.sendTilTopicForBruker(mappedInntektsmelding)
@@ -145,19 +144,19 @@ class InntektsmeldingConsumer(
         }
     }
 
-    private fun hentAktoeridFraPDL(identitetsnummer: String): String {
+    private fun hentAktoerIdFraPdl(identitetsnummer: String): String {
         val aktorid =
             runBlocking {
                 pdlClient.hentAktoerID(identitetsnummer)
             }
-        if (aktorid == null) {
-            sikkerlogger.error("Fant ikke aktøren for: $identitetsnummer")
+
+        return if (aktorid == null) {
             logger.error("Fant ikke aktørId!")
-            if (skalKasteExceptionVedPDLFeil) { // Oppslag feiler i dev-miljøer om ikke brukere er opprettet i PDL - og dev wipes rett som det er
-                throw FantIkkeAktørException(null)
-            }
+            sikkerlogger.error("Fant ikke aktøren for: $identitetsnummer")
+            throw FantIkkeAktørException(null)
+        } else {
+            aktorid
         }
-        return aktorid ?: "AktørID"
     }
 
     override suspend fun runReadynessCheck() {

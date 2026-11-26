@@ -32,8 +32,6 @@ spec:
         - host: oppgave.prod-fss-pub.nais.io
         - host: pdl-api.prod-fss-pub.nais.io
   env:
-    - name: KOIN_PROFILE
-      value: PROD
     - name: OPPGAVEBEHANDLING_URL
       value: https://oppgave.prod-fss-pub.nais.io/api/v1/oppgaver
     - name: PDL_URL

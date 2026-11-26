@@ -15,7 +15,6 @@ import no.nav.helsearbeidsgiver.utils.log.sikkerLogger
 import no.nav.syfo.util.KubernetesProbeManager
 import no.nav.syfo.util.ProbeResult
 import no.nav.syfo.util.ProbeState
-import org.koin.ktor.ext.get
 import java.util.Collections
 
 fun Application.nais() {
@@ -36,14 +35,12 @@ fun Application.nais() {
 
     routing {
         get("/health/is-alive") {
-            val kubernetesProbeManager = this@routing.get<KubernetesProbeManager>()
-            val checkResults = kubernetesProbeManager.runLivenessProbe()
+            val checkResults = KubernetesProbeManager.runLivenessProbe()
             returnResultOfChecks(checkResults)
         }
 
         get("/health/is-ready") {
-            val kubernetesProbeManager = this@routing.get<KubernetesProbeManager>()
-            val checkResults = kubernetesProbeManager.runReadynessProbe()
+            val checkResults = KubernetesProbeManager.runReadynessProbe()
             returnResultOfChecks(checkResults)
         }
 
@@ -58,9 +55,8 @@ fun Application.nais() {
         }
 
         get("/healthcheck") {
-            val kubernetesProbeManager = this@routing.get<KubernetesProbeManager>()
-            val readyResults = kubernetesProbeManager.runReadynessProbe()
-            val liveResults = kubernetesProbeManager.runLivenessProbe()
+            val readyResults = KubernetesProbeManager.runReadynessProbe()
+            val liveResults = KubernetesProbeManager.runLivenessProbe()
             val combinedResults =
                 ProbeResult(
                     liveResults.healthyComponents +

@@ -38,8 +38,8 @@ data class TokenErrorResponse(
 )
 
 class AuthClient(
-    private val httpClient: HttpClient,
     private val tokenEndpoint: String,
+    private val httpClient: HttpClient,
 ) {
     suspend fun token(
         provider: IdentityProvider,

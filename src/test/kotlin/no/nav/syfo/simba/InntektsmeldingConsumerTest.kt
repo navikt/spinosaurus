@@ -21,7 +21,6 @@ import java.util.UUID
 
 class InntektsmeldingConsumerTest {
     lateinit var consumer: InntektsmeldingConsumer
-    val props = kafkaConsumerTestProps().toMap()
     val inntektsmeldingService: InntektsmeldingService = mockk(relaxed = true)
     val inntektsmeldingAivenProducer: InntektsmeldingAivenProducer = mockk(relaxed = true)
     val utsattOppgaveService: UtsattOppgaveService = mockk(relaxed = true)
@@ -31,7 +30,8 @@ class InntektsmeldingConsumerTest {
 
     @BeforeEach
     fun before() {
-        consumer = InntektsmeldingConsumer(props, topicName, inntektsmeldingService, inntektsmeldingAivenProducer, utsattOppgaveService, pdlClient)
+        consumer =
+            InntektsmeldingConsumer(kafkaConsumerTestProps(), topicName, inntektsmeldingService, inntektsmeldingAivenProducer, utsattOppgaveService, pdlClient)
         mockkStatic(LocalDateTime::class)
         every { LocalDateTime.now() } returns testNow
     }
