@@ -44,7 +44,7 @@ class FinnAlleUtgaandeOppgaverProcessor(
                         }.onSuccess { inntektsmelding ->
                             try {
                                 logger.info("Henter behandlende enhet for inntektsmelding: ${oppgaveEntitet.arkivreferanse}")
-                                val gjelderUtland = behandlendeEnhetService.gjelderUtland(oppgaveEntitet)
+                                val gjelderUtland = behandlendeEnhetService.gjelderUtland(oppgaveEntitet.fnr)
 
                                 logger.info("Utleder behandlingskategori for inntektsmelding: ${oppgaveEntitet.arkivreferanse}")
                                 val behandlingsKategori = finnBehandlingsKategori(inntektsmelding, oppgaveEntitet.speil, gjelderUtland)

@@ -31,7 +31,14 @@ class InntektsmeldingConsumerTest {
     @BeforeEach
     fun before() {
         consumer =
-            InntektsmeldingConsumer(kafkaConsumerTestProps(), topicName, inntektsmeldingService, inntektsmeldingAivenProducer, utsattOppgaveService, pdlClient)
+            InntektsmeldingConsumer(
+                kafkaConsumerTestProps(),
+                topicName,
+                pdlClient,
+                inntektsmeldingService,
+                utsattOppgaveService,
+                inntektsmeldingAivenProducer,
+            )
         mockkStatic(LocalDateTime::class)
         every { LocalDateTime.now() } returns testNow
     }

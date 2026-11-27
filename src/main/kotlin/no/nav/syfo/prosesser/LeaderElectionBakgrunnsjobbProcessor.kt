@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import no.nav.hag.utils.bakgrunnsjobb.BakgrunnsjobbService
 import no.nav.hag.utils.bakgrunnsjobb.RecurringJob
-import no.nav.syfo.util.LeaderElectionManager
+import no.nav.syfo.client.leaderelection.LeaderElectionManager
 import no.nav.syfo.utsattoppgave.FeiletUtsattOppgaveMeldingProsessor
 import java.time.Duration
 
