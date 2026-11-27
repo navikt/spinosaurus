@@ -2,92 +2,46 @@ package no.nav.syfo.service
 
 import kotlinx.coroutines.runBlocking
 import no.nav.helsearbeidsgiver.pdl.PdlClient
-import no.nav.helsearbeidsgiver.utils.log.MdcUtils
 import no.nav.helsearbeidsgiver.utils.log.logger
 import no.nav.helsearbeidsgiver.utils.log.sikkerLogger
-import no.nav.syfo.behandling.BehandlendeEnhetFeiletException
-import no.nav.syfo.behandling.IngenAktivEnhetException
-import no.nav.syfo.client.norg.ArbeidsfordelingRequest
-import no.nav.syfo.client.norg.ArbeidsfordelingResponse
-import no.nav.syfo.client.norg.Norg2Client
-import no.nav.syfo.domain.GeografiskTilknytningData
-import no.nav.syfo.dto.UtsattOppgaveEntitet
+import no.nav.helsearbeidsgiver.utils.pipe.ifTrue
+import no.nav.syfo.client.norg2.Norg2Client
 import no.nav.syfo.util.Metrikk
 
-const val SYKEPENGER_UTLAND = "4474"
-const val SYKEPENGER = "SYK"
+private const val SYKEPENGER_UTLAND = "4474"
 
 class BehandlendeEnhetService(
     private val pdlClient: PdlClient,
     private val norg2Client: Norg2Client,
 ) {
-    private val logger = this.logger()
-    private val sikkerlogger = sikkerLogger()
+    private val logger = logger()
+    private val sikkerLogger = sikkerLogger()
 
-    private fun hentBehandlendeEnhet(
-        fnr: String,
-        uuid: String,
-    ): String {
-        val geografiskTilknytning = hentGeografiskTilknytning(fnr)
-
-        val criteria =
-            ArbeidsfordelingRequest(
-                tema = SYKEPENGER,
-                diskresjonskode = geografiskTilknytning.diskresjonskode,
-                geografiskOmraade = geografiskTilknytning.geografiskTilknytning,
-            )
-
-        try {
-            val arbeidsfordelinger =
-                runBlocking {
-                    norg2Client.hentAlleArbeidsfordelinger(criteria, MdcUtils.getCallId())
-                }
-            sikkerlogger.debug("Fant enheter: $arbeidsfordelinger")
-            val behandlendeEnhet =
-                finnAktivBehandlendeEnhet(
-                    arbeidsfordelinger,
-                    geografiskTilknytning.geografiskTilknytning,
-                )
-            if (SYKEPENGER_UTLAND == behandlendeEnhet) {
-                Metrikk.tellInntektsmeldingSykepengerUtland()
+    fun gjelderUtland(fnr: String): Boolean {
+        val behandlendeEnhet = hentBehandlendeEnhet(fnr)
+        return if (behandlendeEnhet != null) {
+            "Hentet behandlende enhet '$behandlendeEnhet'.".also {
+                logger.debug(it)
+                sikkerLogger.debug(it)
             }
-            sikkerlogger.debug(
-                "Fant geografiskTilknytning ${geografiskTilknytning.geografiskTilknytning} med behandlendeEnhet $behandlendeEnhet for inntektsmelding $uuid",
-            )
-            return behandlendeEnhet
-        } catch (e: RuntimeException) {
-            "Klarte ikke å hente behandlende enhet!".also {
-                logger.error(it)
-                sikkerlogger.error(it, e)
-            }
-            throw BehandlendeEnhetFeiletException(e)
+
+            (behandlendeEnhet == SYKEPENGER_UTLAND)
+                .ifTrue { Metrikk.tellInntektsmeldingSykepengerUtland() }
+        } else {
+            val feilmelding = "Klarte ikke hente behandlende enhet."
+            logger.error(feilmelding)
+            sikkerLogger.error(feilmelding)
+            throw RuntimeException(feilmelding, null)
         }
     }
 
-    private fun hentGeografiskTilknytning(fnr: String): GeografiskTilknytningData {
+    private fun hentBehandlendeEnhet(fnr: String): String? =
         runBlocking {
-            pdlClient.fullPerson(fnr)
-        }.let {
-            return GeografiskTilknytningData(
-                geografiskTilknytning = it?.geografiskTilknytning,
-                diskresjonskode = it?.diskresjonskode,
+            val person = pdlClient.fullPerson(fnr)
+
+            norg2Client.hentBehandlendeEnhet(
+                diskresjonskode = person?.diskresjonskode,
+                geografiskOmraade = person?.geografiskTilknytning,
             )
         }
-    }
-
-    fun gjelderUtland(oppgave: UtsattOppgaveEntitet): Boolean {
-        val behandlendeEnhet = this.hentBehandlendeEnhet(oppgave.fnr, oppgave.inntektsmeldingId)
-        sikkerlogger.debug("Fant enhet $behandlendeEnhet for ${oppgave.arkivreferanse}")
-        return (SYKEPENGER_UTLAND == behandlendeEnhet)
-    }
 }
-
-fun finnAktivBehandlendeEnhet(
-    arbeidsfordelinger: List<ArbeidsfordelingResponse>,
-    geografiskTilknytning: String?,
-): String =
-    arbeidsfordelinger
-        .stream()
-        .findFirst()
-        .orElseThrow { IngenAktivEnhetException(geografiskTilknytning, null) }
-        .enhetNr!!

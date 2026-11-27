@@ -42,19 +42,3 @@ class OpprettOppgaveException(
     journalpostId: String,
     cause: Exception?,
 ) : OppgaveException(Feiltype.OPPGAVE_OPPRETT_VANLIG, "Klarte ikke opprette oppgave for journalpostId $journalpostId!", cause)
-
-// BehandlendeEnhetConsumer
-open class BehandlendeEnhetException(
-    feiltype: Feiltype,
-    message: String,
-    cause: Exception?,
-) : BehandlingException(feiltype, message, cause)
-
-class IngenAktivEnhetException(
-    geografiskTilknytning: String?,
-    cause: java.lang.Exception?,
-) : BehandlendeEnhetException(Feiltype.BEHANDLENDE_INGEN_AKTIV_ENHET, "Fant ingen aktiv enhet for $geografiskTilknytning", cause)
-
-class BehandlendeEnhetFeiletException(
-    cause: java.lang.Exception?,
-) : BehandlendeEnhetException(Feiltype.BEHANDLENDE_FEILET, "Feil ved henting av geografisk tilknytning", cause)

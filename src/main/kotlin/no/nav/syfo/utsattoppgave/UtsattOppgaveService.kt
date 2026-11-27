@@ -72,7 +72,7 @@ class UtsattOppgaveService(
                 inntektsmeldingService
                     .hentInntektsmelding(oppgave.inntektsmeldingId)
                     .onSuccess { inntektsmelding ->
-                        val gjelderUtland = behandlendeEnhetService.gjelderUtland(oppgave)
+                        val gjelderUtland = behandlendeEnhetService.gjelderUtland(oppgave.fnr)
                         val behandlingsKategori = finnBehandlingsKategori(inntektsmelding, oppgave.speil, gjelderUtland)
                         if (behandlingsKategori != BehandlingsKategori.IKKE_FRAVAER) {
                             val resultat = oppgaveService.opprettOppgaveIGosys(oppgave, behandlingsKategori, inntektsmelding)

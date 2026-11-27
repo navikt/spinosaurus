@@ -27,7 +27,7 @@ class UtsattOppgaveConsumerTest {
 
     @BeforeEach
     fun before() {
-        consumer = UtsattOppgaveConsumer(kafkaConsumerTestProps(), topicName, utsattOppgaveService, bakgrunnsjobbRepo)
+        consumer = UtsattOppgaveConsumer(kafkaConsumerTestProps(), topicName, bakgrunnsjobbRepo, utsattOppgaveService)
     }
 
     @Test

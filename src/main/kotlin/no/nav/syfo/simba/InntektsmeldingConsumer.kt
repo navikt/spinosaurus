@@ -29,10 +29,10 @@ const val OPPRETT_OPPGAVE_FORSINKELSE = 48L
 class InntektsmeldingConsumer(
     props: Map<String, Any>,
     topicName: String,
-    private val inntektsmeldingService: InntektsmeldingService,
-    private val inntektsmeldingAivenProducer: InntektsmeldingAivenProducer,
-    private val utsattOppgaveService: UtsattOppgaveService,
     private val pdlClient: PdlClient,
+    private val inntektsmeldingService: InntektsmeldingService,
+    private val utsattOppgaveService: UtsattOppgaveService,
+    private val inntektsmeldingAivenProducer: InntektsmeldingAivenProducer,
 ) : ReadynessComponent,
     LivenessComponent {
     private val consumer = KafkaConsumer<String, String>(props)
@@ -145,17 +145,17 @@ class InntektsmeldingConsumer(
     }
 
     private fun hentAktoerIdFraPdl(identitetsnummer: String): String {
-        val aktorid =
+        val aktoerId =
             runBlocking {
                 pdlClient.hentAktoerID(identitetsnummer)
             }
 
-        return if (aktorid == null) {
+        return if (aktoerId == null) {
             logger.error("Fant ikke aktørId!")
             sikkerlogger.error("Fant ikke aktøren for: $identitetsnummer")
             throw FantIkkeAktørException(null)
         } else {
-            aktorid
+            aktoerId
         }
     }
 

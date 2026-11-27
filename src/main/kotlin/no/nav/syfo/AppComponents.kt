@@ -2,9 +2,6 @@ package no.nav.syfo
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import no.nav.auth.AuthClient
-import no.nav.auth.IdentityProvider
-import no.nav.auth.fetchToken
 import no.nav.hag.utils.bakgrunnsjobb.BakgrunnsjobbRepository
 import no.nav.hag.utils.bakgrunnsjobb.BakgrunnsjobbService
 import no.nav.hag.utils.bakgrunnsjobb.PostgresBakgrunnsjobbRepository
@@ -12,7 +9,9 @@ import no.nav.helsearbeidsgiver.oppgave.OppgaveClient
 import no.nav.helsearbeidsgiver.pdl.Behandlingsgrunnlag
 import no.nav.helsearbeidsgiver.pdl.PdlClient
 import no.nav.helsearbeidsgiver.utils.cache.LocalCache
-import no.nav.syfo.client.norg.Norg2Client
+import no.nav.syfo.client.auth.AuthClient
+import no.nav.syfo.client.leaderelection.LeaderElectionManager
+import no.nav.syfo.client.norg2.Norg2Client
 import no.nav.syfo.client.oppgave.OppgaveService
 import no.nav.syfo.integration.kafka.UtsattOppgaveConsumer
 import no.nav.syfo.integration.kafka.commonAivenProps
@@ -26,7 +25,6 @@ import no.nav.syfo.repository.UtsattOppgaveRepositoryImp
 import no.nav.syfo.service.BehandlendeEnhetService
 import no.nav.syfo.service.InntektsmeldingService
 import no.nav.syfo.simba.InntektsmeldingConsumer
-import no.nav.syfo.util.LeaderElectionManager
 import no.nav.syfo.util.createHttpClient
 import no.nav.syfo.utsattoppgave.FeiletUtsattOppgaveMeldingProsessor
 import no.nav.syfo.utsattoppgave.UtsattOppgaveDAO
@@ -71,8 +69,8 @@ class AppComponents {
         UtsattOppgaveConsumer(
             utsattOppgaveAivenProps(),
             Env.Kafka.topicUtsattOppgave,
-            utsattOppgaveService,
             bakgrunnsjobbRepository,
+            utsattOppgaveService,
         )
 }
 
@@ -92,8 +90,7 @@ private fun createDataSource(): HikariDataSource =
     )
 
 private class Clients {
-    private val httpClient =
-        createHttpClient(maxRetries = 3)
+    private val httpClient = createHttpClient()
 
     private val authClient =
         AuthClient(
@@ -110,7 +107,7 @@ private class Clients {
     val oppgave =
         OppgaveClient(
             url = Env.Client.urlOppgave,
-            getToken = authClient.fetchToken(IdentityProvider.AZURE_AD, Env.Client.scopeOppgave),
+            getToken = { authClient.hentAzureToken(Env.Client.scopeOppgave) },
         )
 
     val pdl =
@@ -118,7 +115,7 @@ private class Clients {
             url = Env.Client.urlPdl,
             behandlingsgrunnlag = Behandlingsgrunnlag.INNTEKTSMELDING,
             cacheConfig = LocalCache.Config(1.days, 30_000),
-            getAccessToken = authClient.fetchToken(IdentityProvider.AZURE_AD, Env.Client.scopePdl),
+            getAccessToken = { authClient.hentAzureToken(Env.Client.scopePdl) },
         )
 
     val leaderElectionManager =
@@ -143,10 +140,10 @@ private fun createInntektsmeldingConsumer(
     return InntektsmeldingConsumer(
         inntektsmeldingAivenProps(),
         Env.Kafka.topicInntektsmelding,
-        inntektsmeldingService,
-        aivenProducer,
-        utsattOppgaveService,
         pdlClient,
+        inntektsmeldingService,
+        utsattOppgaveService,
+        aivenProducer,
     )
 }
 

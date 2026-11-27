@@ -22,8 +22,8 @@ import java.time.LocalDateTime
 class UtsattOppgaveConsumer(
     props: Map<String, Any>,
     topicName: String,
-    val utsattOppgaveService: UtsattOppgaveService,
     val bakgrunnsjobbRepo: BakgrunnsjobbRepository,
+    val utsattOppgaveService: UtsattOppgaveService,
 ) : ReadynessComponent,
     LivenessComponent {
     private val consumer: KafkaConsumer<String, String> = KafkaConsumer(props, StringDeserializer(), StringDeserializer())

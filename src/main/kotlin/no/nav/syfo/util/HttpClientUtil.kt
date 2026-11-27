@@ -11,9 +11,9 @@ import io.ktor.http.ContentType
 import io.ktor.serialization.jackson.JacksonConverter
 import io.ktor.serialization.jackson.jackson
 
-internal fun createHttpClient(maxRetries: Int): HttpClient = HttpClient(Apache5) { configure(maxRetries) }
+fun createHttpClient(): HttpClient = HttpClient(Apache5) { configure() }
 
-internal fun HttpClientConfig<*>.configure(retries: Int) {
+fun HttpClientConfig<*>.configure() {
     expectSuccess = true
 
     install(ContentNegotiation) {
@@ -25,7 +25,7 @@ internal fun HttpClientConfig<*>.configure(retries: Int) {
 
     install(HttpRequestRetry) {
         retryOnException(
-            maxRetries = retries,
+            maxRetries = 3,
             retryOnTimeout = true,
         )
         exponentialDelay()

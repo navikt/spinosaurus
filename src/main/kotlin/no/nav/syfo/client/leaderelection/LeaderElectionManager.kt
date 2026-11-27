@@ -1,4 +1,4 @@
-package no.nav.syfo.util
+package no.nav.syfo.client.leaderelection
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body

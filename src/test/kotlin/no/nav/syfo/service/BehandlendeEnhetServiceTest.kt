@@ -1,85 +1,59 @@
 package no.nav.syfo.service
 
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.runBlocking
 import no.nav.helsearbeidsgiver.pdl.PdlClient
 import no.nav.helsearbeidsgiver.pdl.domene.FullPerson
 import no.nav.helsearbeidsgiver.pdl.domene.PersonNavn
 import no.nav.helsearbeidsgiver.utils.test.date.januar
-import no.nav.syfo.behandling.IngenAktivEnhetException
-import no.nav.syfo.client.norg.ArbeidsfordelingResponse
-import no.nav.syfo.client.norg.Norg2Client
-import no.nav.syfo.dto.Tilstand
-import no.nav.syfo.dto.UtsattOppgaveEntitet
+import no.nav.helsearbeidsgiver.utils.test.wrapper.genererGyldig
+import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
+import no.nav.syfo.client.norg2.Norg2Client
 import org.assertj.core.api.Assertions
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
+import org.junit.jupiter.api.assertThrows
 
 class BehandlendeEnhetServiceTest {
-    val pdlClient = mockk<PdlClient>(relaxed = true)
-    val norg2Client = mockk<Norg2Client>(relaxed = true)
+    val pdlClient = mockk<PdlClient>()
+    val norg2Client = mockk<Norg2Client>()
 
-    val fnr = "123456789"
-    val uuid = "abcdefgh"
-    val enhetNr = "enhet_nr_007"
+    val behandlendeEnhetService = BehandlendeEnhetService(pdlClient, norg2Client)
 
     @Test
-    fun skal_finne_enhetsnr_gjelder_utland() {
-        coEvery {
-            pdlClient.fullPerson(fnr)
-        } returns mockFullPerson()
-        val arbeidsfordelinger =
-            listOf(buildArbeidsfordelingResponse(SYKEPENGER_UTLAND, LocalDate.of(2000, 1, 1), LocalDate.of(2030, 1, 1)))
-        every {
-            runBlocking {
-                norg2Client.hentAlleArbeidsfordelinger(any(), any())
-            }
-        } returns arbeidsfordelinger
-        val enhet = BehandlendeEnhetService(pdlClient, norg2Client).gjelderUtland(mockUtsattOppgave())
-        Assertions.assertThat(enhet).isEqualTo(true)
+    fun `behandlende enhet gjelder utland`() {
+        coEvery { pdlClient.fullPerson(mockFnr) } returns mockPerson
+        coEvery { norg2Client.hentBehandlendeEnhet(any(), any()) } returns "4474"
+
+        val gjelderUtland = behandlendeEnhetService.gjelderUtland(mockFnr)
+        Assertions.assertThat(gjelderUtland).isEqualTo(true)
     }
 
     @Test
-    fun skal_finne_aktiv_arbeidsfordeling() {
-        val fordelinger = listOf(buildArbeidsfordelingResponse(enhetNr, LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1), "Aktiv"))
-        val enhet = finnAktivBehandlendeEnhet(fordelinger, "")
-        Assertions.assertThat(enhet).isEqualTo(enhetNr)
+    fun `behandlende enhet gjelder _ikke_ utland`() {
+        coEvery { pdlClient.fullPerson(mockFnr) } returns mockPerson
+        coEvery { norg2Client.hentBehandlendeEnhet(any(), any()) } returns "0123"
+
+        val gjelderUtland = behandlendeEnhetService.gjelderUtland(mockFnr)
+        Assertions.assertThat(gjelderUtland).isEqualTo(false)
     }
 
     @Test
-    fun skal_ikke_finne_aktiv_arbeidsfordeling() {
-        val fordelinger = emptyList<ArbeidsfordelingResponse>()
-        assertThatThrownBy {
-            finnAktivBehandlendeEnhet(fordelinger, "")
-        }.isInstanceOf(IngenAktivEnhetException::class.java)
+    fun `finner ikke behandlende enhet`() {
+        coEvery { pdlClient.fullPerson(mockFnr) } returns mockPerson
+        coEvery { norg2Client.hentBehandlendeEnhet(any(), any()) } returns null
+
+        assertThrows<RuntimeException> {
+            behandlendeEnhetService.gjelderUtland(mockFnr)
+        }
     }
-
-    private fun mockFullPerson() =
-        FullPerson(
-            navn = PersonNavn("Jeppe", "På", "Bjerget"),
-            foedselsdato = 1.januar(1986),
-            ident = fnr,
-            diskresjonskode = "SPFO",
-            geografiskTilknytning = "1851",
-        )
-
-    private fun mockUtsattOppgave(): UtsattOppgaveEntitet =
-        UtsattOppgaveEntitet(
-            id = 0,
-            inntektsmeldingId = uuid,
-            arkivreferanse = "",
-            fnr = fnr,
-            aktørId = "",
-            journalpostId = "",
-            timeout = 1.januar.atStartOfDay(),
-            tilstand = Tilstand.Opprettet,
-            enhet = "",
-            gosysOppgaveId = null,
-            oppdatert = null,
-            speil = true,
-            utbetalingBruker = true,
-        )
 }
+
+private val mockFnr = Fnr.genererGyldig().toString()
+private val mockPerson =
+    FullPerson(
+        navn = PersonNavn("Jeppe", "På", "Bjerget"),
+        foedselsdato = 1.januar(1986),
+        ident = mockFnr,
+        diskresjonskode = "SPFO",
+        geografiskTilknytning = "1851",
+    )
